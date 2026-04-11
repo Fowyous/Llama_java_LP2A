@@ -1,0 +1,113 @@
+@startuml
+' Llama Board Game UML (Java)
+
+package "Model" {
+  class Game {
+    - players: List<Player>
+    - drawPile: Deck
+    - discardPile: Deck
+    - tokens: Tokens
+    - currentPlayerIndex: int
+    + start(): void
+    + nextTurn(): void
+    + applyMove(move: Move): void
+    + isOver(): boolean
+    + getWinner(): Player
+  }
+
+class Player {
+- name: String
+- hand: List
+- tokenType: TokenType
+- isHuman: boolean
+- score: int
++ addCard(card: CardType): void
++ removeCard(card: CardType): void
++ changeState(state: State): void
++ addToken(token: TokenType): void
+}
+
+class Tokens {
+- tokens: Map<TokenType, Integer>
++ createFull(): Tokens
++ isEmpty(type: TokenType): boolean
++ takeToken(type: TokenType): boolean
+}
+
+class Deck {
+- cards: Queue
++ shuffle(): void
++ draw(): CardType
++ peek(): CardType
++ isEmpty(): boolean
++ add(card: CardType): void
++ createFull(): Deck
+}
+
+
+  class Move {
+    - player: Player
+    - type: MoveType
+    - card: CardType
+    - token: TokenType
+    + execute(game: Game): void
+  }
+
+  class RuleEngine {
+    - rules: List<Rule>
+    + validateMove(move: Move, game: Game): boolean
+    + applyRules(move: Move, game: Game): void
+  }
+
+  interface Rule {
+    + isApplicable(move: Move, game: Game): boolean
+    + apply(move: Move, game: Game): void
+  }
+
+enum MoveType {
+    TAKETOKEN
+    GIVETOKEN
+    TAKECARD
+    GIVECARD
+}
+
+enum State {
+    QUITTING
+    PLAYING
+}
+
+enum TokenType {
+    BLACK
+    WHITE
+}
+
+enum CardType {
+    ONE
+    TWO
+    THREE
+    FOUR
+    FIVE
+    SIX
+    LLAMA
+}
+}
+
+
+' Relationships
+Game "1" *-- "*" Player : players
+Game "1" *-- "1" Deck : drawPile
+Game "1" *-- "1" Deck : discardPile
+Game "1" *-- "1" Tokens : tokens
+
+Player "1" --> "0..1" Game : currentGame
+Move "1" --> "1" Player
+Move "1" --> "0..1" Game
+Move "1" --> "0..1" TokenType
+Move "1" --> "0..1" CardType
+
+Deck "1" *-- "*" CardType : cards
+
+RuleEngine "1" o-- "*" Rule : rules
+Rule <|.. RuleEngine
+
+@enduml
