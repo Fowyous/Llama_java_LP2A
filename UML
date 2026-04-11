@@ -14,12 +14,17 @@ package "Model" {
     + isOver(): boolean
     + getWinner(): Player
   }
+class Bot {
 
+    difficulty: Difficulty
+
+    decideMove(game: Game): Move
+    setDifficulty(d: Difficulty): void 
+} 
 class Player {
 - name: String
 - hand: List
 - tokenType: TokenType
-- isHuman: boolean
 - score: int
 + addCard(card: CardType): void
 + removeCard(card: CardType): void
@@ -64,6 +69,11 @@ class Deck {
     + apply(move: Move, game: Game): void
   }
 
+enum Difficulty { 
+    EASY 
+    MEDIUM 
+    HARD 
+}
 enum MoveType {
     TAKETOKEN
     GIVETOKEN
@@ -108,6 +118,8 @@ Move "1" --> "0..1" CardType
 Deck "1" *-- "*" CardType : cards
 
 RuleEngine "1" o-- "*" Rule : rules
+Bot -|> "extends" Player
+Game "1" *-- "*" Bot : players
 Rule <|.. RuleEngine
 
 @enduml
