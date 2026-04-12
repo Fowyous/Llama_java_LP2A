@@ -102,7 +102,6 @@ enum CardType {
 }
 }
 
-
 ' Relationships
 Game "1" *-- "*" Player : players
 Game "1" *-- "1" Deck : drawPile
@@ -122,4 +121,106 @@ Bot -|> "extends" Player
 Game "1" *-- "*" Bot : players
 Rule <|.. RuleEngine
 
+package "view"{
+class MainFrame {
+        - currentScreen: JPanel
+        + showMenu(): void
+        + showSettings(): void
+        + showGame(): void
+    }
+
+    class MenuView {
+        - btnStart: Button
+        - btnSettings: Button
+        - btnQuit: Button
+        + onStartClicked(): void
+    }
+
+    class SettingsView {
+        - comboNbPlayers: ComboBox
+        - comboDifficulty: ComboBox
+        + saveSettings(): void
+    }
+
+    class BoardView {
+        - drawPile: DrawPileView
+        - discardPile: DiscardPileView
+        - players: List<PlayerView>
+        - currentPlayerPanel: PlayerView
+        + updateBoard(gameModel: Game): void
+    }
+
+    class PlayerView {
+        - playerName: String
+        - handView: HandView
+        - scoreLabel: Label
+        - isBot: boolean
+        + displayPlayerInfo(): void
+    }
+
+    class CardView {
+        - image: Image
+        - type: CardType
+        + render(): void
+    }
+
+    class HandView {
+        - cards: List<CardView>
+        + layoutCards(): void
+    }
+}
+
+' Relationships
+MainFrame "1" *-- "1" MenuView
+MainFrame "1" *-- "1" SettingsView
+MainFrame "1" *-- "1" BoardView
+
+BoardView "1" *-- "1..*" PlayerView : contains
+BoardView "1" *-- "1" CardView : shows_piles
+
+PlayerView "1" *-- "1" HandView
+HandView "1" *-- "*" CardView
+
+package "Controller" {
+
+    class GameController {
+        - gameModel: Game
+        - mainFrame: MainFrame
+        + GameController(model: Game, view: MainFrame)
+        + initController(): void
+        + startGame(): void
+        + showSettings(): void
+    }
+
+    class BoardController {
+        - gameModel: Game
+        - boardView: BoardView
+        + handleDrawCard(): void
+        + handlePlayCard(card: CardType): void
+        + handleQuitRound(): void
+        - updateView(): void
+        - checkBotTurn(): void
+    }
+
+    class MenuController {
+        - mainFrame: MainFrame
+        + handleStartGame(): void
+        + handleOpenSettings(): void
+        + handleExit(): void
+    }
+
+    class SettingsController {
+        - gameModel: Game
+        - settingsView: SettingsView
+        + handleSaveSettings(nbPlayers: int, diff: Difficulty): void
+    }
+}
+
+' Relations avec les autres couches (simplifiées)
+GameController "1" --> "1" MenuController
+GameController "1" --> "1" BoardController
+GameController "1" --> "1" SettingsController
+
+BoardController ..> "Model" Game : modifies
+BoardController ..> "View" BoardView : updates
 @enduml
