@@ -1,61 +1,80 @@
 @startuml
-' Llama Board Game UML (Java)
+' Llama Board Game UML corrigé (Java)
 
 package "Model" {
+
   class Game {
     - players: List<Player>
     - drawPile: Deck
     - discardPile: Deck
     - tokens: Tokens
     - currentPlayerIndex: int
+    - currentRound: Round
     + start(): void
     + nextTurn(): void
     + applyMove(move: Move): void
     + isOver(): boolean
     + getWinner(): Player
   }
-class Bot {
 
-    difficulty: Difficulty
+  ' AJOUT : classe Round pour modéliser les manches
+  class Round {
+    - roundNumber: int
+    - activePlayers: List<Player>
+    + startRound(players: List<Player>): void
+    + isOver(): boolean
+    + endRound(): void
+    + distributeTokens(): void
+  }
 
-    decideMove(game: Game): Move
-    setDifficulty(d: Difficulty): void 
-} 
-class Player {
-- name: String
-- hand: List
-- tokenType: TokenType
-- score: int
-+ addCard(card: CardType): void
-+ removeCard(card: CardType): void
-+ changeState(state: State): void
-+ addToken(token: TokenType): void
-}
+  class Bot {
+    ' CORRECTION : modificateur de visibilité ajouté
+    - difficulty: Difficulty
+    + decideMove(game: Game): Move
+    + setDifficulty(d: Difficulty): void
+  }
 
-class Tokens {
-- tokens: Map<TokenType, Integer>
-+ createFull(): Tokens
-+ isEmpty(type: TokenType): boolean
-+ takeToken(type: TokenType): boolean
-}
+  class Player {
+    - name: String
+    ' CORRECTION : type générique List<CardType> (était List brut)
+    - hand: List<CardType>
+    ' CORRECTION : était tokenType: TokenType (un seul type)
+    ' Un joueur possède plusieurs jetons des deux types
+    - tokens: Map<TokenType, Integer>
+    - score: int
+    - state: State
+    + addCard(card: CardType): void
+    + removeCard(card: CardType): void
+    + changeState(state: State): void
+    + addToken(token: TokenType): void
+    + removeToken(token: TokenType): void
+    + computeScore(): int
+  }
 
-class Deck {
-- cards: Queue
-+ shuffle(): void
-+ draw(): CardType
-+ peek(): CardType
-+ isEmpty(): boolean
-+ add(card: CardType): void
-+ createFull(): Deck
-}
+  class Tokens {
+    - tokens: Map<TokenType, Integer>
+    + createFull(): Tokens
+    + isEmpty(type: TokenType): boolean
+    + takeToken(type: TokenType): boolean
+  }
 
+  class Deck {
+    ' CORRECTION : type générique Queue<CardType> (était Queue brut)
+    - cards: Queue<CardType>
+    + shuffle(): void
+    + draw(): CardType
+    + peek(): CardType
+    + isEmpty(): boolean
+    + add(card: CardType): void
+    + createFull(): Deck
+  }
 
+  ' CORRECTION : Move est un objet de données — execute() supprimé
+  ' L'exécution appartient à Game/RuleEngine, pas à Move
   class Move {
     - player: Player
     - type: MoveType
     - card: CardType
-    - token: TokenType
-    + execute(game: Game): void
   }
 
   class RuleEngine {
@@ -69,29 +88,31 @@ class Deck {
     + apply(move: Move, game: Game): void
   }
 
-enum Difficulty { 
-    EASY 
-    MEDIUM 
-    HARD 
-}
-enum MoveType {
-    TAKETOKEN
-    GIVETOKEN
-    TAKECARD
-    GIVECARD
-}
+  enum Difficulty {
+    EASY
+    MEDIUM
+    HARD
+  }
 
-enum State {
+  ' CORRECTION : les vrais coups du jeu L.A.M.A.
+  ' TAKETOKEN/GIVETOKEN supprimés : ils sont automatiques en fin de manche
+  enum MoveType {
+    PLAY_CARD
+    DRAW_CARD
+    QUIT_ROUND
+  }
+
+  enum State {
     QUITTING
     PLAYING
-}
+  }
 
-enum TokenType {
+  enum TokenType {
     BLACK
     WHITE
-}
+  }
 
-enum CardType {
+  enum CardType {
     ONE
     TWO
     THREE
@@ -99,128 +120,149 @@ enum CardType {
     FIVE
     SIX
     LLAMA
-}
+  }
 }
 
-' Relationships
+' Compositions du jeu
 Game "1" *-- "*" Player : players
 Game "1" *-- "1" Deck : drawPile
 Game "1" *-- "1" Deck : discardPile
 Game "1" *-- "1" Tokens : tokens
+' AJOUT : composition avec Round
+Game "1" *-- "1" Round : currentRound
 
-Player "1" --> "0..1" Game : currentGame
+Round "1" --> "*" Player : activePlayers
+
+' CORRECTION : référence circulaire Player -> Game supprimée (inutile)
+
 Move "1" --> "1" Player
-Move "1" --> "0..1" Game
-Move "1" --> "0..1" TokenType
 Move "1" --> "0..1" CardType
+' CORRECTION : Move.token supprimé (token n'est pas une donnée d'un coup joué)
 
 Deck "1" *-- "*" CardType : cards
 
 RuleEngine "1" o-- "*" Rule : rules
-Bot -|> "extends" Player
-Game "1" *-- "*" Bot : players
-Rule <|.. RuleEngine
+' CORRECTION : "Rule <|.. RuleEngine" supprimé (était faux : RuleEngine implémente Rule ?)
+' RuleEngine utilise Rule, il ne l'implémente pas
+RuleEngine ..> Rule : uses
 
-package "view"{
-class MainFrame {
-        - currentScreen: JPanel
-        + showMenu(): void
-        + showSettings(): void
-        + showGame(): void
-    }
+' CORRECTION : "Game *-- Bot" supprimé — Bot hérite de Player, déjà composé dans Game
+Bot --|> Player
 
-    class MenuView {
-        - btnStart: Button
-        - btnSettings: Button
-        - btnQuit: Button
-        + onStartClicked(): void
-    }
+package "View" {
 
-    class SettingsView {
-        - comboNbPlayers: ComboBox
-        - comboDifficulty: ComboBox
-        + saveSettings(): void
-    }
+  class MainFrame {
+    - currentScreen: JPanel
+    + showMenu(): void
+    + showSettings(): void
+    + showGame(): void
+  }
 
-    class BoardView {
-        - drawPile: DrawPileView
-        - discardPile: DiscardPileView
-        - players: List<PlayerView>
-        - currentPlayerPanel: PlayerView
-        + updateBoard(gameModel: Game): void
-    }
+  class MenuView {
+    - btnStart: Button
+    - btnSettings: Button
+    - btnQuit: Button
+    + onStartClicked(): void
+  }
 
-    class PlayerView {
-        - playerName: String
-        - handView: HandView
-        - scoreLabel: Label
-        - isBot: boolean
-        + displayPlayerInfo(): void
-    }
+  class SettingsView {
+    - comboNbPlayers: ComboBox
+    - comboDifficulty: ComboBox
+    + saveSettings(): void
+  }
 
-    class CardView {
-        - image: Image
-        - type: CardType
-        + render(): void
-    }
+  class BoardView {
+    ' CORRECTION : deux vues de piles distinctes (DrawPileView + DiscardPileView)
+    - drawPileView: DrawPileView
+    - discardPileView: DiscardPileView
+    - players: List<PlayerView>
+    - currentPlayerPanel: PlayerView
+    + updateBoard(gameModel: Game): void
+  }
 
-    class HandView {
-        - cards: List<CardView>
-        + layoutCards(): void
-    }
+  ' AJOUT : DrawPileView et DiscardPileView séparés
+  class DrawPileView {
+    + render(): void
+  }
+
+  class DiscardPileView {
+    - topCard: CardView
+    + render(): void
+  }
+
+  class PlayerView {
+    - playerName: String
+    - handView: HandView
+    - scoreLabel: Label
+    - isBot: boolean
+    + displayPlayerInfo(): void
+  }
+
+  class CardView {
+    - image: Image
+    - type: CardType
+    + render(): void
+  }
+
+  class HandView {
+    - cards: List<CardView>
+    + layoutCards(): void
+  }
 }
 
-' Relationships
 MainFrame "1" *-- "1" MenuView
 MainFrame "1" *-- "1" SettingsView
 MainFrame "1" *-- "1" BoardView
 
+' CORRECTION : BoardView composée avec DrawPileView et DiscardPileView
+BoardView "1" *-- "1" DrawPileView
+BoardView "1" *-- "1" DiscardPileView
 BoardView "1" *-- "1..*" PlayerView : contains
-BoardView "1" *-- "1" CardView : shows_piles
 
 PlayerView "1" *-- "1" HandView
 HandView "1" *-- "*" CardView
+DiscardPileView "1" *-- "1" CardView
 
 package "Controller" {
 
-    class GameController {
-        - gameModel: Game
-        - mainFrame: MainFrame
-        + GameController(model: Game, view: MainFrame)
-        + initController(): void
-        + startGame(): void
-        + showSettings(): void
-    }
+  class GameController {
+    - gameModel: Game
+    - mainFrame: MainFrame
+    + GameController(model: Game, view: MainFrame)
+    + initController(): void
+    + startGame(): void
+    + showSettings(): void
+  }
 
-    class BoardController {
-        - gameModel: Game
-        - boardView: BoardView
-        + handleDrawCard(): void
-        + handlePlayCard(card: CardType): void
-        + handleQuitRound(): void
-        - updateView(): void
-        - checkBotTurn(): void
-    }
+  class BoardController {
+    - gameModel: Game
+    - boardView: BoardView
+    + handleDrawCard(): void
+    + handlePlayCard(card: CardType): void
+    + handleQuitRound(): void
+    - updateView(): void
+    - checkBotTurn(): void
+  }
 
-    class MenuController {
-        - mainFrame: MainFrame
-        + handleStartGame(): void
-        + handleOpenSettings(): void
-        + handleExit(): void
-    }
+  class MenuController {
+    - mainFrame: MainFrame
+    + handleStartGame(): void
+    + handleOpenSettings(): void
+    + handleExit(): void
+  }
 
-    class SettingsController {
-        - gameModel: Game
-        - settingsView: SettingsView
-        + handleSaveSettings(nbPlayers: int, diff: Difficulty): void
-    }
+  class SettingsController {
+    - gameModel: Game
+    - settingsView: SettingsView
+    + handleSaveSettings(nbPlayers: int, diff: Difficulty): void
+  }
 }
 
-' Relations avec les autres couches (simplifiées)
 GameController "1" --> "1" MenuController
 GameController "1" --> "1" BoardController
 GameController "1" --> "1" SettingsController
 
-BoardController ..> "Model" Game : modifies
-BoardController ..> "View" BoardView : updates
+BoardController ..> Game : modifies
+BoardController ..> BoardView : updates
+
 @enduml
