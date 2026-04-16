@@ -171,17 +171,7 @@ package "View" {
     + saveSettings(): void
   }
 
-  class BoardView {
-    ' CORRECTION : deux vues de piles distinctes (DrawPileView + DiscardPileView)
-    - drawPileView: DrawPileView
-    - discardPileView: DiscardPileView
-    - players: List<PlayerView>
-    - currentPlayerPanel: PlayerView
-    + updateBoard(gameModel: Game): void
-  }
-
-  ' AJOUT : DrawPileView et DiscardPileView séparés
-  class DrawPileView {
+class DrawPileView {
     + render(): void
   }
 
@@ -191,12 +181,29 @@ package "View" {
   }
 
   class PlayerView {
-    - playerName: String
-    - handView: HandView
-    - scoreLabel: Label
-    - isBot: boolean
-    + displayPlayerInfo(): void
-  }
+  - playerName: String
+  - handView: HandView
+  - scoreLabel: Label
+  - position: Position
+  - isBot: boolean
+  + displayPlayerInfo(): void
+  - applyLayout(): void   ' adapte le rendu selon position
+}
+
+enum Position {
+  SOUTH
+  NORTH
+  EAST
+  WEST
+}
+
+class BoardView {
+  - drawPileView: DrawPileView
+  - discardPileView: DiscardPileView
+  - playerViews: Map<Position, PlayerView>
+  + updateBoard(game: Game): void
+  + addPlayer(player: Player, pos: Position): void
+}
 
   class CardView {
     - image: Image
