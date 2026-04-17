@@ -1,4 +1,7 @@
 package main.java.com.utbm.lama.model.rules;
 
-public interface PlayCarRule {
+import main.java.com.utbm.lama.model.enums.CardType;
+
+public interface PlayCardRule {
+
 }
