@@ -52,11 +52,17 @@ public class Player {
         return Collections.unmodifiableList(hand);
     }
 
-    public boolean hasEmptyHand() { return hand.isEmpty(); }
+    public boolean hasEmptyHand() {
+        return hand.isEmpty();
+    }
 
-    public boolean hasCard(CardType card) { return hand.contains(card); }
+    public boolean hasCard(CardType card) {
+        return hand.contains(card);
+    }
 
-    public void clearHand() { hand.clear(); }
+    public void clearHand() {
+        hand.clear();
+    }
 
     public void addToken(TokenType token) {
         tokens.put(token, tokens.get(token) + 1);
