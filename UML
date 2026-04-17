@@ -1,5 +1,4 @@
 @startuml
-' Llama Board Game UML corrigé (Java)
 
 package "Model" {
 
@@ -17,7 +16,6 @@ package "Model" {
     + getWinner(): Player
   }
 
-  ' AJOUT : classe Round pour modéliser les manches
   class Round {
     - roundNumber: int
     - activePlayers: List<Player>
@@ -28,7 +26,6 @@ package "Model" {
   }
 
   class Bot {
-    ' CORRECTION : modificateur de visibilité ajouté
     - difficulty: Difficulty
     + decideMove(game: Game): Move
     + setDifficulty(d: Difficulty): void
@@ -36,10 +33,7 @@ package "Model" {
 
   class Player {
     - name: String
-    ' CORRECTION : type générique List<CardType> (était List brut)
     - hand: List<CardType>
-    ' CORRECTION : était tokenType: TokenType (un seul type)
-    ' Un joueur possède plusieurs jetons des deux types
     - tokens: Map<TokenType, Integer>
     - score: int
     - state: State
@@ -59,7 +53,6 @@ package "Model" {
   }
 
   class Deck {
-    ' CORRECTION : type générique Queue<CardType> (était Queue brut)
     - cards: Queue<CardType>
     + shuffle(): void
     + draw(): CardType
@@ -69,8 +62,6 @@ package "Model" {
     + createFull(): Deck
   }
 
-  ' CORRECTION : Move est un objet de données — execute() supprimé
-  ' L'exécution appartient à Game/RuleEngine, pas à Move
   class Move {
     - player: Player
     - type: MoveType
@@ -94,8 +85,6 @@ package "Model" {
     HARD
   }
 
-  ' CORRECTION : les vrais coups du jeu L.A.M.A.
-  ' TAKETOKEN/GIVETOKEN supprimés : ils sont automatiques en fin de manche
   enum MoveType {
     PLAY_CARD
     DRAW_CARD
@@ -132,21 +121,12 @@ Game "1" *-- "1" Tokens : tokens
 Game "1" *-- "1" Round : currentRound
 
 Round "1" --> "*" Player : activePlayers
-
-' CORRECTION : référence circulaire Player -> Game supprimée (inutile)
-
 Move "1" --> "1" Player
 Move "1" --> "0..1" CardType
-' CORRECTION : Move.token supprimé (token n'est pas une donnée d'un coup joué)
-
 Deck "1" *-- "*" CardType : cards
 
 RuleEngine "1" o-- "*" Rule : rules
-' CORRECTION : "Rule <|.. RuleEngine" supprimé (était faux : RuleEngine implémente Rule ?)
-' RuleEngine utilise Rule, il ne l'implémente pas
 RuleEngine ..> Rule : uses
-
-' CORRECTION : "Game *-- Bot" supprimé — Bot hérite de Player, déjà composé dans Game
 Bot --|> Player
 
 package "View" {
@@ -187,7 +167,7 @@ class DrawPileView {
   - position: Position
   - isBot: boolean
   + displayPlayerInfo(): void
-  - applyLayout(): void   ' adapte le rendu selon position
+  - applyLayout(): void
 }
 
 enum Position {
@@ -221,7 +201,6 @@ MainFrame "1" *-- "1" MenuView
 MainFrame "1" *-- "1" SettingsView
 MainFrame "1" *-- "1" BoardView
 
-' CORRECTION : BoardView composée avec DrawPileView et DiscardPileView
 BoardView "1" *-- "1" DrawPileView
 BoardView "1" *-- "1" DiscardPileView
 BoardView "1" *-- "1..*" PlayerView : contains
