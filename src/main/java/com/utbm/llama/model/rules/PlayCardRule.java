@@ -1,6 +1,11 @@
 package main.java.com.utbm.llama.model.rules;
 
+import main.java.com.utbm.llama.model.Game;
+import main.java.com.utbm.llama.model.Move;
 import main.java.com.utbm.llama.model.enums.CardType;
+import main.java.com.utbm.llama.model.enums.MoveType;
+
+import java.util.Map;
 
 import java.util.Map;
 import java.util.Objects;

@@ -1,5 +1,4 @@
 package main.java.com.utbm.llama.model.rules;
-package main.java.com.utbm.llama.model;
 
 import main.java.com.utbm.llama.model.Game;
 import main.java.com.utbm.llama.model.Move;

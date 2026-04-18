@@ -1,5 +1,12 @@
 package main.java.com.utbm.llama.model.rules;
 
+import main.java.com.utbm.llama.model.Deck;
+import main.java.com.utbm.llama.model.Game;
+import main.java.com.utbm.llama.model.Move;
+import main.java.com.utbm.llama.model.Player;
+import main.java.com.utbm.llama.model.enums.MoveType;
+import main.java.com.utbm.llama.model.enums.State;
+
 public class DrawCardRule implements Rule{
 	@Override
 	public boolean isApplicable(Move move, Game game){
