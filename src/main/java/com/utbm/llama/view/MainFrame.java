@@ -18,8 +18,8 @@ public class MainFrame extends JFrame {
     private final MenuView menuView;
     private final SettingsView settingsView;
     private BoardView boardView;
-    /*private JuryView           juryView;
-    private CesureView         cesureView;*/
+    private JuryView           juryView;
+    private CesureView         cesureView;
 
     private final CardLayout cardLayout;
     private final JPanel     contentPanel;
@@ -78,7 +78,7 @@ public class MainFrame extends JFrame {
      *
      * @param juryView la vue du jury à afficher
      */
-    /*public void showJury(JuryView juryView) {
+    public void showJury(JuryView juryView) {
         if (this.juryView != null) {
             contentPanel.remove(this.juryView);
         }
@@ -87,14 +87,14 @@ public class MainFrame extends JFrame {
         cardLayout.show(contentPanel, SCREEN_JURY);
         revalidate();
         repaint();
-    }*/
+    }
 
     /**
      * Affiche l'écran de semestre de césure.
      *
      * @param cesureView la vue de césure à afficher
      */
-    /*public void showCesure(CesureView cesureView) {
+    public void showCesure(CesureView cesureView) {
         if (this.cesureView != null) {
             contentPanel.remove(this.cesureView);
         }
@@ -103,7 +103,7 @@ public class MainFrame extends JFrame {
         cardLayout.show(contentPanel, SCREEN_CESURE);
         revalidate();
         repaint();
-    }*/
+    }
 
 
     public MenuView     getMenuView()     {
@@ -115,6 +115,10 @@ public class MainFrame extends JFrame {
     public BoardView    getBoardView()    {
         return boardView;
     }
-    /*public JuryView     getJuryView()     { return juryView; }
-    public CesureView   getCesureView()   { return cesureView; }*/
+    public JuryView     getJuryView()     {
+        return juryView;
+    }
+    public CesureView   getCesureView()   {
+        return cesureView;
+    }
 }

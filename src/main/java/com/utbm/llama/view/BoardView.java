@@ -1,8 +1,8 @@
 package main.java.com.utbm.llama.view;
 
 import main.java.com.utbm.llama.model.enums.CardType;
-import main.java.com.utbm.llama.model.Game;
-import main.java.com.utbm.llama.model.Player;
+import test.java.com.utbm.modeltest.Game;
+import test.java.com.utbm.modeltest.Player;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -253,5 +253,9 @@ public class BoardView extends JPanel {
     }
     public List<PlayerView> getPlayerViews(){
         return playerViews;
+    }
+
+    public void updateBoard(Game game, Player localPlayer) {
+
     }
 }
