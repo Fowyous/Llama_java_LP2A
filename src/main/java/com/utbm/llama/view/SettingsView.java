@@ -32,7 +32,7 @@ public class SettingsView extends JPanel {
         setLayout(new BorderLayout());
         setBackground(BG);
 
-        comboNbPlayers  = buildCombo(new Integer[]{2, 3, 4, 5, 6});
+        comboNbPlayers  = buildCombo(new Integer[]{2, 3, 4});
         comboDifficulty = buildCombo(Difficulty.values());
         comboGameMode   = buildCombo(GameMode.values());
 
