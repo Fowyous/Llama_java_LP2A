@@ -1,4 +1,4 @@
 package main.java.com.utbm.llama.model.rules;
 
-public interface DrawCardRule {
+public interface QuitRoundRule {
 }

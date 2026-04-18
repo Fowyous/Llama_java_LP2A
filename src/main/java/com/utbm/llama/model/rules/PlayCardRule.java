@@ -1,6 +1,6 @@
-package main.java.com.utbm.lama.model.rules;
+package main.java.com.utbm.llama.model.rules;
 
-import main.java.com.utbm.lama.model.enums.CardType;
+import main.java.com.utbm.llama.model.enums.CardType;
 
 /**
  * this is the rule where we determine what card the player is allowed to play depending on the card on
