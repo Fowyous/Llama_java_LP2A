@@ -5,51 +5,46 @@ import main.java.com.utbm.llama.model.enums.CardType;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
-import java.util.Queue;
 
 /**
- * Représente un paquet de cartes (pioche ou défausse).
- * Le jeu L.A.M.A. contient 56 cartes : 8 exemplaires de chaque
- * valeur (ONE à LLAMA), soit 7 × 8 = 56 cartes.
- * Cette classe est utilisée à deux endroits différents dans Game :
- *   - drawPile  (pioche) — on pioche depuis le dessus
- *   - discardPile (défausse) — on pose sur le dessus, on consulte le dessus
- * L'implémentation interne utilise une ArrayDeque pour des
- * opérations O(1) en tête et en queue.
+ * Représente un tas de cartes (pioche ou défausse).
+ * Implémenté comme une Deque :
+ *  - On pioche depuis le HAUT (pollFirst)
+ *  - On ajoute au HAUT (addFirst = défausse) ou en bas (addLast = remplissage)
+ * Usage :
+ *  Deck draw    = Deck.createFull();   // pioche complète mélangée
+ *  Deck discard = Deck.empty();        // défausse vide
  */
 public class Deck {
 
-    /** Nombre d'exemplaires de chaque carte dans un paquet complet. */
-    public static final int COPIES_PER_CARD = 8;
-
-    private final ArrayDeque<CardType> cards;
+    private final Deque<CardType> cards = new ArrayDeque<>();
 
     /**
-     * Crée un paquet vide.
-     */
-    public Deck() {
-        this.cards = new ArrayDeque<>();
-    }
-
-    /**
-     * Crée un paquet plein (56 cartes) non mélangé.
-     * Appeler {@link #shuffle()} après la création pour l'utiliser comme pioche.
+     * Crée une pioche complète (8 exemplaires de chaque carte = 56 cartes)
+     * et la mélange.
      */
     public static Deck createFull() {
         Deck deck = new Deck();
-        for (CardType type : CardType.values()) {
-            for (int i = 0; i < COPIES_PER_CARD; i++) {
-                deck.cards.addLast(type);
+        for (int i = 0; i < 8; i++) {
+            for (CardType ct : CardType.values()) {
+                deck.cards.addLast(ct);
             }
         }
+        deck.shuffle();
         return deck;
     }
 
+    /** Crée une pile vide (utilisée pour la défausse au démarrage). */
+    public static Deck empty() {
+        return new Deck();
+    }
+
+    private Deck() {}
+
     /**
-     * Mélange aléatoirement les cartes du paquet.
-     * Utilise {@link Collections#shuffle} — peut être seedé en test
-     * en passant par la version surchargée.
+     * Mélange aléatoirement toutes les cartes du tas.
      */
     public void shuffle() {
         List<CardType> list = new ArrayList<>(cards);
@@ -59,43 +54,27 @@ public class Deck {
     }
 
     /**
-     * Mélange avec un générateur aléatoire fixe (utile pour les tests).
+     * Retire et retourne la carte du dessus.
      *
-     * @param random instance de java.util.Random à utiliser
-     */
-    public void shuffle(java.util.Random random) {
-        List<CardType> list = new ArrayList<>(cards);
-        Collections.shuffle(list, random);
-        cards.clear();
-        cards.addAll(list);
-    }
-
-    /**
-     * Pioche la carte du dessus du paquet.
-     *
-     * @return la carte piochée
-     * @throws java.util.NoSuchElementException si le paquet est vide
+     * @return la carte du dessus, ou {@code null} si le tas est vide
      */
     public CardType draw() {
-        if (isEmpty()) {
-            throw new java.util.NoSuchElementException("La pioche est vide");
-        }
-        return cards.removeFirst();
+        return cards.pollFirst();
     }
 
     /**
-     * Consulte la carte du dessus sans la retirer.
+     * Retourne la carte du dessus SANS la retirer.
      *
-     * @return la carte du dessus, ou null si le paquet est vide
+     * @return la carte du dessus, ou {@code null} si le tas est vide
      */
     public CardType peek() {
         return cards.peekFirst();
     }
 
     /**
-     * Pose une carte sur le dessus du paquet (défausse).
+     * Ajoute une carte AU DESSUS du tas (pour la défausse).
      *
-     * @param card carte à ajouter
+     * @param card la carte à poser
      */
     public void add(CardType card) {
         if (card == null) throw new IllegalArgumentException("Impossible d'ajouter une carte null");
@@ -103,22 +82,37 @@ public class Deck {
     }
 
     /**
-     * @return true si le paquet ne contient aucune carte
+     * @return true si le tas ne contient aucune carte
      */
     public boolean isEmpty() {
         return cards.isEmpty();
     }
 
     /**
-     * @return le nombre de cartes restantes dans le paquet
+     * @return le nombre de cartes dans le tas
      */
     public int size() {
         return cards.size();
     }
 
+    /**
+     * Retourne toutes les cartes sous forme de liste (copie défensive).
+     * La première carte de la liste est celle du dessus du tas.
+     */
+    public List<CardType> getCards() {
+        return new ArrayList<>(cards);
+    }
+
+    /**
+     * Vide complètement le tas.
+     * Utilisé en début de manche pour réinitialiser la défausse.
+     */
+    public void clear() {
+        cards.clear();
+    }
+
     @Override
     public String toString() {
-        return "Deck{taille=" + cards.size() +
-                ", dessus=" + (isEmpty() ? "vide" : peek()) + "}";
+        return "Deck[" + cards.size() + " cartes, dessus=" + peek() + "]";
     }
 }
