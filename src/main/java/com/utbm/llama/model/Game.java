@@ -1,4 +1,4 @@
-package main.java.com.utbm.lama.model;
+package main.java.com.utbm.llama.model;
 
 public class Game {
     Player player1;

@@ -1,8 +1,8 @@
-package main.java.com.utbm.lama.model;
+package main.java.com.utbm.llama.model;
 
-import main.java.com.utbm.lama.model.enums.CardType;
-import main.java.com.utbm.lama.model.enums.Difficulty;
-import main.java.com.utbm.lama.model.enums.MoveType;
+import main.java.com.utbm.llama.model.enums.CardType;
+import main.java.com.utbm.llama.model.enums.Difficulty;
+import main.java.com.utbm.llama.model.enums.MoveType;
 
 import java.util.List;
 import java.util.Random;

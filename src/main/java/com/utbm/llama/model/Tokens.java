@@ -1,6 +1,6 @@
-package main.java.com.utbm.lama.model;
+package main.java.com.utbm.llama.model;
 
-import main.java.com.utbm.lama.model.enums.TokenType;
+import main.java.com.utbm.llama.model.enums.TokenType;
 
 import java.util.EnumMap;
 import java.util.Map;

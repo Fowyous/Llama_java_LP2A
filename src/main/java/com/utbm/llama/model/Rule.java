@@ -1,9 +1,10 @@
-package main.java.com.utbm.lama.model;
+package main.java.com.utbm.llama.model;
 
-import main.java.com.utbm.lama.model.Game;
-import main.java.com.utbm.lama.model.Move;
+import main.java.com.utbm.llama.model.Game;
+import main.java.com.utbm.llama.model.Move;
 
 /**
+ *
  * Contrat qu'implémente chaque règle du jeu.
  * Le pattern Strategy est utilisé ici : chaque règle est un objet
  * indépendant que RuleEngine agrège. Pour ajouter une règle UTBM,
@@ -56,6 +57,6 @@ public interface Rule {
      * @return message décrivant pourquoi le coup est refusé
      */
     default String getErrorMessage(Move move, Game game) {
-        return "Coup invalide : " + move + " (règle : " + getClass().getSimpleName() + ")";
+        return "Invalid move : " + move + " (rule : " + getClass().getSimpleName() + ")";
     }
 }

@@ -1,8 +1,8 @@
-package main.java.com.utbm.lama.model;
+package main.java.com.utbm.llama.model;
 
-import main.java.com.utbm.lama.model.enums.CardType;
-import main.java.com.utbm.lama.model.enums.State;
-import main.java.com.utbm.lama.model.enums.TokenType;
+import main.java.com.utbm.llama.model.enums.CardType;
+import main.java.com.utbm.llama.model.enums.State;
+import main.java.com.utbm.llama.model.enums.TokenType;
 
 import java.util.ArrayList;
 import java.util.Collections;

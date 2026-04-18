@@ -1,9 +1,13 @@
+package main.java.com.utbm.lama.model.rules;
+
+import main.java.com.utbm.lama.model.enums.CardType;
+
 /**
  * this is the rule where we determine what card the player is allowed to play depending on the card on
  * top of the discard pile. For example if the discard pile has a one the player can only play a two.
  */
 
-public class PlayingCardRule implements Rule {
+public class PlayCardRule implements Rule {
 
 	//this map contains on the left the card type of the top card and on the right the card type of the card that we can play and doesn't violate the rules of the game.
 	private static final Map<CardType, CardType> VALID_NEXT_CARDS = Map.ofEntries(
