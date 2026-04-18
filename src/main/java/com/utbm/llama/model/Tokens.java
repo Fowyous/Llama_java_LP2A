@@ -8,8 +8,8 @@ import java.util.Map;
 /**
  * Stock central de jetons de la partie.
  * Le jeu L.A.M.A. de base contient :
- *   - 40 jetons blancs (valeur 1)
- *   - 20 jetons noirs  (valeur 10)
+ * - 40 jetons blancs (valeur 1)
+ * - 20 jetons noirs  (valeur 10)
  * Cette classe représente la "banque" commune, pas les jetons
  * détenus par un joueur (ceux-ci sont dans Player).
  * Les constantes INITIAL_WHITE et INITIAL_BLACK sont modifiables

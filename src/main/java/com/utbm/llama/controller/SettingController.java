@@ -37,11 +37,7 @@ public class SettingController {
 
     private void initListeners() {
 
-        settingsView.addSaveListener(e -> handleSaveSettings(
-                settingsView.getNbPlayers(),
-                settingsView.getDifficulty(),
-                settingsView.getGameMode()
-        ));
+        settingsView.addSaveListener(e -> handleSaveSettings(settingsView.getNbPlayers(), settingsView.getDifficulty(), settingsView.getGameMode()));
 
         settingsView.addBackListener(e -> mainFrame.showMenu());
     }
@@ -78,8 +74,7 @@ public class SettingController {
 
         players.add(new Player("Joueur"));
 
-        String[] botNames = {"IA — Étudiant A", "IA — Étudiant B", "IA — Étudiant C",
-                "IA — Étudiant D", "IA — Étudiant E"};
+        String[] botNames = {"IA — Étudiant A", "IA — Étudiant B", "IA — Étudiant C", "IA — Étudiant D", "IA — Étudiant E"};
 
         for (int i = 1; i < nbPlayers; i++) {
             players.add(new Bot(botNames[i - 1], difficulty));

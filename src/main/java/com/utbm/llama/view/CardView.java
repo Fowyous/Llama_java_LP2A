@@ -11,40 +11,44 @@ import java.awt.geom.RoundRectangle2D;
 /**
  * Composant visuel représentant une carte du jeu LAMA.
  * Peut être :
- *  - face visible  (type connu)
- *  - face cachée   (mode jury ou dos de pioche)
- *  - sélectionnable (dans HandView ou JuryView)
+ * - face visible  (type connu)
+ * - face cachée   (mode jury ou dos de pioche)
+ * - sélectionnable (dans HandView ou JuryView)
  */
 public class CardView extends JPanel {
 
     public static final int CARD_W = 80;
     public static final int CARD_H = 120;
-    private static final int ARC   = 12;
+    private static final int ARC = 12;
 
-    private static final Color CARD_BG      = Color.decode("#FAF5E4");
+    private static final Color CARD_BG = Color.decode("#FAF5E4");
     private static final Color CARD_BACK_BG = Color.decode("#1A3A5C");
-    private static final Color LLAMA_COLOR  = Color.decode("#D4526E");
+    private static final Color LLAMA_COLOR = Color.decode("#D4526E");
     private static final Color NUMBER_COLOR = Color.decode("#1A1A2E");
     private static final Color SELECTED_BDR = Color.decode("#C8A84B");
-    private static final Color HOVER_BDR    = Color.decode("#8A6E30");
-    private static final Color DEFAULT_BDR  = Color.decode("#C8C0A0");
-    private static final Color SHADOW       = new Color(0, 0, 0, 80);
+    private static final Color HOVER_BDR = Color.decode("#8A6E30");
+    private static final Color DEFAULT_BDR = Color.decode("#C8C0A0");
+    private static final Color SHADOW = new Color(0, 0, 0, 80);
 
     private final CardType type;
-    private boolean faceDown    = false;
-    private boolean selected    = false;
-    private boolean hovering    = false;
-    private boolean selectable  = false;
+    private boolean faceDown = false;
+    private boolean selected = false;
+    private boolean hovering = false;
+    private boolean selectable = false;
 
-    /** Carte face visible. */
+    /**
+     * Carte face visible.
+     */
     public CardView(CardType type) {
         this.type = type;
         init();
     }
 
-    /** Carte face cachée (dos). */
+    /**
+     * Carte face cachée (dos).
+     */
     public CardView() {
-        this.type     = null;
+        this.type = null;
         this.faceDown = true;
         init();
     }
@@ -56,14 +60,26 @@ public class CardView extends JPanel {
         setMaximumSize(new Dimension(CARD_W, CARD_H));
 
         addMouseListener(new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) {
-                if (selectable) { hovering = true; repaint(); }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (selectable) {
+                    hovering = true;
+                    repaint();
+                }
             }
-            @Override public void mouseExited(MouseEvent e) {
-                hovering = false; repaint();
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                hovering = false;
+                repaint();
             }
-            @Override public void mousePressed(MouseEvent e) {
-                if (selectable) { selected = !selected; repaint(); }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (selectable) {
+                    selected = !selected;
+                    repaint();
+                }
             }
         });
     }
@@ -188,6 +204,11 @@ public class CardView extends JPanel {
         repaint();
     }
 
-    public boolean isSelected() { return selected; }
-    public CardType getCardType() { return type; }
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public CardType getCardType() {
+        return type;
+    }
 }

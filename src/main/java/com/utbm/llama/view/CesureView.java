@@ -15,27 +15,27 @@ import java.awt.geom.RoundRectangle2D;
  */
 public class CesureView extends JPanel {
 
-    private static final Color BG     = Color.decode("#0D0D0D");
+    private static final Color BG = Color.decode("#0D0D0D");
     private static final Color ACCENT = Color.decode("#C8A84B");
-    private static final Color BLUE   = Color.decode("#5B9BD5");
-    private static final Color TEXT   = Color.decode("#F0EDE6");
-    private static final Color SUB    = Color.decode("#8A8680");
-    private static final Color RED    = Color.decode("#D4526E");
+    private static final Color BLUE = Color.decode("#5B9BD5");
+    private static final Color TEXT = Color.decode("#F0EDE6");
+    private static final Color SUB = Color.decode("#8A8680");
+    private static final Color RED = Color.decode("#D4526E");
 
-    private final JLabel  playerNameLabel;
-    private final JLabel  creditsLabel;
-    private final JLabel  descriptionLabel;
-    private final JLabel  roundInfoLabel;
+    private final JLabel playerNameLabel;
+    private final JLabel creditsLabel;
+    private final JLabel descriptionLabel;
+    private final JLabel roundInfoLabel;
     private final JButton btnContinue;
 
     public CesureView() {
         setBackground(BG);
         setLayout(new GridBagLayout());
 
-        playerNameLabel  = buildLabel("",  22, Font.BOLD, TEXT);
-        creditsLabel     = buildLabel("",  16, Font.BOLD, RED);
-        descriptionLabel = buildLabel("",  14, Font.ITALIC, SUB);
-        roundInfoLabel   = buildLabel("",  13, Font.PLAIN, BLUE);
+        playerNameLabel = buildLabel("", 22, Font.BOLD, TEXT);
+        creditsLabel = buildLabel("", 16, Font.BOLD, RED);
+        descriptionLabel = buildLabel("", 14, Font.ITALIC, SUB);
+        roundInfoLabel = buildLabel("", 13, Font.PLAIN, BLUE);
 
         btnContinue = new JButton("CONTINUER →");
         btnContinue.setFont(new Font("Monospaced", Font.BOLD, 14));
@@ -46,25 +46,32 @@ public class CesureView extends JPanel {
         btnContinue.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0; gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
 
-        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 24, 0);
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 0, 24, 0);
         add(buildIconPanel(), gbc);
 
-        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 8, 0);
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 8, 0);
         add(playerNameLabel, gbc);
 
-        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 16, 0);
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 16, 0);
         add(creditsLabel, gbc);
 
-        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 8, 0);
+        gbc.gridy = 3;
+        gbc.insets = new Insets(0, 0, 8, 0);
         add(buildInfoCard(), gbc);
 
-        gbc.gridy = 4; gbc.insets = new Insets(12, 0, 0, 0);
+        gbc.gridy = 4;
+        gbc.insets = new Insets(12, 0, 0, 0);
         add(roundInfoLabel, gbc);
 
-        gbc.gridy = 5; gbc.insets = new Insets(32, 0, 0, 0);
+        gbc.gridy = 5;
+        gbc.insets = new Insets(32, 0, 0, 0);
         add(btnContinue, gbc);
     }
 
@@ -92,7 +99,10 @@ public class CesureView extends JPanel {
                 g2.dispose();
             }
 
-            @Override public Dimension getPreferredSize() { return new Dimension(100, 100); }
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(100, 100);
+            }
         };
         icon.setOpaque(false);
 
@@ -107,7 +117,7 @@ public class CesureView extends JPanel {
         row.add(icon);
 
         wrapper.add(title, BorderLayout.NORTH);
-        wrapper.add(row,   BorderLayout.CENTER);
+        wrapper.add(row, BorderLayout.CENTER);
 
         return wrapper;
     }
@@ -173,7 +183,9 @@ public class CesureView extends JPanel {
         }
     }
 
-    public void addContinueListener(ActionListener l) { btnContinue.addActionListener(l); }
+    public void addContinueListener(ActionListener l) {
+        btnContinue.addActionListener(l);
+    }
 
     private JLabel buildLabel(String text, int size, int style, Color color) {
         JLabel lbl = new JLabel(text, SwingConstants.CENTER);

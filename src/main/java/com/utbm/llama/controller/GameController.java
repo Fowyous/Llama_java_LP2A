@@ -67,9 +67,7 @@ public class GameController {
             return;
         }
 
-        System.out.println("[GAME] Démarrage d'une partie | "
-                + game.getPlayers().size() + " joueurs | "
-                + game.getGameMode());
+        System.out.println("[GAME] Démarrage d'une partie | " + game.getPlayers().size() + " joueurs | " + game.getGameMode());
 
         boardController = new BoardController(mainFrame, game, localPlayer, juryController);
 
@@ -90,8 +88,7 @@ public class GameController {
      */
     public void setGame(Game game) {
         this.game = game;
-        System.out.println("[GAME] Nouveau modèle configuré : "
-                + game.getPlayers().size() + " joueurs, mode " + game.getGameMode());
+        System.out.println("[GAME] Nouveau modèle configuré : " + game.getPlayers().size() + " joueurs, mode " + game.getGameMode());
     }
 
     /**

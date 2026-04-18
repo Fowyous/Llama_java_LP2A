@@ -12,14 +12,14 @@ import java.awt.geom.RoundRectangle2D;
  */
 class DrawPileView extends JPanel {
 
-    private static final Color BG     = new Color(0, 0, 0, 0);
+    private static final Color BG = new Color(0, 0, 0, 0);
     private static final Color ACCENT = Color.decode("#C8A84B");
-    private static final Color TEXT   = Color.decode("#F0EDE6");
-    private static final Color SUB    = Color.decode("#8A8680");
+    private static final Color TEXT = Color.decode("#F0EDE6");
+    private static final Color SUB = Color.decode("#8A8680");
 
     private final JButton drawButton;
-    private final JLabel  countLabel;
-    private int           remaining = 0;
+    private final JLabel countLabel;
+    private int remaining = 0;
 
     public DrawPileView() {
         setOpaque(false);
@@ -52,7 +52,8 @@ class DrawPileView extends JPanel {
                 g2.dispose();
             }
 
-            @Override public Dimension getPreferredSize() {
+            @Override
+            public Dimension getPreferredSize() {
                 return new Dimension(CardView.CARD_W + 8, CardView.CARD_H + 8);
             }
         };
@@ -60,7 +61,8 @@ class DrawPileView extends JPanel {
         pileGraphic.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         drawButton = new JButton() {
-            @Override protected void paintComponent(Graphics g) { /* invisible */ }
+            @Override
+            protected void paintComponent(Graphics g) { /* invisible */ }
         };
         drawButton.setOpaque(false);
         drawButton.setBorderPainted(false);
@@ -75,7 +77,7 @@ class DrawPileView extends JPanel {
         pileGraphic.setBounds(0, 0, pileGraphic.getPreferredSize().width, pileGraphic.getPreferredSize().height);
         drawButton.setBounds(0, 0, pileGraphic.getPreferredSize().width, pileGraphic.getPreferredSize().height);
         layered.add(pileGraphic, JLayeredPane.DEFAULT_LAYER);
-        layered.add(drawButton,  JLayeredPane.PALETTE_LAYER);
+        layered.add(drawButton, JLayeredPane.PALETTE_LAYER);
         layered.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel piocheLabel = new JLabel("PIOCHE", SwingConstants.CENTER);
@@ -94,13 +96,17 @@ class DrawPileView extends JPanel {
         add(countLabel);
     }
 
-    /** Met à jour le nombre de cartes restantes dans la pioche. */
+    /**
+     * Met à jour le nombre de cartes restantes dans la pioche.
+     */
     public void render(int remaining) {
         this.remaining = remaining;
         countLabel.setText(remaining + " carte" + (remaining > 1 ? "s" : ""));
     }
 
-    /** Active ou désactive le bouton de pioche. */
+    /**
+     * Active ou désactive le bouton de pioche.
+     */
     public void setDrawable(boolean drawable) {
         drawButton.setEnabled(drawable);
         drawButton.setCursor(drawable
@@ -108,5 +114,7 @@ class DrawPileView extends JPanel {
                 : Cursor.getDefaultCursor());
     }
 
-    public void addDrawListener(ActionListener l) { drawButton.addActionListener(l); }
+    public void addDrawListener(ActionListener l) {
+        drawButton.addActionListener(l);
+    }
 }

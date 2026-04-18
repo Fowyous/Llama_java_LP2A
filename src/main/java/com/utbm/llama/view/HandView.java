@@ -17,8 +17,8 @@ public class HandView extends JPanel {
     private static final Color BG = new Color(0, 0, 0, 0);
 
     private final List<CardView> cardViews = new ArrayList<>();
-    private boolean              interactive = true;
-    private Consumer<CardType>   onCardPlayed;
+    private boolean interactive = true;
+    private Consumer<CardType> onCardPlayed;
 
     public HandView() {
         setOpaque(false);
@@ -28,8 +28,8 @@ public class HandView extends JPanel {
     /**
      * Recharge la main à partir d'une liste de types de cartes.
      *
-     * @param cards   cartes en main
-     * @param active  si true, les cartes sont cliquables (tour du joueur)
+     * @param cards  cartes en main
+     * @param active si true, les cartes sont cliquables (tour du joueur)
      */
     public void updateHand(List<CardType> cards, boolean active) {
         removeAll();
@@ -84,7 +84,9 @@ public class HandView extends JPanel {
         cardViews.forEach(cv -> cv.setSelected(false));
     }
 
-    /** @return la carte actuellement sélectionnée, ou null si aucune. */
+    /**
+     * @return la carte actuellement sélectionnée, ou null si aucune.
+     */
     public CardType getSelectedCard() {
         return cardViews.stream()
                 .filter(CardView::isSelected)
@@ -93,17 +95,25 @@ public class HandView extends JPanel {
                 .orElse(null);
     }
 
-    /** Enregistre le callback appelé quand le joueur clique sur une carte. */
+    /**
+     * Enregistre le callback appelé quand le joueur clique sur une carte.
+     */
     public void setOnCardPlayed(Consumer<CardType> callback) {
         this.onCardPlayed = callback;
     }
 
-    /** Active ou désactive l'interactivité de la main. */
+    /**
+     * Active ou désactive l'interactivité de la main.
+     */
     public void setInteractive(boolean interactive) {
         this.interactive = interactive;
         cardViews.forEach(cv -> cv.setSelectable(interactive));
     }
 
-    /** Retourne le nombre de cartes affichées. */
-    public int getCardCount() { return cardViews.size(); }
+    /**
+     * Retourne le nombre de cartes affichées.
+     */
+    public int getCardCount() {
+        return cardViews.size();
+    }
 }

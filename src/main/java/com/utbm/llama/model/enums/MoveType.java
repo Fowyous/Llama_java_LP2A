@@ -11,10 +11,14 @@ package main.java.com.utbm.llama.model.enums;
  */
 public enum MoveType {
 
-    /** Le joueur pose une carte de sa main sur la défausse. */
+    /**
+     * Le joueur pose une carte de sa main sur la défausse.
+     */
     PLAY_CARD,
 
-    /** Le joueur pioche une carte depuis la pioche. Son tour se termine. */
+    /**
+     * Le joueur pioche une carte depuis la pioche. Son tour se termine.
+     */
     DRAW_CARD,
 
     /**
@@ -27,8 +31,8 @@ public enum MoveType {
     @Override
     public String toString() {
         return switch (this) {
-            case PLAY_CARD  -> "Jouer une carte";
-            case DRAW_CARD  -> "Piocher";
+            case PLAY_CARD -> "Jouer une carte";
+            case DRAW_CARD -> "Piocher";
             case QUIT_ROUND -> "Passer la manche";
         };
     }

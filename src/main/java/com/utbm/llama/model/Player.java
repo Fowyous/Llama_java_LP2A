@@ -9,13 +9,13 @@ import java.util.List;
 
 /**
  * Représente un joueur humain dans le jeu LAMA UTBM.
- *
+ * <p>
  * Données gérées :
- *  - Main de cartes
- *  - Crédits (remplace les points du jeu original)
- *  - État dans la manche (PLAYING / QUITTING)
- *  - Flags spéciaux : semestre à l'étranger, semestre de césure
- *  - Suivi des crédits perdus dans la manche (pour déclencher le jury)
+ * - Main de cartes
+ * - Crédits (remplace les points du jeu original)
+ * - État dans la manche (PLAYING / QUITTING)
+ * - Flags spéciaux : semestre à l'étranger, semestre de césure
+ * - Suivi des crédits perdus dans la manche (pour déclencher le jury)
  */
 public class Player {
 
@@ -23,7 +23,9 @@ public class Player {
 
     private final List<CardType> hand = new ArrayList<>();
 
-    /** Crédits actuels du joueur. Peuvent être négatifs. */
+    /**
+     * Crédits actuels du joueur. Peuvent être négatifs.
+     */
     private int credits = 0;
 
     /**
@@ -122,54 +124,90 @@ public class Player {
         credits += amount;
     }
 
-    /** @return les crédits actuels (peut être négatif) */
-    public int getCredits() { return credits; }
+    /**
+     * @return les crédits actuels (peut être négatif)
+     */
+    public int getCredits() {
+        return credits;
+    }
 
-    /** Force la valeur des crédits (utiliser avec précaution). */
-    public void setCredits(int credits) { this.credits = credits; }
+    /**
+     * Force la valeur des crédits (utiliser avec précaution).
+     */
+    public void setCredits(int credits) {
+        this.credits = credits;
+    }
 
-    /** @return les crédits perdus au cours de la manche en cours (≥ 0) */
-    public int getCreditsLostThisRound() { return creditsLostThisRound; }
+    /**
+     * @return les crédits perdus au cours de la manche en cours (≥ 0)
+     */
+    public int getCreditsLostThisRound() {
+        return creditsLostThisRound;
+    }
 
-    /** Remet le compteur de perte à 0 (appelé au début de chaque manche). */
-    public void resetCreditsLostThisRound() { creditsLostThisRound = 0; }
+    /**
+     * Remet le compteur de perte à 0 (appelé au début de chaque manche).
+     */
+    public void resetCreditsLostThisRound() {
+        creditsLostThisRound = 0;
+    }
 
-    /** @return true si le joueur bénéficie du semestre à l'étranger (4 cartes). */
-    public boolean hasStudyAbroad() { return studyAbroad; }
+    /**
+     * @return true si le joueur bénéficie du semestre à l'étranger (4 cartes).
+     */
+    public boolean hasStudyAbroad() {
+        return studyAbroad;
+    }
 
     /**
      * Active ou désactive le flag semestre à l'étranger.
      * Quand true, startingHandSize est automatiquement mis à 4.
      */
     public void setStudyAbroad(boolean studyAbroad) {
-        this.studyAbroad     = studyAbroad;
+        this.studyAbroad = studyAbroad;
         this.startingHandSize = studyAbroad ? 4 : 6;
     }
 
-    /** @return true si le joueur est en semestre de césure (saute une manche). */
-    public boolean isSuspended() { return suspended; }
+    /**
+     * @return true si le joueur est en semestre de césure (saute une manche).
+     */
+    public boolean isSuspended() {
+        return suspended;
+    }
 
-    /** Active ou désactive la suspension (semestre de césure). */
-    public void setSuspended(boolean suspended) { this.suspended = suspended; }
+    /**
+     * Active ou désactive la suspension (semestre de césure).
+     */
+    public void setSuspended(boolean suspended) {
+        this.suspended = suspended;
+    }
 
-    /** @return le nombre de cartes à distribuer en début de manche (4 ou 6). */
-    public int getStartingHandSize() { return startingHandSize; }
+    /**
+     * @return le nombre de cartes à distribuer en début de manche (4 ou 6).
+     */
+    public int getStartingHandSize() {
+        return startingHandSize;
+    }
 
-    public State getState() { return state; }
+    public State getState() {
+        return state;
+    }
 
     public void changeState(State newState) {
         if (newState == null) throw new IllegalArgumentException("State null impossible");
         this.state = newState;
     }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
     /**
      * Remet le joueur en état PLAYING et réinitialise le suivi des crédits.
      * Appelé par Round.startRound() pour chaque joueur actif.
      */
     public void resetForNewRound() {
-        state                = State.PLAYING;
+        state = State.PLAYING;
         creditsLostThisRound = 0;
     }
 
@@ -177,7 +215,7 @@ public class Player {
     public String toString() {
         return String.format("Player[%s | %d crédits | %d cartes | %s%s%s]",
                 name, credits, hand.size(), state,
-                studyAbroad ? " | ABROAD"    : "",
-                suspended   ? " | CÉSURE"    : "");
+                studyAbroad ? " | ABROAD" : "",
+                suspended ? " | CÉSURE" : "");
     }
 }

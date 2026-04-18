@@ -15,34 +15,34 @@ import java.util.List;
 /**
  * Vue principale du plateau de jeu.
  * Organisation :
- *  ┌─────────────────────────────────────────────────┐
- *  │  HUD (manche, mode, crédits à valider)          │  NORTH
- *  ├────────────────┬────────────────────────────────┤
- *  │  Adversaires   │   Zone centrale                │
- *  │  (colonne G)   │   Pioche | Défausse            │  CENTER
- *  │                │   Actions du joueur local      │
- *  ├────────────────┴────────────────────────────────┤
- *  │  Panneau du joueur local                        │  SOUTH
- *  └─────────────────────────────────────────────────┘
+ * ┌─────────────────────────────────────────────────┐
+ * │  HUD (manche, mode, crédits à valider)          │  NORTH
+ * ├────────────────┬────────────────────────────────┤
+ * │  Adversaires   │   Zone centrale                │
+ * │  (colonne G)   │   Pioche | Défausse            │  CENTER
+ * │                │   Actions du joueur local      │
+ * ├────────────────┴────────────────────────────────┤
+ * │  Panneau du joueur local                        │  SOUTH
+ * └─────────────────────────────────────────────────┘
  */
 public class BoardView extends JPanel {
 
-    private static final Color BG         = Color.decode("#0D0D0D");
-    private static final Color PANEL_BG   = Color.decode("#111111");
-    private static final Color ACCENT     = Color.decode("#C8A84B");
-    private static final Color TEXT_MAIN  = Color.decode("#F0EDE6");
-    private static final Color TEXT_SUB   = Color.decode("#8A8680");
-    private static final Color RED        = Color.decode("#D4526E");
+    private static final Color BG = Color.decode("#0D0D0D");
+    private static final Color PANEL_BG = Color.decode("#111111");
+    private static final Color ACCENT = Color.decode("#C8A84B");
+    private static final Color TEXT_MAIN = Color.decode("#F0EDE6");
+    private static final Color TEXT_SUB = Color.decode("#8A8680");
+    private static final Color RED = Color.decode("#D4526E");
 
-    private final DrawPileView          drawPileView;
-    private final DiscardPileView       discardPileView;
-    private final List<PlayerView>      playerViews = new ArrayList<>();
-    private PlayerView                  localPlayerView;
+    private final DrawPileView drawPileView;
+    private final DiscardPileView discardPileView;
+    private final List<PlayerView> playerViews = new ArrayList<>();
+    private PlayerView localPlayerView;
 
-    private final JLabel  roundLabel;
-    private final JLabel  modeLabel;
-    private final JLabel  thresholdLabel;
-    private final JLabel  detecBonusLabel;
+    private final JLabel roundLabel;
+    private final JLabel modeLabel;
+    private final JLabel thresholdLabel;
+    private final JLabel detecBonusLabel;
 
     private final JButton btnDraw;
     private final JButton btnQuit;
@@ -55,20 +55,20 @@ public class BoardView extends JPanel {
         setBackground(BG);
         setLayout(new BorderLayout(0, 0));
 
-        drawPileView    = new DrawPileView();
+        drawPileView = new DrawPileView();
         discardPileView = new DiscardPileView();
 
-        roundLabel     = buildHudLabel("MANCHE 1 / 6", 20, Font.BOLD);
-        modeLabel      = buildHudLabel("MODE COURT — 180 crédits", 12, Font.PLAIN);
+        roundLabel = buildHudLabel("MANCHE 1 / 6", 20, Font.BOLD);
+        modeLabel = buildHudLabel("MODE COURT — 180 crédits", 12, Font.PLAIN);
         thresholdLabel = buildHudLabel("", 12, Font.ITALIC);
         detecBonusLabel = buildHudLabel("🎓 BONUS DETEC +30 crédits !", 13, Font.BOLD);
         detecBonusLabel.setForeground(ACCENT);
         detecBonusLabel.setVisible(false);
 
-        btnDraw = buildActionButton("PIOCHER",     Color.decode("#1E3A5F"), TEXT_MAIN);
-        btnQuit = buildActionButton("PASSER LA MANCHE", RED,               Color.WHITE);
+        btnDraw = buildActionButton("PIOCHER", Color.decode("#1E3A5F"), TEXT_MAIN);
+        btnQuit = buildActionButton("PASSER LA MANCHE", RED, Color.WHITE);
 
-        opponentsPanel  = new JPanel();
+        opponentsPanel = new JPanel();
         opponentsPanel.setBackground(PANEL_BG);
         opponentsPanel.setLayout(new BoxLayout(opponentsPanel, BoxLayout.Y_AXIS));
         opponentsPanel.setBorder(new EmptyBorder(12, 12, 12, 12));
@@ -83,9 +83,9 @@ public class BoardView extends JPanel {
                 new EmptyBorder(0, 0, 0, 0)
         ));
 
-        add(buildHud(),      BorderLayout.NORTH);
-        add(opponentsPanel,  BorderLayout.WEST);
-        add(centerPanel,     BorderLayout.CENTER);
+        add(buildHud(), BorderLayout.NORTH);
+        add(opponentsPanel, BorderLayout.WEST);
+        add(centerPanel, BorderLayout.CENTER);
         add(localPlayerPanel, BorderLayout.SOUTH);
     }
 
@@ -107,8 +107,8 @@ public class BoardView extends JPanel {
         centerInfo.setOpaque(false);
         centerInfo.add(detecBonusLabel);
 
-        hud.add(leftInfo,    BorderLayout.WEST);
-        hud.add(centerInfo,  BorderLayout.CENTER);
+        hud.add(leftInfo, BorderLayout.WEST);
+        hud.add(centerInfo, BorderLayout.CENTER);
         hud.add(thresholdLabel, BorderLayout.EAST);
 
         return hud;
@@ -121,7 +121,8 @@ public class BoardView extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(16, 24, 16, 24);
 
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         panel.add(drawPileView, gbc);
 
         gbc.gridx = 1;
@@ -130,7 +131,8 @@ public class BoardView extends JPanel {
         JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
         sep.setForeground(Color.decode("#2E2E2E"));
         sep.setPreferredSize(new Dimension(1, 150));
-        gbc.gridx = 2; gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.gridx = 2;
+        gbc.fill = GridBagConstraints.VERTICAL;
         panel.add(sep, gbc);
         gbc.fill = GridBagConstraints.NONE;
 
@@ -150,8 +152,8 @@ public class BoardView extends JPanel {
     /**
      * Rafraîchit entièrement la vue depuis l'état du modèle Game.
      *
-     * @param game          le modèle de jeu
-     * @param localPlayer   le joueur local (main visible)
+     * @param game        le modèle de jeu
+     * @param localPlayer le joueur local (main visible)
      */
     public void updateBoard(Game game, Player localPlayer) {
         updateHud(game);
@@ -236,23 +238,27 @@ public class BoardView extends JPanel {
         return btn;
     }
 
-    public void addDrawListener(ActionListener l){
+    public void addDrawListener(ActionListener l) {
         btnDraw.addActionListener(l);
     }
-    public void addQuitRoundListener(ActionListener l){
+
+    public void addQuitRoundListener(ActionListener l) {
         btnQuit.addActionListener(l);
     }
 
-    public DrawPileView    getDrawPileView(){
+    public DrawPileView getDrawPileView() {
         return drawPileView;
     }
-    public DiscardPileView getDiscardPileView(){
+
+    public DiscardPileView getDiscardPileView() {
         return discardPileView;
     }
-    public PlayerView      getLocalPlayerView(){
+
+    public PlayerView getLocalPlayerView() {
         return localPlayerView;
     }
-    public List<PlayerView> getPlayerViews(){
+
+    public List<PlayerView> getPlayerViews() {
         return playerViews;
     }
 

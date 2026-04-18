@@ -12,12 +12,12 @@ import java.awt.geom.RoundRectangle2D;
  */
 public class MenuView extends JPanel {
 
-    private static final Color BG         = Color.decode("#0D0D0D");
-    private static final Color ACCENT     = Color.decode("#C8A84B"); // or UTBM
-    private static final Color TEXT_MAIN  = Color.decode("#F0EDE6");
-    private static final Color TEXT_SUB   = Color.decode("#8A8680");
-    private static final Color BTN_BG     = Color.decode("#1A1A1A");
-    private static final Color BTN_HOVER  = Color.decode("#252525");
+    private static final Color BG = Color.decode("#0D0D0D");
+    private static final Color ACCENT = Color.decode("#C8A84B"); // or UTBM
+    private static final Color TEXT_MAIN = Color.decode("#F0EDE6");
+    private static final Color TEXT_SUB = Color.decode("#8A8680");
+    private static final Color BTN_BG = Color.decode("#1A1A1A");
+    private static final Color BTN_HOVER = Color.decode("#252525");
     private static final Color BTN_BORDER = Color.decode("#2E2E2E");
 
     private final JButton btnStart;
@@ -30,15 +30,15 @@ public class MenuView extends JPanel {
         setBorder(new EmptyBorder(0, 0, 0, 0));
 
         add(buildCenterPanel(), BorderLayout.CENTER);
-        add(buildFooter(),      BorderLayout.SOUTH);
+        add(buildFooter(), BorderLayout.SOUTH);
 
-        btnStart    = buildMenuButton("▶  NOUVELLE PARTIE", true);
-        btnSettings = buildMenuButton("⚙  PARAMÈTRES",      false);
-        btnQuit     = buildMenuButton("✕  QUITTER",          false);
+        btnStart = buildMenuButton("▶  NOUVELLE PARTIE", true);
+        btnSettings = buildMenuButton("⚙  PARAMÈTRES", false);
+        btnQuit = buildMenuButton("✕  QUITTER", false);
 
         removeAll();
         add(buildCenterPanelWithButtons(), BorderLayout.CENTER);
-        add(buildFooter(),                 BorderLayout.SOUTH);
+        add(buildFooter(), BorderLayout.SOUTH);
     }
 
     private JPanel buildCenterPanelWithButtons() {
@@ -48,7 +48,7 @@ public class MenuView extends JPanel {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.fill  = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
 
         JLabel titleLabel = new JLabel("L.A.M.A", SwingConstants.CENTER);
@@ -70,32 +70,39 @@ public class MenuView extends JPanel {
         taglineLabel.setForeground(TEXT_SUB);
         taglineLabel.setBorder(new EmptyBorder(16, 0, 60, 0));
 
-        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 4, 0);
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 0, 4, 0);
         panel.add(titleLabel, gbc);
 
-        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 0, 0);
         panel.add(subtitleLabel, gbc);
 
-        gbc.gridy = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(sep, gbc);
         gbc.fill = GridBagConstraints.NONE;
 
         gbc.gridy = 3;
         panel.add(taglineLabel, gbc);
 
-        gbc.gridy = 4; gbc.insets = new Insets(0, 0, 12, 0);
+        gbc.gridy = 4;
+        gbc.insets = new Insets(0, 0, 12, 0);
         panel.add(btnStart, gbc);
 
         gbc.gridy = 5;
         panel.add(btnSettings, gbc);
 
-        gbc.gridy = 6; gbc.insets = new Insets(24, 0, 0, 0);
+        gbc.gridy = 6;
+        gbc.insets = new Insets(24, 0, 0, 0);
         panel.add(btnQuit, gbc);
 
         return panel;
     }
 
-    /** Placeholder — remplacé dans le constructeur. */
+    /**
+     * Placeholder — remplacé dans le constructeur.
+     */
     private JPanel buildCenterPanel() {
         JPanel p = new JPanel();
         p.setBackground(BG);
@@ -152,23 +159,27 @@ public class MenuView extends JPanel {
         return btn;
     }
 
-    public void addStartListener(ActionListener l){
+    public void addStartListener(ActionListener l) {
         btnStart.addActionListener(l);
     }
-    public void addSettingsListener(ActionListener l){
+
+    public void addSettingsListener(ActionListener l) {
         btnSettings.addActionListener(l);
     }
-    public void addQuitListener(ActionListener l){
+
+    public void addQuitListener(ActionListener l) {
         btnQuit.addActionListener(l);
     }
 
-    public JButton getBtnStart(){
+    public JButton getBtnStart() {
         return btnStart;
     }
-    public JButton getBtnSettings(){
+
+    public JButton getBtnSettings() {
         return btnSettings;
     }
-    public JButton getBtnQuit(){
+
+    public JButton getBtnQuit() {
         return btnQuit;
     }
 }

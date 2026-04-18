@@ -2,137 +2,132 @@ package main.java.com.utbm.llama.model;
 
 import main.java.com.utbm.llama.model.enums.CardType;
 import main.java.com.utbm.llama.model.enums.Difficulty;
-import main.java.com.utbm.llama.model.enums.MoveType;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 /**
- * Joueur contrôlé par l'IA. Hérite de Player — un Bot EST un Player
- * et peut donc être utilisé partout où un Player est attendu.
- * La seule addition par rapport à Player est la méthode {@link #decideMove},
- * qui choisit automatiquement un coup selon la difficulté configurée.
- * Niveaux de difficulté :
- *   EASY   — Aléatoire pur parmi les coups légaux.
- *             Si une carte jouable existe, 70 % de chance de la jouer,
- *             30 % de piocher. Se couche si la main est pleine (≥6 cartes).
- *   MEDIUM — Préfère toujours jouer une carte plutôt que piocher.
- *             Se couche si le score actuel dépasse un seuil ou si
- *             la main est trop chargée.
- *   HARD   — Tient compte de la carte visible en défausse et des
- *             scores adversaires pour décider si se coucher est rentable.
- *             Joue la carte qui minimise ses pénalités futures.
+ * Joueur contrôlé par l'IA.
+ * Hérite de Player — un Bot est un Player avec une logique de décision automatique.
+ * ┌─ EASY ──────────────────────────────────────────────────────────────────────┐
+ * │  Joue une carte légale au hasard.                                           │
+ * │  Si aucune carte jouable → pioche.                                          │
+ * │  Ne passe jamais la manche volontairement (sauf si forcé).                  │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ * ┌─ MEDIUM ────────────────────────────────────────────────────────────────────┐
+ * │  Préfère jouer une carte plutôt que piocher.                                │
+ * │  Choisit la carte jouable de PLUS GRANDE valeur (vide la main plus vite).   │
+ * │  Pioche si aucune carte jouable et que la pioche n'est pas vide.            │
+ * │  Passe la manche si aucun coup possible.                                    │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ * ┌─ HARD ──────────────────────────────────────────────────────────────────────┐
+ * │  Minimise la valeur des cartes restantes en main.                           │
+ * │  Joue la carte de PLUS PETITE valeur parmi les jouables (garde les grosses  │
+ * │  cartes pour plus tard si possible).                                        │
+ * │  Passe la manche si la main restante vaut > 15 crédits ET qu'il ne peut    │
+ * │  rien jouer (limite les dégâts).                                            │
+ * │  Ne pioche JAMAIS si la main contient déjà ≥ 4 cartes.                     │
+ * └─────────────────────────────────────────────────────────────────────────────┘
  */
 public class Bot extends Player {
 
-    private static final int EASY_QUIT_HAND_SIZE   = 6;
-    private static final int MEDIUM_QUIT_SCORE      = 30;
-    private static final int MEDIUM_QUIT_HAND_SIZE  = 5;
-    private static final int HARD_QUIT_HAND_SIZE    = 4;
-
-    private Difficulty difficulty;
-    private final Random random;
+    private final Difficulty difficulty;
+    private final Random rng = new Random();
 
     public Bot(String name, Difficulty difficulty) {
         super(name);
-        if (difficulty == null) throw new IllegalArgumentException("La difficulté ne peut pas être null");
+        if (difficulty == null) throw new IllegalArgumentException("La difficulté d'un bot ne peut pas être null");
         this.difficulty = difficulty;
-        this.random     = new Random();
-    }
-
-    /** Constructeur avec graine fixe — utile pour les tests déterministes. */
-    public Bot(String name, Difficulty difficulty, long seed) {
-        super(name);
-        this.difficulty = difficulty;
-        this.random     = new Random(seed);
     }
 
     /**
-     * Choisit le meilleur coup selon la difficulté du Bot.
-     * @param topDiscard  carte visible sur la défausse (null si défausse vide)
-     * @param drawEmpty   true si la pioche est vide
-     * @param opponents   liste des autres joueurs (pour HARD)
-     * @return le MoveType choisi (PLAY_CARD, DRAW_CARD ou QUIT_ROUND)
+     * Décide du meilleur coup à jouer selon la difficulté.
+     *
+     * @param game l'état courant du jeu (lecture seule pour la prise de décision)
+     * @return un Move valide pour ce bot
      */
-    public MoveType decideMove(CardType topDiscard, boolean drawEmpty, List<Player> opponents) {
+    public Move decideMove(Game game) {
         return switch (difficulty) {
-            case EASY   -> decideEasy(topDiscard, drawEmpty);
-            case MEDIUM -> decideMedium(topDiscard, drawEmpty);
-            case HARD   -> decideHard(topDiscard, drawEmpty, opponents);
+            case EASY -> decideMoveEasy(game);
+            case MEDIUM -> decideMovemedium(game);
+            case HARD -> decideMoveHard(game);
         };
     }
 
-    private MoveType decideEasy(CardType topDiscard, boolean drawEmpty) {
-        if (getHand().size() >= EASY_QUIT_HAND_SIZE) return MoveType.QUIT_ROUND;
-        boolean canPlay = topDiscard != null && hasPlayableCard(topDiscard);
+    private Move decideMoveEasy(Game game) {
+        List<CardType> playable = getPlayableCards(game);
 
-        if (canPlay) {
-            if (random.nextDouble() < 0.70) return MoveType.PLAY_CARD;
+        if (!playable.isEmpty()) {
+            CardType chosen = playable.get(rng.nextInt(playable.size()));
+            return Move.playCard(this, chosen);
         }
 
-        if (!drawEmpty) return MoveType.DRAW_CARD;
-        return canPlay ? MoveType.PLAY_CARD : MoveType.QUIT_ROUND;
+        if (!game.getDrawPile().isEmpty()) {
+            return Move.drawCard(this);
+        }
+
+        return Move.quitRound(this);
     }
 
-    private MoveType decideMedium(CardType topDiscard, boolean drawEmpty) {
-        int handSize = getHand().size();
-        if (computeScore() >= MEDIUM_QUIT_SCORE || handSize >= MEDIUM_QUIT_HAND_SIZE) {
-            return MoveType.QUIT_ROUND;
+    private Move decideMovemedium(Game game) {
+        List<CardType> playable = getPlayableCards(game);
+
+        if (!playable.isEmpty()) {
+            CardType best = playable.stream().max(Comparator.comparingInt(CardType::getValue)).orElseThrow();
+            return Move.playCard(this, best);
         }
-        if (topDiscard != null && hasPlayableCard(topDiscard)) return MoveType.PLAY_CARD;
-        if (!drawEmpty) return MoveType.DRAW_CARD;
-        return MoveType.QUIT_ROUND;
+
+        if (!game.getDrawPile().isEmpty()) {
+            return Move.drawCard(this);
+        }
+
+        return Move.quitRound(this);
     }
 
-    private MoveType decideHard(CardType topDiscard, boolean drawEmpty, List<Player> opponents) {
-        int handSize = getHand().size();
+    private Move decideMoveHard(Game game) {
+        List<CardType> playable = getPlayableCards(game);
 
-        int minOpponentScore = opponents.stream()
-                .mapToInt(Player::computeScore)
-                .min()
-                .orElse(Integer.MAX_VALUE);
-        if (computeScore() < minOpponentScore && handSize >= HARD_QUIT_HAND_SIZE) {
-            return MoveType.QUIT_ROUND;
+        if (!playable.isEmpty()) {
+            CardType safest = playable.stream().min(Comparator.comparingInt(CardType::getValue)).orElseThrow();
+            return Move.playCard(this, safest);
         }
-        if (topDiscard != null && hasPlayableCard(topDiscard)) return MoveType.PLAY_CARD;
-        if (!drawEmpty && handSize < HARD_QUIT_HAND_SIZE) return MoveType.DRAW_CARD;
 
-        return MoveType.QUIT_ROUND;
+        int handValue = computeHandValue();
+
+        if (!game.getDrawPile().isEmpty() && getHand().size() < 4) {
+            return Move.drawCard(this);
+        }
+
+        if (handValue > 15) {
+            return Move.quitRound(this);
+        }
+
+        if (!game.getDrawPile().isEmpty()) {
+            return Move.drawCard(this);
+        }
+
+        return Move.quitRound(this);
     }
 
     /**
-     * Vérifie si le bot possède au moins une carte jouable
-     * sur la carte visible de la défausse.
-     */
-    private boolean hasPlayableCard(CardType topDiscard) {
-        return getHand().stream().anyMatch(topDiscard::accepts);
-    }
-
-    /**
-     * Retourne la première carte jouable de la main par rapport à la défausse.
-     * Appelé par BoardController après que decideMove() a retourné PLAY_CARD.
+     * Retourne la liste des cartes de la main jouables sur la défausse actuelle.
      *
-     * @param topDiscard carte du dessus de la défausse
-     * @return la carte à jouer, ou null si aucune n'est jouable
+     * @param game état du jeu
+     * @return cartes jouables (peut être vide)
      */
-    public CardType chooseCard(CardType topDiscard) {
-        if (topDiscard == null) return null;
-        return getHand().stream()
-                .filter(topDiscard::accepts)
-                .findFirst()
-                .orElse(null);
+    private List<CardType> getPlayableCards(Game game) {
+        CardType top = game.getDiscardPile().peek();
+        return getHand().stream().filter(card -> card.canBePlayedOn(top)).toList();
     }
 
-    public Difficulty getDifficulty() { return difficulty; }
-
-    public void setDifficulty(Difficulty difficulty) {
-        if (difficulty == null) throw new IllegalArgumentException("La difficulté ne peut pas être null");
-        this.difficulty = difficulty;
+    public Difficulty getDifficulty() {
+        return difficulty;
     }
 
     @Override
     public String toString() {
-        return String.format("Bot{name='%s', difficulty=%s, score=%d, state=%s}",
-                getName(), difficulty, computeScore(), getState());
+        return "Bot[" + getName() + " | " + difficulty + " | " + getCredits() + " crédits]";
     }
 }

@@ -12,7 +12,7 @@ import java.awt.*;
 class DiscardPileView extends JPanel {
 
     private static final Color ACCENT = Color.decode("#C8A84B");
-    private static final Color SUB    = Color.decode("#8A8680");
+    private static final Color SUB = Color.decode("#8A8680");
 
     private CardView topCardView;
     private final JLabel label;

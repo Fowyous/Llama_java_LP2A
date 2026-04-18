@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * Représente un tas de cartes (pioche ou défausse).
  * Implémenté comme une Deque :
- *  - On pioche depuis le HAUT (pollFirst)
- *  - On ajoute au HAUT (addFirst = défausse) ou en bas (addLast = remplissage)
+ * - On pioche depuis le HAUT (pollFirst)
+ * - On ajoute au HAUT (addFirst = défausse) ou en bas (addLast = remplissage)
  * Usage :
- *  Deck draw    = Deck.createFull();   // pioche complète mélangée
- *  Deck discard = Deck.empty();        // défausse vide
+ * Deck draw    = Deck.createFull();   // pioche complète mélangée
+ * Deck discard = Deck.empty();        // défausse vide
  */
 public class Deck {
 
@@ -36,12 +36,15 @@ public class Deck {
         return deck;
     }
 
-    /** Crée une pile vide (utilisée pour la défausse au démarrage). */
+    /**
+     * Crée une pile vide (utilisée pour la défausse au démarrage).
+     */
     public static Deck empty() {
         return new Deck();
     }
 
-    private Deck() {}
+    private Deck() {
+    }
 
     /**
      * Mélange aléatoirement toutes les cartes du tas.

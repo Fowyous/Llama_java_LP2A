@@ -48,8 +48,7 @@ public class BoardController {
 
     private static final int BOT_DELAY_MS = 1200;
 
-    public BoardController(MainFrame mainFrame, Game game, Player localPlayer,
-                           JuryController juryController) {
+    public BoardController(MainFrame mainFrame, Game game, Player localPlayer, JuryController juryController) {
         this.mainFrame = mainFrame;
         this.game = game;
         this.localPlayer = localPlayer;
@@ -236,9 +235,7 @@ public class BoardController {
     }
 
     private boolean isLocalPlayerTurn() {
-        return game.getCurrentPlayer().equals(localPlayer)
-                && localPlayer.getState() == State.PLAYING
-                && roundInProgress;
+        return game.getCurrentPlayer().equals(localPlayer) && localPlayer.getState() == State.PLAYING && roundInProgress;
     }
 
     /**
@@ -247,12 +244,9 @@ public class BoardController {
      * ou quand un joueur a vidé sa main.
      */
     private void checkRoundOver() {
-        boolean allQuit = game.getPlayers().stream()
-                .filter(p -> !p.isSuspended())
-                .allMatch(p -> p.getState() == State.QUITTING || p.getHand().isEmpty());
+        boolean allQuit = game.getPlayers().stream().filter(p -> !p.isSuspended()).allMatch(p -> p.getState() == State.QUITTING || p.getHand().isEmpty());
 
-        boolean anyEmptyHand = game.getPlayers().stream()
-                .anyMatch(p -> p.getHand().isEmpty() && !p.isSuspended());
+        boolean anyEmptyHand = game.getPlayers().stream().anyMatch(p -> p.getHand().isEmpty() && !p.isSuspended());
 
         if (allQuit || anyEmptyHand) {
             roundInProgress = false;
@@ -271,24 +265,17 @@ public class BoardController {
      * 6. Prépare la manche suivante ou termine la partie
      */
     private void endRound() {
-        List<Player> activePlayers = game.getPlayers().stream()
-                .filter(p -> !p.isSuspended())
-                .toList();
+        List<Player> activePlayers = game.getPlayers().stream().filter(p -> !p.isSuspended()).toList();
 
         for (Player p : activePlayers) {
-            int handValue = p.getHand().stream()
-                    .mapToInt(CardType::getValue)
-                    .sum();
+            int handValue = p.getHand().stream().mapToInt(CardType::getValue).sum();
 
             int creditsBefore = p.getCredits();
             p.addCredits(-handValue);
             int lost = creditsBefore - p.getCredits();
             p.setCreditsLostThisRound(Math.max(0, lost));
 
-            System.out.println("[ROUND END] " + p.getName()
-                    + " | main = " + handValue
-                    + " | crédits avant = " + creditsBefore
-                    + " | crédits après = " + p.getCredits());
+            System.out.println("[ROUND END] " + p.getName() + " | main = " + handValue + " | crédits avant = " + creditsBefore + " | crédits après = " + p.getCredits());
 
             if (p.getHand().isEmpty()) {
                 p.setStudyAbroad(true);
@@ -329,16 +316,10 @@ public class BoardController {
     public void triggerCesure(Player player, Runnable onDone) {
         player.setSuspended(true);
 
-        boolean allSuspended = game.getPlayers().stream()
-                .allMatch(Player::isSuspended);
+        boolean allSuspended = game.getPlayers().stream().allMatch(Player::isSuspended);
 
         CesureView cesureView = new CesureView();
-        cesureView.setup(
-                player.getName(),
-                player.getCredits(),
-                currentRoundNumber + 1,
-                allSuspended
-        );
+        cesureView.setup(player.getName(), player.getCredits(), currentRoundNumber + 1, allSuspended);
 
         cesureView.addContinueListener(e -> {
             mainFrame.showGame(boardView);
@@ -346,8 +327,7 @@ public class BoardController {
         });
 
         mainFrame.showCesure(cesureView);
-        System.out.println("[CESURE] " + player.getName() + " suspend pour la manche "
-                + (currentRoundNumber + 1));
+        System.out.println("[CESURE] " + player.getName() + " suspend pour la manche " + (currentRoundNumber + 1));
     }
 
     /**
@@ -409,9 +389,7 @@ public class BoardController {
 
             p.setStudyAbroad(false);
 
-            System.out.println("[ROUND START] " + p.getName()
-                    + " | " + p.getHand().size() + " cartes | "
-                    + p.getCredits() + " crédits");
+            System.out.println("[ROUND START] " + p.getName() + " | " + p.getHand().size() + " cartes | " + p.getCredits() + " crédits");
         }
 
         updateView();
@@ -427,8 +405,7 @@ public class BoardController {
         for (Player p : game.getPlayers()) {
             if (p.getCredits() >= 120) {
                 p.addCredits(30);
-                System.out.println("[DETEC] " + p.getName() + " valide le DETEC ! +30 crédits → "
-                        + p.getCredits());
+                System.out.println("[DETEC] " + p.getName() + " valide le DETEC ! +30 crédits → " + p.getCredits());
             }
         }
     }
@@ -439,15 +416,12 @@ public class BoardController {
      * Les seuils 180/300 sont honorifiques.
      */
     private void endGame() {
-        Player winner = game.getPlayers().stream()
-                .max((a, b) -> Integer.compare(a.getCredits(), b.getCredits()))
-                .orElse(localPlayer);
+        Player winner = game.getPlayers().stream().max((a, b) -> Integer.compare(a.getCredits(), b.getCredits())).orElse(localPlayer);
 
         System.out.println("=== FIN DE PARTIE ===");
         for (Player p : game.getPlayers()) {
             boolean graduated = game.isGraduated(p);
-            System.out.println(p.getName() + " : " + p.getCredits() + " crédits"
-                    + (graduated ? " ★ DIPLÔMÉ" : ""));
+            System.out.println(p.getName() + " : " + p.getCredits() + " crédits" + (graduated ? " ★ DIPLÔMÉ" : ""));
         }
         System.out.println("Vainqueur : " + winner.getName());
 
@@ -461,10 +435,7 @@ public class BoardController {
             }
             sb.append("\n🏆 Vainqueur : ").append(winner.getName());
 
-            javax.swing.JOptionPane.showMessageDialog(
-                    mainFrame, sb.toString(),
-                    "Résultats", javax.swing.JOptionPane.INFORMATION_MESSAGE
-            );
+            javax.swing.JOptionPane.showMessageDialog(mainFrame, sb.toString(), "Résultats", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             mainFrame.showMenu();
         });
     }

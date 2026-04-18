@@ -3,17 +3,18 @@ package main.java.com.utbm.llama.model.rules;
 import main.java.com.utbm.llama.model.Game;
 import main.java.com.utbm.llama.model.Move;
 
-/** Contract implemented by each game rule. 
- * The Strategy pattern is used here: each rule is an independent object 
- * that RuleEngine aggregates. To add a UTBM rule, implement this interface 
- * and register it with RuleEngine — no changes to existing code are required. 
- * Lifecycle of a rule within RuleEngine: 
- *   1. isApplicable() — does this rule concern this type of move? 
- *   2. validate()     — does the move comply with the rule?
- *   3. apply()        — if valid, apply the rule's effects. 
- * Separation of validation / application: 
- *   validate() must NEVER modify game state. 
- *   apply() is called only if validate() returns true. 
+/**
+ * Contract implemented by each game rule.
+ * The Strategy pattern is used here: each rule is an independent object
+ * that RuleEngine aggregates. To add a UTBM rule, implement this interface
+ * and register it with RuleEngine — no changes to existing code are required.
+ * Lifecycle of a rule within RuleEngine:
+ * 1. isApplicable() — does this rule concern this type of move?
+ * 2. validate()     — does the move comply with the rule?
+ * 3. apply()        — if valid, apply the rule's effects.
+ * Separation of validation / application:
+ * validate() must NEVER modify game state.
+ * apply() is called only if validate() returns true.
  */
 public interface Rule {
 
@@ -28,7 +29,7 @@ public interface Rule {
     boolean isApplicable(Move move, Game game);
 
 
-   /**
+    /**
      * Vérifie que le coup respecte cette règle sans modifier l'état du jeu.
      *
      * @param move the move that is going to be validated.

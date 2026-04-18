@@ -15,32 +15,32 @@ import java.awt.event.ActionListener;
  */
 public class SettingsView extends JPanel {
 
-    private static final Color BG        = Color.decode("#0D0D0D");
-    private static final Color PANEL_BG  = Color.decode("#141414");
-    private static final Color ACCENT    = Color.decode("#C8A84B");
+    private static final Color BG = Color.decode("#0D0D0D");
+    private static final Color PANEL_BG = Color.decode("#141414");
+    private static final Color ACCENT = Color.decode("#C8A84B");
     private static final Color TEXT_MAIN = Color.decode("#F0EDE6");
-    private static final Color TEXT_SUB  = Color.decode("#8A8680");
-    private static final Color BORDER    = Color.decode("#2E2E2E");
+    private static final Color TEXT_SUB = Color.decode("#8A8680");
+    private static final Color BORDER = Color.decode("#2E2E2E");
 
-    private final JComboBox<Integer>    comboNbPlayers;
+    private final JComboBox<Integer> comboNbPlayers;
     private final JComboBox<Difficulty> comboDifficulty;
-    private final JComboBox<GameMode>   comboGameMode;
-    private final JButton               btnSave;
-    private final JButton               btnBack;
+    private final JComboBox<GameMode> comboGameMode;
+    private final JButton btnSave;
+    private final JButton btnBack;
 
     public SettingsView() {
         setLayout(new BorderLayout());
         setBackground(BG);
 
-        comboNbPlayers  = buildCombo(new Integer[]{2, 3, 4});
+        comboNbPlayers = buildCombo(new Integer[]{2, 3, 4});
         comboDifficulty = buildCombo(Difficulty.values());
-        comboGameMode   = buildCombo(GameMode.values());
+        comboGameMode = buildCombo(GameMode.values());
 
         btnSave = buildButton("SAUVEGARDER", true);
-        btnBack = buildButton("← RETOUR",    false);
+        btnBack = buildButton("← RETOUR", false);
 
-        add(buildHeader(),  BorderLayout.NORTH);
-        add(buildForm(),    BorderLayout.CENTER);
+        add(buildHeader(), BorderLayout.NORTH);
+        add(buildForm(), BorderLayout.CENTER);
         add(buildActions(), BorderLayout.SOUTH);
     }
 
@@ -59,7 +59,7 @@ public class SettingsView extends JPanel {
         sub.setBorder(new EmptyBorder(6, 0, 0, 0));
 
         header.add(title, BorderLayout.NORTH);
-        header.add(sub,   BorderLayout.SOUTH);
+        header.add(sub, BorderLayout.SOUTH);
 
         JSeparator sep = new JSeparator();
         sep.setForeground(ACCENT);
@@ -103,8 +103,9 @@ public class SettingsView extends JPanel {
         ));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0; gbc.gridy = 0;
-        gbc.fill  = GridBagConstraints.BOTH;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(0, 60, 0, 60);
         wrapper.add(form, gbc);
 
@@ -183,27 +184,32 @@ public class SettingsView extends JPanel {
     public void addSaveListener(ActionListener l) {
         btnSave.addActionListener(l);
     }
+
     public void addBackListener(ActionListener l) {
         btnBack.addActionListener(l);
     }
 
-    public int        getNbPlayers()  {
-        return (Integer)    comboNbPlayers.getSelectedItem();
+    public int getNbPlayers() {
+        return (Integer) comboNbPlayers.getSelectedItem();
     }
+
     public Difficulty getDifficulty() {
         return (Difficulty) comboDifficulty.getSelectedItem();
     }
-    public GameMode   getGameMode()   {
-        return (GameMode)   comboGameMode.getSelectedItem();
+
+    public GameMode getGameMode() {
+        return (GameMode) comboGameMode.getSelectedItem();
     }
 
-    public void setNbPlayers(int n)      {
+    public void setNbPlayers(int n) {
         comboNbPlayers.setSelectedItem(n);
     }
+
     public void setDifficulty(Difficulty d) {
         comboDifficulty.setSelectedItem(d);
     }
-    public void setGameMode(GameMode m)  {
+
+    public void setGameMode(GameMode m) {
         comboGameMode.setSelectedItem(m);
     }
 }

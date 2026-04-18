@@ -9,20 +9,20 @@ import java.awt.*;
  */
 public class MainFrame extends JFrame {
 
-    public static final String SCREEN_MENU     = "MENU";
+    public static final String SCREEN_MENU = "MENU";
     public static final String SCREEN_SETTINGS = "SETTINGS";
-    public static final String SCREEN_BOARD    = "BOARD";
-    public static final String SCREEN_JURY     = "JURY";
-    public static final String SCREEN_CESURE   = "CESURE";
+    public static final String SCREEN_BOARD = "BOARD";
+    public static final String SCREEN_JURY = "JURY";
+    public static final String SCREEN_CESURE = "CESURE";
 
     private final MenuView menuView;
     private final SettingsView settingsView;
     private BoardView boardView;
-    private JuryView           juryView;
-    private CesureView         cesureView;
+    private JuryView juryView;
+    private CesureView cesureView;
 
     private final CardLayout cardLayout;
-    private final JPanel     contentPanel;
+    private final JPanel contentPanel;
 
     public MainFrame() {
         super("LAMA UTBM — Survivre au cursus");
@@ -32,11 +32,11 @@ public class MainFrame extends JFrame {
         setPreferredSize(new Dimension(1440, 900));
         setLocationRelativeTo(null);
 
-        cardLayout   = new CardLayout();
+        cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
         contentPanel.setBackground(Color.decode("#0D0D0D"));
 
-        menuView     = new MenuView();
+        menuView = new MenuView();
         settingsView = new SettingsView();
 
         contentPanel.add(menuView, SCREEN_MENU);
@@ -46,12 +46,16 @@ public class MainFrame extends JFrame {
         pack();
     }
 
-    /** Affiche le menu principal. */
+    /**
+     * Affiche le menu principal.
+     */
     public void showMenu() {
         cardLayout.show(contentPanel, SCREEN_MENU);
     }
 
-    /** Affiche l'écran de paramètres. */
+    /**
+     * Affiche l'écran de paramètres.
+     */
     public void showSettings() {
         cardLayout.show(contentPanel, SCREEN_SETTINGS);
     }
@@ -106,19 +110,23 @@ public class MainFrame extends JFrame {
     }
 
 
-    public MenuView     getMenuView()     {
+    public MenuView getMenuView() {
         return menuView;
     }
+
     public SettingsView getSettingsView() {
         return settingsView;
     }
-    public BoardView    getBoardView()    {
+
+    public BoardView getBoardView() {
         return boardView;
     }
-    public JuryView     getJuryView()     {
+
+    public JuryView getJuryView() {
         return juryView;
     }
-    public CesureView   getCesureView()   {
+
+    public CesureView getCesureView() {
         return cesureView;
     }
 }

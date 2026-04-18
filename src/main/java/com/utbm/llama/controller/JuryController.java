@@ -46,11 +46,7 @@ public class JuryController {
         this.onJuryFinished = onFinished;
 
         juryView = new JuryView();
-        juryView.setup(
-                player.getName(),
-                creditsLost,
-                player.getCredits()
-        );
+        juryView.setup(player.getName(), creditsLost, player.getCredits());
 
         juryView.addConfirmListener(e -> handleCardPicked(juryView.getSelectedIndex()));
         mainFrame.showJury(juryView);
@@ -70,10 +66,7 @@ public class JuryController {
         juryView.revealCard(index, revealed);
         targetPlayer.addCredits(gained);
 
-        System.out.println("[JURY] " + targetPlayer.getName()
-                + " a choisi " + revealed.name()
-                + " → +" + gained + " crédits"
-                + " | Total : " + targetPlayer.getCredits());
+        System.out.println("[JURY] " + targetPlayer.getName() + " a choisi " + revealed.name() + " → +" + gained + " crédits" + " | Total : " + targetPlayer.getCredits());
 
         javax.swing.Timer delay = new javax.swing.Timer(1800, evt -> {
             ((javax.swing.Timer) evt.getSource()).stop();
@@ -90,16 +83,13 @@ public class JuryController {
      */
     private void evaluatePostJury() {
         if (targetPlayer.getCredits() < 0) {
-            System.out.println("[JURY] " + targetPlayer.getName()
-                    + " est toujours en négatif (" + targetPlayer.getCredits()
-                    + ") → semestre de césure");
+            System.out.println("[JURY] " + targetPlayer.getName() + " est toujours en négatif (" + targetPlayer.getCredits() + ") → semestre de césure");
 
             if (boardController != null) {
                 boardController.triggerCesure(targetPlayer, onJuryFinished);
             }
         } else {
-            System.out.println("[JURY] " + targetPlayer.getName()
-                    + " repasse en positif → retour au jeu");
+            System.out.println("[JURY] " + targetPlayer.getName() + " repasse en positif → retour au jeu");
             notifyFinished();
         }
     }

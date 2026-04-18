@@ -12,16 +12,16 @@ import java.util.stream.Collectors;
  * Centralise l'historique de toutes les opérations de crédits,
  * manche par manche et joueur par joueur.
  * Avantages :
- *  - Évite de surcharger Game et Round avec de la comptabilité
- *  - Permet d'afficher un récapitulatif clair en fin de partie
- *  - Facilite le débogage (trace de chaque opération)
+ * - Évite de surcharger Game et Round avec de la comptabilité
+ * - Permet d'afficher un récapitulatif clair en fin de partie
+ * - Facilite le débogage (trace de chaque opération)
  * Utilisation typique :
- *  CreditLedger ledger = new CreditLedger();
- *  ledger.record(1, player, CreditLedger.Reason.ROUND_START,  +35);
- *  ledger.record(1, player, CreditLedger.Reason.HAND_PENALTY, -12);
- *  ledger.record(1, player, CreditLedger.Reason.JURY_GAIN,    +6);
- *  int lost = ledger.getLostThisRound(1, player);   // → 12
- *  int total = ledger.getTotal(player);             // → 35 - 12 + 6 = 29
+ * CreditLedger ledger = new CreditLedger();
+ * ledger.record(1, player, CreditLedger.Reason.ROUND_START,  +35);
+ * ledger.record(1, player, CreditLedger.Reason.HAND_PENALTY, -12);
+ * ledger.record(1, player, CreditLedger.Reason.JURY_GAIN,    +6);
+ * int lost = ledger.getLostThisRound(1, player);   // → 12
+ * int total = ledger.getTotal(player);             // → 35 - 12 + 6 = 29
  */
 public class CreditLedger {
 
@@ -31,57 +31,89 @@ public class CreditLedger {
      */
     public enum Reason {
 
-        /** +35 crédits au début de chaque manche. */
+        /**
+         * +35 crédits au début de chaque manche.
+         */
         ROUND_START("Début de manche", true),
 
-        /** Déduction de la valeur des cartes restantes en main. */
+        /**
+         * Déduction de la valeur des cartes restantes en main.
+         */
         HAND_PENALTY("Pénalité de main", false),
 
-        /** Gain de crédits suite au mini-jeu du Jury. */
+        /**
+         * Gain de crédits suite au mini-jeu du Jury.
+         */
         JURY_GAIN("Gain au jury", true),
 
-        /** +30 crédits pour avoir validé le DETEC (mode LONG, manche 4). */
+        /**
+         * +30 crédits pour avoir validé le DETEC (mode LONG, manche 4).
+         */
         DETEC_BONUS("Bonus DETEC", true),
 
-        /** Correction manuelle (usage exceptionnel). */
+        /**
+         * Correction manuelle (usage exceptionnel).
+         */
         MANUAL_CORRECTION("Correction", true);
 
         private final String label;
         private final boolean isGain;
 
         Reason(String label, boolean isGain) {
-            this.label  = label;
+            this.label = label;
             this.isGain = isGain;
         }
 
-        public String  getLabel()  { return label; }
-        public boolean isGain()    { return isGain; }
-        public boolean isLoss()    { return !isGain; }
+        public String getLabel() {
+            return label;
+        }
+
+        public boolean isGain() {
+            return isGain;
+        }
+
+        public boolean isLoss() {
+            return !isGain;
+        }
     }
 
     /**
      * Une ligne du registre : qui, quand, pourquoi, combien.
      */
     public static class Entry {
-        private final int    roundNumber;
+        private final int roundNumber;
         private final Player player;
         private final Reason reason;
-        private final int    delta;
-        private final int    balanceAfter;
+        private final int delta;
+        private final int balanceAfter;
 
         public Entry(int roundNumber, Player player, Reason reason, int delta, int balanceAfter) {
-            this.roundNumber  = roundNumber;
-            this.player       = player;
-            this.reason       = reason;
-            this.delta        = delta;
+            this.roundNumber = roundNumber;
+            this.player = player;
+            this.reason = reason;
+            this.delta = delta;
             this.balanceAfter = balanceAfter;
         }
 
-        public int    getRoundNumber()  { return roundNumber; }
-        public Player getPlayer()       { return player; }
-        public Reason getReason()       { return reason; }
-        public int    getDelta()        { return delta; }
-        public int    getBalanceAfter() { return balanceAfter; }
+        public int getRoundNumber() {
+            return roundNumber;
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
+        public Reason getReason() {
+            return reason;
+        }
+
+        public int getDelta() {
+            return delta;
+        }
+
+        public int getBalanceAfter() {
+            return balanceAfter;
+        }
 
         @Override
         public String toString() {
@@ -90,7 +122,9 @@ public class CreditLedger {
         }
     }
 
-    /** Toutes les entrées dans l'ordre chronologique. */
+    /**
+     * Toutes les entrées dans l'ordre chronologique.
+     */
     private final List<Entry> entries = new ArrayList<>();
 
     /**
@@ -224,6 +258,10 @@ public class CreditLedger {
         System.out.println("══════════════════════════════════════════════════");
     }
 
-    /** @return le nombre total d'entrées enregistrées */
-    public int size() { return entries.size(); }
+    /**
+     * @return le nombre total d'entrées enregistrées
+     */
+    public int size() {
+        return entries.size();
+    }
 }

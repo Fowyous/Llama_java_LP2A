@@ -16,40 +16,40 @@ import java.util.function.Consumer;
  * Il voit 7 cartes face cachée, en choisit une,
  * et gagne la valeur de cette carte (1 à 10) en crédits.
  * Layout :
- *  ┌──────────────────────────────────────────────────────┐
- *  │  En-tête dramatique (titre + contexte)               │
- *  │  Crédits perdus                                      │
- *  │  7 cartes face cachée                                │
- *  │  [CONFIRMER MON CHOIX]                               │
- *  └──────────────────────────────────────────────────────┘
+ * ┌──────────────────────────────────────────────────────┐
+ * │  En-tête dramatique (titre + contexte)               │
+ * │  Crédits perdus                                      │
+ * │  7 cartes face cachée                                │
+ * │  [CONFIRMER MON CHOIX]                               │
+ * └──────────────────────────────────────────────────────┘
  */
 public class JuryView extends JPanel {
 
-    private static final Color BG       = Color.decode("#0D0D0D");
+    private static final Color BG = Color.decode("#0D0D0D");
     private static final Color PANEL_BG = Color.decode("#111111");
-    private static final Color ACCENT   = Color.decode("#C8A84B");
-    private static final Color RED      = Color.decode("#D4526E");
-    private static final Color TEXT     = Color.decode("#F0EDE6");
-    private static final Color SUB      = Color.decode("#8A8680");
+    private static final Color ACCENT = Color.decode("#C8A84B");
+    private static final Color RED = Color.decode("#D4526E");
+    private static final Color TEXT = Color.decode("#F0EDE6");
+    private static final Color SUB = Color.decode("#8A8680");
 
     private final List<CardView> hiddenCards = new ArrayList<>();
-    private int                  selectedIndex = -1;
-    private Consumer<Integer>    onCardPicked;
+    private int selectedIndex = -1;
+    private Consumer<Integer> onCardPicked;
 
-    private final JLabel  playerNameLabel;
-    private final JLabel  creditsLostLabel;
-    private final JLabel  currentCreditsLabel;
-    private final JPanel  cardsPanel;
+    private final JLabel playerNameLabel;
+    private final JLabel creditsLostLabel;
+    private final JLabel currentCreditsLabel;
+    private final JPanel cardsPanel;
     private final JButton btnConfirm;
-    private final JLabel  resultLabel;
+    private final JLabel resultLabel;
 
     public JuryView() {
         setBackground(BG);
         setLayout(new BorderLayout());
 
-        playerNameLabel    = buildLabel("",              20, Font.BOLD, TEXT);
-        creditsLostLabel   = buildLabel("",              15, Font.PLAIN, RED);
-        currentCreditsLabel = buildLabel("",             13, Font.ITALIC, SUB);
+        playerNameLabel = buildLabel("", 20, Font.BOLD, TEXT);
+        creditsLostLabel = buildLabel("", 15, Font.PLAIN, RED);
+        currentCreditsLabel = buildLabel("", 13, Font.ITALIC, SUB);
 
         cardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 8));
         cardsPanel.setBackground(BG);
@@ -66,9 +66,9 @@ public class JuryView extends JPanel {
         resultLabel = buildLabel("", 18, Font.BOLD, ACCENT);
         resultLabel.setVisible(false);
 
-        add(buildHeader(),  BorderLayout.NORTH);
-        add(buildCenter(),  BorderLayout.CENTER);
-        add(buildFooter(),  BorderLayout.SOUTH);
+        add(buildHeader(), BorderLayout.NORTH);
+        add(buildCenter(), BorderLayout.CENTER);
+        add(buildFooter(), BorderLayout.SOUTH);
 
         buildHiddenCards();
     }
@@ -113,7 +113,8 @@ public class JuryView extends JPanel {
         center.setBackground(BG);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.insets = new Insets(20, 0, 10, 0);
 
         JLabel instruction = buildLabel(
@@ -122,10 +123,12 @@ public class JuryView extends JPanel {
         );
         center.add(instruction, gbc);
 
-        gbc.gridy = 1; gbc.insets = new Insets(10, 0, 20, 0);
+        gbc.gridy = 1;
+        gbc.insets = new Insets(10, 0, 20, 0);
         center.add(cardsPanel, gbc);
 
-        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 10, 0);
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 10, 0);
         center.add(resultLabel, gbc);
 
         return center;
@@ -209,7 +212,9 @@ public class JuryView extends JPanel {
         btnConfirm.setEnabled(false);
     }
 
-    /** Callback appelé quand le joueur valide son choix — reçoit l'index (0-6). */
+    /**
+     * Callback appelé quand le joueur valide son choix — reçoit l'index (0-6).
+     */
     public void setOnCardPicked(Consumer<Integer> callback) {
         this.onCardPicked = callback;
         btnConfirm.addActionListener(e -> {
@@ -219,8 +224,13 @@ public class JuryView extends JPanel {
         });
     }
 
-    public void addConfirmListener(ActionListener l) { btnConfirm.addActionListener(l); }
-    public int  getSelectedIndex() { return selectedIndex; }
+    public void addConfirmListener(ActionListener l) {
+        btnConfirm.addActionListener(l);
+    }
+
+    public int getSelectedIndex() {
+        return selectedIndex;
+    }
 
 
     private JLabel buildLabel(String text, int size, int style, Color color) {

@@ -4,24 +4,21 @@ package main.java.com.utbm.llama.model.enums;
  * Position d'affichage d'un joueur autour du plateau.
  * Le joueur humain principal occupe toujours SOUTH.
  * Les joueurs suivants sont assignés dans le sens horaire :
- *          NORTH
- *            |
- *  WEST -----+----- EAST
- *            |
- *          SOUTH  ← joueur 1 (humain)
+ * NORTH
+ * |
+ * WEST -----+----- EAST
+ * |
+ * SOUTH  ← joueur 1 (humain)
  * Règles d'attribution selon le nombre de joueurs :
- *   2 joueurs  → SOUTH, NORTH
- *   3 joueurs  → SOUTH, NORTH, EAST
- *   4 joueurs  → SOUTH, NORTH, EAST, WEST
+ * 2 joueurs  → SOUTH, NORTH
+ * 3 joueurs  → SOUTH, NORTH, EAST
+ * 4 joueurs  → SOUTH, NORTH, EAST, WEST
  * La position détermine aussi l'orientation visuelle de la main
  * (cartes horizontales pour SOUTH/NORTH, verticales pour EAST/WEST).
  */
 public enum Position {
 
-    SOUTH,
-    NORTH,
-    EAST,
-    WEST;
+    SOUTH, NORTH, EAST, WEST;
 
     /**
      * Retourne les positions dans l'ordre d'attribution
@@ -33,9 +30,7 @@ public enum Position {
      */
     public static Position[] forPlayerCount(int playerCount) {
         if (playerCount < 1 || playerCount > 4) {
-            throw new IllegalArgumentException(
-                    "Le nombre de joueurs doit être compris entre 1 et 4, reçu : " + playerCount
-            );
+            throw new IllegalArgumentException("Le nombre de joueurs doit être compris entre 1 et 4, reçu : " + playerCount);
         }
         Position[] all = {SOUTH, NORTH, EAST, WEST};
         Position[] result = new Position[playerCount];
