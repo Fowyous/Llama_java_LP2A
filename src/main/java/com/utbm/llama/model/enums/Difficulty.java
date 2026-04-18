@@ -1,7 +1,7 @@
 package main.java.com.utbm.llama.model.enums;
 
 /**
- * Niveau de difficulté d'un Bot.
+ * Bot difficulty level.
  * EASY   — Plays randomly among legal moves.
  * MEDIUM — Applies some simple heuristics
  *          (prefers playing a card rather than drawing,
