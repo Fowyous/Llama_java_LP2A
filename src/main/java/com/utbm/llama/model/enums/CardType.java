@@ -1,4 +1,4 @@
-package main.java.com.utbm.lama.model.enums;
+package main.java.com.utbm.llama.model.enums;
 
 /**
  * Représente les 7 valeurs de cartes du jeu L.A.M.A.

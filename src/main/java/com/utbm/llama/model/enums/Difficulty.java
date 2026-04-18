@@ -1,13 +1,13 @@
-package main.java.com.utbm.lama.model.enums;
+package main.java.com.utbm.llama.model.enums;
 
 /**
  * Niveau de difficulté d'un Bot.
- * EASY   — Joue aléatoirement parmi les coups légaux.
- * MEDIUM — Applique quelques heuristiques simples
- *          (préfère jouer une carte plutôt que piocher,
- *           se couche si la main est trop chargée).
- * HARD   — Stratégie avancée : tient compte des cartes
- *           visibles et du score des adversaires.
+ * EASY   — Plays randomly among legal moves.
+ * MEDIUM — Applies some simple heuristics
+ *          (prefers playing a card rather than drawing,
+ *                folds if the hand is too full).
+ * HARD   —Advanced strategy: takes into account visible cards
+ * 			      and opponents' scores.
  */
 public enum Difficulty {
     EASY,

@@ -1,4 +1,4 @@
-package main.java.com.utbm.lama.model.enums;
+package main.java.com.utbm.llama.model.enums;
 
 /**
  * Position d'affichage d'un joueur autour du plateau.
