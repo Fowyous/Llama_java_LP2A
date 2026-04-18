@@ -26,4 +26,9 @@ public class QuitRoundRule implements Rule{
 		return player.getState() != State.QUITTING;
 
 	}
+
+	@Override
+	public void apply(Move move, Game game) {
+
+	}
 }

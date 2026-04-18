@@ -7,6 +7,8 @@ import main.java.com.utbm.llama.model.Player;
 import main.java.com.utbm.llama.model.enums.MoveType;
 import main.java.com.utbm.llama.model.enums.State;
 
+import java.util.Objects;
+
 public class DrawCardRule implements Rule{
 	@Override
 	public boolean isApplicable(Move move, Game game){
@@ -34,5 +36,10 @@ public class DrawCardRule implements Rule{
 		}
 		Deck drawPile = game.getDrawPile();
 		return drawPile != null && !drawPile.isEmpty();
+	}
+
+	@Override
+	public void apply(Move move, Game game) {
+
 	}
 }

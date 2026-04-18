@@ -2,6 +2,9 @@ package main.java.com.utbm.llama.model;
 
 import main.java.com.utbm.llama.model.rules.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * the rule engine checks wether all rules apply and applies them. check the commenting of each rule for more information.
  */

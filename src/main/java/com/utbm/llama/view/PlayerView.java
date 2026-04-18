@@ -1,7 +1,8 @@
 package main.java.com.utbm.llama.view;
 
 import main.java.com.utbm.llama.model.enums.CardType;
-import main.java.com.utbm.llama.model.Player;
+import main.java.com.utbm.llama.model.enums.State;
+import test.java.com.utbm.modeltest.*;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -138,7 +139,7 @@ public class PlayerView extends JPanel {
             showBadge("CÉSURE EN COURS", RED);
         } else if (player.hasStudyAbroad()) {
             showBadge("SEMESTRE À L'ÉTRANGER — 4 cartes", BLUE);
-        } else if (player.getState() == model.State.QUITTING) {
+        } else if (player.getState() == State.QUITTING) {
             showBadge("A PASSÉ LA MANCHE", TEXT_SUB);
         } else {
             statusBadge.setVisible(false);

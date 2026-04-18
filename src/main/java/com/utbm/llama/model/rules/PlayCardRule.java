@@ -61,4 +61,9 @@ public class PlayCardRule implements Rule {
 		return allowed != null && move.getCard() == allowed;
 
 	}
+
+	@Override
+	public void apply(Move move, Game game) {
+
+	}
 }
