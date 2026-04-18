@@ -8,9 +8,10 @@ import main.java.com.utbm.llama.model.enums.MoveType;
 import main.java.com.utbm.llama.model.enums.State;
 
 public class DrawCardRule implements Rule{
+	@Override
 	public boolean isApplicable(Move move, Game game){
-		if (move == null || game == null) return false;
-		
+	
+		Objects.requireNonNull(move, "move cannot be null");
 		return move.getType() == MoveType.DRAW_CARD;
 
 	}
@@ -20,9 +21,13 @@ public class DrawCardRule implements Rule{
 	 * <p>
 	 * This rule is valid only if the draw pile is not empty.
 	 */
+	@Override
 	public boolean validate(Move move, Game game){
 
-		if (move == null || game == null) return false;
+		Objects.requireNonNull(game, "game cannot be null");
+
+		Objects.requireNonNull(move, "move cannot be null");
+
 		Player player = move.getPlayer();
 		if (player.getState() == State.QUITTING){
 			return false;

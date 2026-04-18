@@ -13,4 +13,7 @@ public class Game {
     public Deck getDrawPile(){
 	    return drawPile;
     }
+    public Deck getDiscardPile(){
+	    return discardPile;
+    }
 }

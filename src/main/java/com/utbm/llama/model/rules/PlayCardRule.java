@@ -7,6 +7,9 @@ import main.java.com.utbm.llama.model.enums.MoveType;
 
 import java.util.Map;
 
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * this is the rule where we determine what card the player is allowed to play depending on the card on
  * top of the discard pile. For example if the discard pile has a one the player can only play a two.
@@ -26,10 +29,12 @@ public class PlayCardRule implements Rule {
 
 
 
+	@Override
 	public boolean isApplicable(Move move, Game game){
 
 		// if the move is not playing a card then it doesn't consern this rule.
-		if (move == null || game == null) return false;
+		Objects.requireNonNull(move, "move cannot be null");
+		Objects.requireNonNull(game, "game cannot be null");
 		
 		return move.getType() == MoveType.PLAY_CARD;
 
@@ -39,17 +44,21 @@ public class PlayCardRule implements Rule {
 	 * {@inheritDoc}
 	 * <p>
 	 * if the card played is one number above the one on top of the draw pile then the rule is respected. If the card on top of the draw pile is a Llama we return true if the card played is a one.
+	 * the discard pile should not be empty before this move is played
 	 */
+	@Override
 	public boolean validate(Move move, Game game){
-		
-		CardType topCard = game.discardPile.Peek();
+		Objects.requireNonNull(move, "move cannot be null");
+		Objects.requireNonNull(game, "game cannot be null");
+		CardType topCard = game.getDiscardPile().peek();
 
 		if (topCard == null) {    
 			throw new IllegalStateException("Discard pile is empty");
 		}
 			// we verify wether the card on top of the pile and the card in the move are applicable.
-		return move.card == VALID_NEXT_CARDS.get(topCard);
 
+		CardType allowed = VALID_NEXT_CARDS.get(topCard);        
+		return allowed != null && move.getCard() == allowed;
 
 	}
 }
