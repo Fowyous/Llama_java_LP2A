@@ -1,5 +1,11 @@
 package main.java.com.utbm.llama.model.rules;
 
+import main.java.com.utbm.llama.model.Game;
+import main.java.com.utbm.llama.model.Move;
+import main.java.com.utbm.llama.model.Player;
+import main.java.com.utbm.llama.model.enums.MoveType;
+import main.java.com.utbm.llama.model.enums.State;
+
 import java.util.Objects;
 
 public class QuitRoundRule implements Rule{
