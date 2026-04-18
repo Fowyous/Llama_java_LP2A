@@ -32,8 +32,8 @@ public interface Rule {
    /**
      * Vérifie que le coup respecte cette règle sans modifier l'état du jeu.
      *
-     * @param move le coup à valider
-     * @param game l'état courant du jeu (lecture seule dans cette méthode)
+     * @param move the move that is going to be validated.
+     * @param game the current game (read only in this method).
      * @return true si le coup est valide selon cette règle
      */
     boolean validate(Move move, Game game);

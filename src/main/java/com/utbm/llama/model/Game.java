@@ -9,5 +9,8 @@ public class Game {
     Deck discardPile;
     Tokens tokens;
     Round round;
-    
+
+    public Deck getDrawPile(){
+	    return drawPile;
+    }
 }

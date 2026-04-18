@@ -18,11 +18,8 @@ public class PlayCardRule implements Rule {
 			Map.entry(CardType.FIVE, CardType.SIX),    
 			Map.entry(CardType.SIX, CardType.LLAMA),    
 			Map.entry(CardType.LLAMA, CardType.ONE));
-	/**
-	 * @param move the move that is going to be played.
-	 * @param game the current game.
-	 * @return true if the card played is one number above the one on top of the draw pile. If the card on top of the draw pile is a Llama we return true if the card played is a one.
-	 */
+
+
 
 	public boolean isApplicable(Move move, Game game){
 		if(move.MoveType != PLAY_CARD){// if the move is not playing a card then it doesn't consern this rule.
@@ -31,6 +28,12 @@ public class PlayCardRule implements Rule {
 		return true
 
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * if the card played is one number above the one on top of the draw pile then the rule is respected. If the card on top of the draw pile is a Llama we return true if the card played is a one.
+	 */
 	public boolean validate(Move move, Game game){
 		
 		CardType topCard = game.discardPile.Peek();
