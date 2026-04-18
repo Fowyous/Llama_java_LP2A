@@ -23,12 +23,16 @@ public class PlayCardRule implements Rule {
 	 * @param game the current game.
 	 * @return true if the card played is one number above the one on top of the draw pile. If the card on top of the draw pile is a Llama we return true if the card played is a one.
 	 */
+
 	public boolean isApplicable(Move move, Game game){
-		
 		if(move.MoveType != PLAY_CARD){// if the move is not playing a card then it doesn't consern this rule.
 			return false;
 		}
+		return true
 
+	}
+	public boolean validate(Move move, Game game){
+		
 		CardType topCard = game.discardPile.Peek();
 
 		if (topCard == null) {    

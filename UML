@@ -76,6 +76,7 @@ package "Model" {
 
   interface Rule {
     + isApplicable(move: Move, game: Game): boolean
+    + validate(move: Move, game Game): boolean
     + apply(move: Move, game: Game): void
   }
 
