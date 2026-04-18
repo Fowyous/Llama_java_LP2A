@@ -6,7 +6,7 @@ public class QuitRoundRule implements Rule{
 	@Override
 	public boolean isApplicable(Move move, Game game){
 
-		if (move == null || game == null) return false;
+		Objects.requireNonNull(move, "move cannot be null");
 		return move.getType() == MoveType.QUIT_ROUND;
 	}
 
