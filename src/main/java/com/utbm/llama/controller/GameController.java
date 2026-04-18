@@ -1,7 +1,6 @@
 package main.java.com.utbm.llama.controller;
 
 import main.java.com.utbm.llama.model.Game;
-import main.java.com.utbm.llama.model.enums.GameMode;
 import main.java.com.utbm.llama.model.Player;
 import main.java.com.utbm.llama.view.MainFrame;
 
@@ -16,7 +15,7 @@ import main.java.com.utbm.llama.view.MainFrame;
  * main()
  * └── new GameController(mainFrame)
  * ├── new MenuController      → branche le menu
- * ├── new SettingsController  → branche les paramètres
+ * ├── new SettingController  → branche les paramètres
  * ├── new JuryController      → prêt à être déclenché
  * └── new BoardController     → créé au moment de startGame()
  * Pattern utilisé : Mediator
@@ -30,7 +29,7 @@ public class GameController {
     private Player localPlayer;
 
     private final MenuController menuController;
-    private final SettingsController settingsController;
+    private final SettingController settingController;
     private final JuryController juryController;
     private BoardController boardController;
 
@@ -44,11 +43,11 @@ public class GameController {
         this.mainFrame = mainFrame;
 
         this.menuController = new MenuController(mainFrame);
-        this.settingsController = new SettingsController(mainFrame);
+        this.settingController = new SettingController(mainFrame);
         this.juryController = new JuryController(mainFrame);
 
         menuController.setGameController(this);
-        settingsController.setGameController(this);
+        settingController.setGameController(this);
 
         mainFrame.showMenu();
 
@@ -57,7 +56,7 @@ public class GameController {
 
     /**
      * Démarre (ou redémarre) une partie.
-     * Appelé par MenuController ou SettingsController.
+     * Appelé par MenuController ou SettingController.
      * Prérequis : game et localPlayer doivent être non-null.
      * Si game est null (pas encore configuré), redirige vers les settings.
      */
@@ -87,7 +86,7 @@ public class GameController {
 
     /**
      * Remplace le modèle de jeu.
-     * Appelé par SettingsController après que l'utilisateur a sauvegardé.
+     * Appelé par SettingController après que l'utilisateur a sauvegardé.
      */
     public void setGame(Game game) {
         this.game = game;
@@ -115,8 +114,8 @@ public class GameController {
         return menuController;
     }
 
-    public SettingsController getSettingsController() {
-        return settingsController;
+    public SettingController getSettingController() {
+        return settingController;
     }
 
     public JuryController getJuryController() {

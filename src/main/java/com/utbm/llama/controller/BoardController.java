@@ -6,6 +6,7 @@ import main.java.com.utbm.llama.model.enums.GameMode;
 import main.java.com.utbm.llama.model.enums.State;
 import main.java.com.utbm.llama.view.BoardView;
 import main.java.com.utbm.llama.view.CesureView;
+import main.java.com.utbm.llama.view.HandView;
 import main.java.com.utbm.llama.view.MainFrame;
 
 import javax.swing.Timer;
@@ -493,7 +494,7 @@ public class BoardController {
         return new PlayerViewRef(boardView.getLocalPlayerView().getHandView());
     }
 
-    private record PlayerViewRef(view.HandView handView) {
+    private record PlayerViewRef(HandView handView) {
 
     }
 

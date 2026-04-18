@@ -19,7 +19,7 @@ import java.util.List;
  * - Créer un nouveau modèle Game et le transmettre au GameController
  * - Naviguer vers le menu ou lancer la partie selon l'action
  */
-public class SettingsController {
+public class SettingController {
 
     private final MainFrame mainFrame;
     private final SettingsView settingsView;
@@ -29,7 +29,7 @@ public class SettingsController {
     private Difficulty savedDifficulty = Difficulty.MEDIUM;
     private GameMode savedGameMode = GameMode.SHORT;
 
-    public SettingsController(MainFrame mainFrame) {
+    public SettingController(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         this.settingsView = mainFrame.getSettingsView();
         initListeners();
