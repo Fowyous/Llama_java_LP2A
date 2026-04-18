@@ -1,8 +1,9 @@
 package main.java.com.utbm.llama.view;
 
 import main.java.com.utbm.llama.model.enums.CardType;
-import test.java.com.utbm.modeltest.Game;
-import test.java.com.utbm.modeltest.Player;
+import main.java.com.utbm.llama.model.enums.GameMode;
+import main.java.com.utbm.llama.model.enums.State;
+import test.java.com.utbm.modeltest.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -152,36 +153,36 @@ public class BoardView extends JPanel {
      * @param game          le modèle de jeu
      * @param localPlayer   le joueur local (main visible)
      */
-    /*public void updateBoard(Game game, Player localPlayer) {
+    public void updateBoard(Game game, Player localPlayer) {
         updateHud(game);
         updatePiles(game);
         updatePlayers(game, localPlayer);
         updateActions(game, localPlayer);
-    }*/
+    }
 
-    /*private void updateHud(Game game) {
-        int maxRounds = game.getGameMode() == model.GameMode.SHORT ? 6 : 10;
+    private void updateHud(Game game) {
+        int maxRounds = game.getGameMode() == GameMode.SHORT ? 6 : 10;
         int threshold = game.getGraduationThreshold();
         roundLabel.setText("MANCHE " + game.getCurrentRound().getRoundNumber() + " / " + maxRounds);
-        modeLabel.setText("MODE " + (game.getGameMode() == model.GameMode.SHORT ? "COURT" : "LONG")
+        modeLabel.setText("MODE " + (game.getGameMode() == GameMode.SHORT ? "COURT" : "LONG")
                 + " — " + threshold + " crédits pour valider");
 
-        boolean showDetec = game.getGameMode() == model.GameMode.LONG
+        boolean showDetec = game.getGameMode() == GameMode.LONG
                 && game.getCurrentRound().getRoundNumber() == 4;
         detecBonusLabel.setVisible(showDetec);
-    }*/
+    }
 
-    /*private void updatePiles(Game game) {
+    private void updatePiles(Game game) {
         drawPileView.render(game.getDrawPile().size());
         discardPileView.render(game.getDiscardPile().isEmpty()
                 ? null
                 : game.getDiscardPile().peek());
-    }*/
+    }
 
-    /*private void updatePlayers(Game game, Player localPlayer) {
+    private void updatePlayers(Game game, Player localPlayer) {
         localPlayerPanel.removeAll();
         if (localPlayerView == null || !localPlayerView.getPlayerName().equals(localPlayer.getName())) {
-            localPlayerView = new PlayerView(localPlayer.getName(), localPlayer instanceof model.Bot);
+            localPlayerView = new PlayerView(localPlayer.getName(), localPlayer instanceof Bot);
         }
         boolean isLocalActive = game.getCurrentPlayer().equals(localPlayer);
         localPlayerView.update(localPlayer, true, isLocalActive);
@@ -196,7 +197,7 @@ public class BoardView extends JPanel {
 
         for (Player p : game.getPlayers()) {
             if (p.equals(localPlayer)) continue;
-            PlayerView pv = new PlayerView(p.getName(), p instanceof model.Bot);
+            PlayerView pv = new PlayerView(p.getName(), p instanceof Bot);
             pv.update(p, false, game.getCurrentPlayer().equals(p));
             opponentsPanel.add(pv);
             opponentsPanel.add(Box.createVerticalStrut(8));
@@ -205,15 +206,15 @@ public class BoardView extends JPanel {
         localPlayerPanel.revalidate();
         opponentsPanel.revalidate();
         repaint();
-    }*/
+    }
 
-    /*private void updateActions(Game game, Player localPlayer) {
+    private void updateActions(Game game, Player localPlayer) {
         boolean isActive = game.getCurrentPlayer().equals(localPlayer)
                 && !localPlayer.isSuspended();
         btnDraw.setEnabled(isActive && !game.getDrawPile().isEmpty());
-        btnQuit.setEnabled(isActive && localPlayer.getState() == model.State.PLAYING);
+        btnQuit.setEnabled(isActive && localPlayer.getState() == State.PLAYING);
         localPlayerView.getHandView().setInteractive(isActive);
-    }*/
+    }
 
     private JLabel buildHudLabel(String text, int size, int style) {
         JLabel lbl = new JLabel(text);
@@ -255,7 +256,4 @@ public class BoardView extends JPanel {
         return playerViews;
     }
 
-    public void updateBoard(Game game, Player localPlayer) {
-
-    }
 }
