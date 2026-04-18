@@ -1,6 +1,6 @@
 package main.java.com.utbm.llama.model.rules;
 
-public class DrawCardRule {
+public class DrawCardRule implements Rule{
 	public boolean isApplicable(Move move, Game game){
 		if (move == null || game == null) return false;
 		
@@ -16,6 +16,10 @@ public class DrawCardRule {
 	public boolean validate(Move move, Game game){
 
 		if (move == null || game == null) return false;
+		Player player = move.getPlayer();
+		if (player.getState() == State.QUITTING){
+			return false;
+		}
 		Deck drawPile = game.getDrawPile();
 		return drawPile != null && !drawPile.isEmpty();
 	}

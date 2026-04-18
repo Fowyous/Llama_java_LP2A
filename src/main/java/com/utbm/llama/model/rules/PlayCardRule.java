@@ -22,10 +22,11 @@ public class PlayCardRule implements Rule {
 
 
 	public boolean isApplicable(Move move, Game game){
-		if(move.MoveType != PLAY_CARD){// if the move is not playing a card then it doesn't consern this rule.
-			return false;
-		}
-		return true
+
+		// if the move is not playing a card then it doesn't consern this rule.
+		if (move == null || game == null) return false;
+		
+		return move.getType() == MoveType.PLAY_CARD;
 
 	}
 
