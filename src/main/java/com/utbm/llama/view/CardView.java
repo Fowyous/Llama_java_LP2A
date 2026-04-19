@@ -76,10 +76,6 @@ public class CardView extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if (selectable) {
-                    selected = !selected;
-                    repaint();
-                }
             }
         });
     }

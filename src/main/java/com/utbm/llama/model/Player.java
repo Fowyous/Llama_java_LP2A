@@ -218,4 +218,8 @@ public class Player {
                 studyAbroad ? " | ABROAD" : "",
                 suspended ? " | CÉSURE" : "");
     }
+
+    public void setCreditsLostThisRound(int creditsLostThisRound) {
+        this.creditsLostThisRound = creditsLostThisRound;
+    }
 }

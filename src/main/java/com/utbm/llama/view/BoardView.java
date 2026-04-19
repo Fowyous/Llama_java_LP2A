@@ -163,6 +163,7 @@ public class BoardView extends JPanel {
     }
 
     private void updateHud(Game game) {
+        if (game.getCurrentRound() == null) return;
         int maxRounds = game.getGameMode() == GameMode.SHORT ? 6 : 10;
         int threshold = game.getGraduationThreshold();
         roundLabel.setText("MANCHE " + game.getCurrentRound().getRoundNumber() + " / " + maxRounds);

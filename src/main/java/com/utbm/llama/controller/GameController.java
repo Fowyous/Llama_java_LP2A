@@ -68,6 +68,7 @@ public class GameController {
         }
 
         System.out.println("[GAME] Démarrage d'une partie | " + game.getPlayers().size() + " joueurs | " + game.getGameMode());
+        game.start();
 
         boardController = new BoardController(mainFrame, game, localPlayer, juryController);
 

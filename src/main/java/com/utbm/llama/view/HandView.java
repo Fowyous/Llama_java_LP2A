@@ -39,14 +39,14 @@ public class HandView extends JPanel {
             CardView cv = new CardView(ct);
             cv.setSelectable(active && interactive);
 
-            if (active && interactive && onCardPlayed != null) {
+            if (active && interactive) {
                 cv.addMouseListener(new java.awt.event.MouseAdapter() {
                     @Override
                     public void mouseClicked(java.awt.event.MouseEvent e) {
-                        if (cv.isSelected()) {
+                        deselectAll();
+                        cv.setSelected(true);
+                        if (onCardPlayed != null) {
                             onCardPlayed.accept(ct);
-                            deselectAll();
-                            cv.setSelected(true);
                         }
                     }
                 });

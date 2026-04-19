@@ -1,3 +1,5 @@
+package main.java.com.utbm.llama;
+
 import main.java.com.utbm.llama.controller.GameController;
 import main.java.com.utbm.llama.view.MainFrame;
 

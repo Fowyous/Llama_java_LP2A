@@ -9,7 +9,7 @@ import main.java.com.utbm.llama.view.CesureView;
 import main.java.com.utbm.llama.view.HandView;
 import main.java.com.utbm.llama.view.MainFrame;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -323,7 +323,9 @@ public class BoardController {
 
         cesureView.addContinueListener(e -> {
             mainFrame.showGame(boardView);
-            if (onDone != null) onDone.run();
+            if (onDone != null) {
+                SwingUtilities.invokeLater(onDone::run);
+            }
         });
 
         mainFrame.showCesure(cesureView);
@@ -335,21 +337,22 @@ public class BoardController {
      * Vérifie d'abord si la partie est terminée.
      */
     private void prepareNextRound() {
-        int maxRounds = game.getGameMode() == GameMode.SHORT ? 6 : 10;
-
-        if (currentRoundNumber >= maxRounds) {
+        if (game.isOver()) {
             endGame();
             return;
         }
-
-        currentRoundNumber++;
-        System.out.println("[BOARD] === Début de la manche " + currentRoundNumber + " ===");
-
-        if (game.getGameMode() == GameMode.LONG && currentRoundNumber == 5) {
-            applyDetecBonus();
+        boolean started = game.beginNextRound();
+        if (started) {
+            startRound();
+            SwingUtilities.invokeLater(() -> {
+                if (boardView != null) {
+                    mainFrame.showGame(boardView);
+                    updateView();
+                }
+            });
+        } else {
+            endGame();
         }
-
-        startRound();
     }
 
     /**
@@ -363,7 +366,7 @@ public class BoardController {
     private void startRound() {
         roundInProgress = true;
 
-        if (game.getDrawPile().size() < game.getPlayers().size() * 6) {
+        /*if (game.getDrawPile().size() < game.getPlayers().size() * 6) {
             game.getDrawPile().shuffle();
         }
 
@@ -390,7 +393,7 @@ public class BoardController {
             p.setStudyAbroad(false);
 
             System.out.println("[ROUND START] " + p.getName() + " | " + p.getHand().size() + " cartes | " + p.getCredits() + " crédits");
-        }
+        }*/
 
         updateView();
         bindCardPlayedListener();

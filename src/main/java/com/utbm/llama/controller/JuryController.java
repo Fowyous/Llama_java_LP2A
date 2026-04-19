@@ -5,6 +5,8 @@ import main.java.com.utbm.llama.model.Player;
 import main.java.com.utbm.llama.view.JuryView;
 import main.java.com.utbm.llama.view.MainFrame;
 
+import javax.swing.*;
+
 /**
  * Contrôleur du mini-jeu "Jury".
  * Contexte : déclenché quand un joueur perd ≥ 20 crédits dans une manche.
@@ -83,24 +85,21 @@ public class JuryController {
      */
     private void evaluatePostJury() {
         if (targetPlayer.getCredits() < 0) {
-            System.out.println("[JURY] " + targetPlayer.getName() + " est toujours en négatif (" + targetPlayer.getCredits() + ") → semestre de césure");
-
-            if (boardController != null) {
-                boardController.triggerCesure(targetPlayer, onJuryFinished);
-            }
+            boardController.triggerCesure(targetPlayer, onJuryFinished);
         } else {
-            System.out.println("[JURY] " + targetPlayer.getName() + " repasse en positif → retour au jeu");
             notifyFinished();
         }
     }
 
-    /**
-     * Appelle le callback de fin de jury.
-     */
     private void notifyFinished() {
-        if (onJuryFinished != null) {
-            onJuryFinished.run();
-        }
+        SwingUtilities.invokeLater(() -> {
+            if (boardController.getBoardView() != null) {
+                mainFrame.showGame(boardController.getBoardView());
+            }
+            if (onJuryFinished != null) {
+                onJuryFinished.run();
+            }
+        });
     }
 
     public void setBoardController(BoardController bc) {
