@@ -1,89 +1,31 @@
 @startuml
 
-package "Model" {
+skinparam packageStyle rectangle
+skinparam classBackgroundColor #1A1A1A
+skinparam classBorderColor #C8A84B
+skinparam classArrowColor #C8A84B
+skinparam classFontColor #F0EDE6
+skinparam packageBackgroundColor #111111
+skinparam packageBorderColor #2E2E2E
+skinparam packageFontColor #C8A84B
+skinparam noteBackgroundColor #141414
+skinparam noteBorderColor #2E2E2E
+skinparam noteFontColor #8A8680
 
-  class Game {
-    - players: List<Player>
-    - drawPile: Deck
-    - discardPile: Deck
-    - tokens: Tokens
-    - currentPlayerIndex: int
-    - currentRound: Round
-    + start(): void
-    + nextTurn(): void
-    + applyMove(move: Move): void
-    + isOver(): boolean
-    + getWinner(): Player
-  }
+package "model" {
 
-  class Round {
-    - roundNumber: int
-    - activePlayers: List<Player>
-    + startRound(players: List<Player>): void
-    + isOver(): boolean
-    + endRound(): void
-    + distributeTokens(): void
-  }
+  enum CardType {
+    ONE(1)
+    TWO(2)
+    THREE(3)
+    FOUR(4)
+    FIVE(5)
+    SIX(6)
+    LLAMA(10)
 
-  class Bot {
-    - difficulty: Difficulty
-    + decideMove(game: Game): Move
-    + setDifficulty(d: Difficulty): void
-  }
-
-  class Player {
-    - name: String
-    - hand: List<CardType>
-    - tokens: Map<TokenType, Integer>
-    - score: int
-    - state: State
-    + addCard(card: CardType): void
-    + removeCard(card: CardType): void
-    + changeState(state: State): void
-    + addToken(token: TokenType): void
-    + removeToken(token: TokenType): void
-    + computeScore(): int
-  }
-
-  class Tokens {
-    - tokens: Map<TokenType, Integer>
-    + createFull(): Tokens
-    + isEmpty(type: TokenType): boolean
-    + takeToken(type: TokenType): boolean
-  }
-
-  class Deck {
-    - cards: Queue<CardType>
-    + shuffle(): void
-    + draw(): CardType
-    + peek(): CardType
-    + isEmpty(): boolean
-    + add(card: CardType): void
-    + createFull(): Deck
-  }
-
-  class Move {
-    - player: Player
-    - type: MoveType
-    - card: CardType
-  }
-
-  class RuleEngine {
-    - rules: List<Rule>
-    + validateMove(move: Move, game: Game): boolean
-    + applyRules(move: Move, game: Game): void
-  }
-
-  interface Rule {
-    + isApplicable(move: Move, game: Game): boolean
-    + validate(move: Move, game Game): boolean
-    + apply(move: Move, game: Game): void
-  }
-
-  enum Difficulty {
-    EASY
-    MEDIUM
-    HARD
+    + getValue(): int
+    + canBePlayedOn(top: CardType): boolean
+    + next(): CardType
   }
 
   enum MoveType {
@@ -93,163 +35,681 @@ package "Model" {
   }
 
   enum State {
-    QUITTING
     PLAYING
+    QUITTING
   }
 
-  enum TokenType {
-    BLACK
-    WHITE
+  enum GameMode {
+    SHORT(6, 180)
+    LONG(10, 300)
+
+    + {static} DETEC_ROUND: int = 4
+    + {static} DETEC_THRESHOLD: int = 120
+    + {static} DETEC_BONUS: int = 30
+
+    + getMaxRounds(): int
+    + getGraduationThreshold(): int
+    + hasDetecBonus(): boolean
   }
 
-  enum CardType {
-    ONE
-    TWO
-    THREE
-    FOUR
-    FIVE
-    SIX
-    LLAMA
+  enum Difficulty {
+    EASY
+    MEDIUM
+    HARD
   }
+
+  class Deck {
+    - cards: Deque<CardType>
+
+    + {static} createFull(): Deck
+    + {static} empty(): Deck
+
+    + shuffle(): void
+    + draw(): CardType
+    + peek(): CardType
+    + add(card: CardType): void
+    + isEmpty(): boolean
+    + size(): int
+    + getCards(): List<CardType>
+    + clear(): void
+  }
+
+  class Move {
+    - player: Player
+    - type: MoveType
+    - card: CardType
+
+    + {static} playCard(player, card): Move
+    + {static} drawCard(player): Move
+    + {static} quitRound(player): Move
+
+    + getPlayer(): Player
+    + getType(): MoveType
+    + getCard(): CardType
+    + isPlayCard(): boolean
+    + isDrawCard(): boolean
+    + isQuitRound(): boolean
+  }
+
+  class Player {
+    - name: String
+    - hand: List<CardType>
+    - credits: int
+    - creditsLostThisRound: int
+    - startingHandSize: int
+    - studyAbroad: boolean
+    - suspended: boolean
+    - state: State
+
+    + addCard(card: CardType): void
+    + removeCard(card: CardType): void
+    + clearHand(): void
+    + getHand(): List<CardType>
+    + computeHandValue(): int
+    + addCredits(amount: int): void
+    + getCredits(): int
+    + setCredits(n: int): void
+    + resetCreditsLostThisRound(): void
+    + getCreditsLostThisRound(): int
+    + hasStudyAbroad(): boolean
+    + setStudyAbroad(b: boolean): void
+    + isSuspended(): boolean
+    + setSuspended(b: boolean): void
+    + getStartingHandSize(): int
+    + getState(): State
+    + changeState(s: State): void
+    + resetForNewRound(): void
+    + getName(): String
+  }
+
+  class Bot {
+    - difficulty: Difficulty
+    - rng: Random
+
+    + decideMove(game: Game): Move
+    - decideMoveEasy(game: Game): Move
+    - decideMovemedium(game: Game): Move
+    - decideMoveHard(game: Game): Move
+    - getPlayableCards(game: Game): List<CardType>
+    + getDifficulty(): Difficulty
+  }
+
+  class Jury {
+    - targetPlayer: Player
+    - creditsLostThisRound: int
+    - hiddenCards: List<CardType>
+    - chosenCard: CardType
+    - resolved: boolean
+    + pickCard(index: int): CardType
+    + requiresCesure(): boolean
+    + getTargetPlayer(): Player
+    + getHiddenCards(): List<CardType>
+    + getChosenCard(): CardType
+    + getGained(): int
+    + isResolved(): boolean
+  }
+
+  class CreditLedger {
+    - entries: List<Entry>
+
+    + record(round: int, player: Player, reason: Reason, delta: int): void
+    + recordOnly(round: int, player: Player, reason: Reason, delta: int, balance: int): void
+    + getLostThisRound(round: int, player: Player): int
+    + getGainedThisRound(round: int, player: Player): int
+    + getNetForRound(round: int, player: Player): int
+    + getEntriesForRound(round: int, player: Player): List<Entry>
+    + getEntriesForPlayer(player: Player): List<Entry>
+    + getAllEntries(): List<Entry>
+    + buildSummary(players: List<Player>, nbRounds: int): Map<Player, int[]>
+    + printFull(): void
+    + size(): int
+  }
+
+  enum "CreditLedger.Reason" as Reason {
+    ROUND_START
+    HAND_PENALTY
+    JURY_GAIN
+    DETEC_BONUS
+    MANUAL_CORRECTION
+
+    + getLabel(): String
+    + isGain(): boolean
+    + isLoss(): boolean
+  }
+
+  class "CreditLedger.Entry" as LedgerEntry {
+    - roundNumber: int
+    - player: Player
+    - reason: Reason
+    - delta: int
+    - balanceAfter: int
+
+    + getRoundNumber(): int
+    + getPlayer(): Player
+    + getReason(): Reason
+    + getDelta(): int
+    + getBalanceAfter(): int
+  }
+
+  class Round {
+    - roundNumber: int
+    - allPlayers: List<Player>
+    - activePlayers: List<Player>
+    - gameMode: GameMode
+    - ledger: CreditLedger
+    - over: boolean
+
+    + {static} CREDITS_PER_ROUND: int = 35
+    + {static} JURY_TRIGGER_THRESHOLD: int = 20
+    + {static} DEFAULT_HAND_SIZE: int = 6
+    + {static} STUDY_ABROAD_HAND_SIZE: int = 4
+
+    + startRound(drawPile: Deck): void
+    + isOver(): boolean
+    + deductHandPenalties(): List<JuryCandidate>
+    + checkStudyAbroad(): void
+    + checkDetecBonus(): void
+    + needsCesure(player: Player): boolean
+    + applyCesure(player: Player): void
+    + allPlayersSuspended(): boolean
+    + markEnded(): void
+    + getRoundNumber(): int
+    + getAllPlayers(): List<Player>
+    + getActivePlayers(): List<Player>
+  }
+
+  class "Round.JuryCandidate" as JuryCandidate <<record>> {
+    + player: Player
+    + creditsLost: int
+  }
+
+  class Game {
+    - players: List<Player>
+    - gameMode: GameMode
+    - ledger: CreditLedger
+    - drawPile: Deck
+    - discardPile: Deck
+    - currentRound: Round
+    - currentRoundNumber: int
+    - currentPlayerIndex: int
+    - gameOver: boolean
+
+    + start(): void
+    + beginNextRound(): boolean
+    + nextTurn(): void
+    + applyMove(move: Move): void
+    + endCurrentRound(): List<JuryCandidate>
+    + endRoundPostJury(): void
+    + isOver(): boolean
+    + getWinner(): Player
+    + isGraduated(player: Player): boolean
+    + getGraduationThreshold(): int
+    + printSummary(): void
+    + getPlayers(): List<Player>
+    + getCurrentPlayer(): Player
+    + getCurrentRound(): Round
+    + getDrawPile(): Deck
+    + getDiscardPile(): Deck
+    + getGameMode(): GameMode
+    + getLedger(): CreditLedger
+    + getCurrentRoundNumber(): int
+  }
+
+  package "rules" {
+
+    interface Rule {
+      + isApplicable(move: Move, game: Game): boolean
+      + validate(move: Move, game: Game): boolean
+      + apply(move: Move, game: Game): void
+      + getName(): String
+    }
+
+    class PlayCardRule {
+      + isApplicable(move: Move, game: Game): boolean
+      + validate(move: Move, game: Game): boolean
+      + apply(move: Move, game: Game): void
+      + getName(): String
+    }
+
+    class DrawCardRule {
+      + isApplicable(move: Move, game: Game): boolean
+      + validate(move: Move, game: Game): boolean
+      + apply(move: Move, game: Game): void
+      + getName(): String
+    }
+
+    class QuitRoundRule {
+      + isApplicable(move: Move, game: Game): boolean
+      + validate(move: Move, game: Game): boolean
+      + apply(move: Move, game: Game): void
+      + getName(): String
+    }
+
+    class StudyAbroadRule {
+      + isApplicable(move: Move, game: Game): boolean
+      + validate(move: Move, game: Game): boolean
+      + apply(move: Move, game: Game): void
+      + {static} isEligible(player: Player): boolean
+      + {static} applyTo(player: Player): void
+      + getName(): String
+    }
+
+    class JuryRule {
+      + {static} JURY_TRIGGER: int = 20
+
+      + isApplicable(move: Move, game: Game): boolean
+      + validate(move: Move, game: Game): boolean
+      + apply(move: Move, game: Game): void
+      + {static} shouldTrigger(player: Player, lost: int): boolean
+      + {static} shouldTrigger(player: Player): boolean
+      + getName(): String
+    }
+
+    class CesureRule {
+      + isApplicable(move: Move, game: Game): boolean
+      + validate(move: Move, game: Game): boolean
+      + apply(move: Move, game: Game): void
+      + {static} shouldTrigger(player: Player): boolean
+      + {static} applyTo(player: Player, game: Game): void
+      + getName(): String
+    }
+
+    class DetecBonusRule {
+      + isApplicable(move: Move, game: Game): boolean
+      + validate(move: Move, game: Game): boolean
+      + apply(move: Move, game: Game): void
+      + {static} isApplicableContext(game: Game): boolean
+      + {static} isEligible(player: Player): boolean
+      + {static} applyIfEligible(game: Game, ledger: CreditLedger): void
+      + getName(): String
+    }
+
+    class RuleEngine {
+      - rules: List<Rule>
+      - studyAbroadRule: StudyAbroadRule
+      - juryRule: JuryRule
+      - cesureRule: CesureRule
+      - detecBonusRule: DetecBonusRule
+
+      + validateMove(move: Move, game: Game): boolean
+      + applyRules(move: Move, game: Game): void
+      + processEndOfRound(game: Game): List<JuryCandidate>
+      + processPostJury(game: Game): List<Player>
+      + hasPlayableCard(player: Player, game: Game): boolean
+      + getPlayableCards(player: Player, game: Game): List<CardType>
+      + isRoundOver(game: Game): boolean
+      + addRule(rule: Rule): void
+      + getRules(): List<Rule>
+    }
+
+    ' Implémentations de Rule
+    PlayCardRule    ..|> Rule
+    DrawCardRule    ..|> Rule
+    QuitRoundRule   ..|> Rule
+    StudyAbroadRule ..|> Rule
+    JuryRule        ..|> Rule
+    CesureRule      ..|> Rule
+    DetecBonusRule  ..|> Rule
+
+    RuleEngine "1" o-- "*" Rule         : rules
+    RuleEngine ..> Game                 : uses
+    RuleEngine ..> Move                 : uses
+    RuleEngine ..> JuryCandidate        : produces
+  }
+
+  Game "1" *-- "1" Deck                  : drawPile
+  Game "1" *-- "1" Deck                  : discardPile
+  Game "1" *-- "1" CreditLedger          : ledger
+  Game "1" *-- "1" Round                 : currentRound
+  Game "1" o-- "*" Player                : players
+  Game ..> Move                          : applyMove()
+  Game ..> JuryCandidate                 : endCurrentRound()
+
+  Round "1" o-- "*" Player               : allPlayers / activePlayers
+  Round "1" *-- "0..*" JuryCandidate     : produces
+  Round ..> CreditLedger                 : uses
+
+  Bot --|> Player
+
+  Jury "1" --> "1" Player                : targetPlayer
+  Jury "1" --> "1..7" CardType           : hiddenCards
+
+  Move "1" --> "1" Player
+  Move "1" --> "0..1" CardType
+  Move "1" --> "1" MoveType
+
+  Deck "1" *-- "*" CardType              : cards
+
+  CreditLedger "1" *-- "*" LedgerEntry   : entries
+  CreditLedger "1" *-- "1" Reason
+  LedgerEntry "1" --> "1" Reason
+  LedgerEntry "1" --> "1" Player
+
+  Player --> State
+  Bot --> Difficulty
+  Game --> GameMode
+  Round --> GameMode
 }
 
-' Compositions du jeu
-Game "1" *-- "*" Player : players
-Game "1" *-- "1" Deck : drawPile
-Game "1" *-- "1" Deck : discardPile
-Game "1" *-- "1" Tokens : tokens
-' AJOUT : composition avec Round
-Game "1" *-- "1" Round : currentRound
-
-Round "1" --> "*" Player : activePlayers
-Move "1" --> "1" Player
-Move "1" --> "0..1" CardType
-Deck "1" *-- "*" CardType : cards
-
-RuleEngine "1" o-- "*" Rule : rules
-RuleEngine ..> Rule : uses
-Bot --|> Player
-
-package "View" {
+package "view" {
 
   class MainFrame {
-    - currentScreen: JPanel
+    + {static} SCREEN_MENU: String
+    + {static} SCREEN_SETTINGS: String
+    + {static} SCREEN_BOARD: String
+    + {static} SCREEN_JURY: String
+    + {static} SCREEN_CESURE: String
+    - menuView: MenuView
+    - settingsView: SettingsView
+    - boardView: BoardView
+    - juryView: JuryView
+    - cesureView: CesureView
+    - cardLayout: CardLayout
+    - contentPanel: JPanel
+
     + showMenu(): void
     + showSettings(): void
-    + showGame(): void
+    + showGame(boardView: BoardView): void
+    + showJury(juryView: JuryView): void
+    + showCesure(cesureView: CesureView): void
+    + getMenuView(): MenuView
+    + getSettingsView(): SettingsView
+    + getBoardView(): BoardView
+    + getJuryView(): JuryView
+    + getCesureView(): CesureView
   }
 
   class MenuView {
-    - btnStart: Button
-    - btnSettings: Button
-    - btnQuit: Button
-    + onStartClicked(): void
+    - btnStart: JButton
+    - btnSettings: JButton
+    - btnQuit: JButton
+
+    + addStartListener(l: ActionListener): void
+    + addSettingsListener(l: ActionListener): void
+    + addQuitListener(l: ActionListener): void
+    + getBtnStart(): JButton
+    + getBtnSettings(): JButton
+    + getBtnQuit(): JButton
   }
 
   class SettingsView {
-    - comboNbPlayers: ComboBox
-    - comboDifficulty: ComboBox
-    + saveSettings(): void
+    - comboNbPlayers: JComboBox<Integer>
+    - comboDifficulty: JComboBox<Difficulty>
+    - comboGameMode: JComboBox<GameMode>
+    - btnSave: JButton
+    - btnBack: JButton
+
+    + addSaveListener(l: ActionListener): void
+    + addBackListener(l: ActionListener): void
+    + getNbPlayers(): int
+    + getDifficulty(): Difficulty
+    + getGameMode(): GameMode
+    + setNbPlayers(n: int): void
+    + setDifficulty(d: Difficulty): void
+    + setGameMode(m: GameMode): void
   }
 
-class DrawPileView {
-    + render(): void
+  class BoardView {
+    - drawPileView: DrawPileView
+    - discardPileView: DiscardPileView
+    - playerViews: List<PlayerView>
+    - localPlayerView: PlayerView
+    - roundLabel: JLabel
+    - modeLabel: JLabel
+    - thresholdLabel: JLabel
+    - detecBonusLabel: JLabel
+    - btnDraw: JButton
+    - btnQuit: JButton
+    - opponentsPanel: JPanel
+
+    + updateBoard(game: Game, localPlayer: Player): void
+    + addDrawListener(l: ActionListener): void
+    + addQuitRoundListener(l: ActionListener): void
+    + getDrawPileView(): DrawPileView
+    + getDiscardPileView(): DiscardPileView
+    + getLocalPlayerView(): PlayerView
+    + getPlayerViews(): List<PlayerView>
+  }
+
+  class DrawPileView {
+    - drawButton: JButton
+    - countLabel: JLabel
+    - remaining: int
+
+    + render(remaining: int): void
+    + setDrawable(b: boolean): void
+    + addDrawListener(l: ActionListener): void
   }
 
   class DiscardPileView {
-    - topCard: CardView
-    + render(): void
+    - topCardView: CardView
+
+    + render(topCard: CardType): void
+    + getTopCardView(): CardView
   }
 
   class PlayerView {
-  - playerName: String
-  - handView: HandView
-  - scoreLabel: Label
-  - position: Position
-  - isBot: boolean
-  + displayPlayerInfo(): void
-  - applyLayout(): void
-}
+    - playerName: String
+    - isBot: boolean
+    - nameLabel: JLabel
+    - creditsLabel: JLabel
+    - statusBadge: JLabel
+    - handView: HandView
+    - activeIndicator: JLabel
 
-enum Position {
-  SOUTH
-  NORTH
-  EAST
-  WEST
-}
-
-class BoardView {
-  - drawPileView: DrawPileView
-  - discardPileView: DiscardPileView
-  - playerViews: Map<Position, PlayerView>
-  + updateBoard(game: Game): void
-  + addPlayer(player: Player, pos: Position): void
-}
+    + update(player: Player, isLocal: boolean, isActive: boolean): void
+    + updateCredits(credits: int): void
+    + updateActive(active: boolean): void
+    + updateStatus(player: Player): void
+    + getHandView(): HandView
+    + getPlayerName(): String
+    + isBot(): boolean
+  }
 
   class CardView {
-    - image: Image
+    + {static} CARD_W: int = 80
+    + {static} CARD_H: int = 120
     - type: CardType
-    + render(): void
+    - faceDown: boolean
+    - selected: boolean
+    - hovering: boolean
+    - selectable: boolean
+
+    + setSelectable(b: boolean): void
+    + setSelected(b: boolean): void
+    + setFaceDown(b: boolean): void
+    + isSelected(): boolean
+    + getCardType(): CardType
   }
 
   class HandView {
-    - cards: List<CardView>
-    + layoutCards(): void
+    - cardViews: List<CardView>
+    - interactive: boolean
+    - onCardPlayed: Consumer<CardType>
+
+    + updateHand(cards: List<CardType>, active: boolean): void
+    + showHidden(count: int): void
+    + deselectAll(): void
+    + getSelectedCard(): CardType
+    + setOnCardPlayed(callback: Consumer<CardType>): void
+    + setInteractive(b: boolean): void
+    + getCardCount(): int
   }
+
+  class JuryView {
+    - hiddenCards: List<CardView>
+    - selectedIndex: int
+    - playerNameLabel: JLabel
+    - creditsLostLabel: JLabel
+    - currentCreditsLabel: JLabel
+    - cardsPanel: JPanel
+    - btnConfirm: JButton
+    - resultLabel: JLabel
+
+    + setup(playerName: String, creditsLost: int, currentCredits: int): void
+    + revealCard(index: int, revealed: CardType): void
+    + setOnCardPicked(callback: Consumer<Integer>): void
+    + addConfirmListener(l: ActionListener): void
+    + getSelectedIndex(): int
+  }
+
+  class CesureView {
+    - playerNameLabel: JLabel
+    - creditsLabel: JLabel
+    - descriptionLabel: JLabel
+    - roundInfoLabel: JLabel
+    - btnContinue: JButton
+
+    + setup(playerName: String, currentCredits: int, nextRound: int, isBothSkipping: boolean): void
+    + addContinueListener(l: ActionListener): void
+  }
+
+  ' Relations View
+  MainFrame "1" *-- "1" MenuView
+  MainFrame "1" *-- "1" SettingsView
+  MainFrame "1" *-- "0..1" BoardView
+  MainFrame "1" *-- "0..1" JuryView
+  MainFrame "1" *-- "0..1" CesureView
+
+  BoardView "1" *-- "1" DrawPileView
+  BoardView "1" *-- "1" DiscardPileView
+  BoardView "1" *-- "1..*" PlayerView    : opponents + local
+
+  PlayerView "1" *-- "1" HandView
+  HandView   "1" *-- "*" CardView
+  DiscardPileView "1" *-- "0..1" CardView
+
+  JuryView "1" *-- "7" CardView          : hiddenCards
 }
 
-MainFrame "1" *-- "1" MenuView
-MainFrame "1" *-- "1" SettingsView
-MainFrame "1" *-- "1" BoardView
-
-BoardView "1" *-- "1" DrawPileView
-BoardView "1" *-- "1" DiscardPileView
-BoardView "1" *-- "1..*" PlayerView : contains
-
-PlayerView "1" *-- "1" HandView
-HandView "1" *-- "*" CardView
-DiscardPileView "1" *-- "1" CardView
-
-package "Controller" {
+package "controller" {
 
   class GameController {
-    - gameModel: Game
     - mainFrame: MainFrame
-    + GameController(model: Game, view: MainFrame)
-    + initController(): void
-    + startGame(): void
-    + showSettings(): void
-  }
+    - game: Game
+    - localPlayer: Player
+    - menuController: MenuController
+    - settingsController: SettingsController
+    - juryController: JuryController
+    - boardController: BoardController
 
-  class BoardController {
-    - gameModel: Game
-    - boardView: BoardView
-    + handleDrawCard(): void
-    + handlePlayCard(card: CardType): void
-    + handleQuitRound(): void
-    - updateView(): void
-    - checkBotTurn(): void
+    + startGame(): void
+    + showMenu(): void
+    + showSettings(): void
+    + setGame(game: Game): void
+    + setLocalPlayer(p: Player): void
+    + getGame(): Game
+    + getLocalPlayer(): Player
+    + getMenuController(): MenuController
+    + getSettingsController(): SettingsController
+    + getJuryController(): JuryController
+    + getBoardController(): BoardController
+    + getMainFrame(): MainFrame
   }
 
   class MenuController {
     - mainFrame: MainFrame
+    - menuView: MenuView
+    - gameController: GameController
+
     + handleStartGame(): void
     + handleOpenSettings(): void
     + handleExit(): void
+    + setGameController(gc: GameController): void
   }
 
   class SettingsController {
-    - gameModel: Game
+    - mainFrame: MainFrame
     - settingsView: SettingsView
-    + handleSaveSettings(nbPlayers: int, diff: Difficulty): void
+    - gameController: GameController
+    - savedNbPlayers: int
+    - savedDifficulty: Difficulty
+    - savedGameMode: GameMode
+
+    + handleSaveSettings(nbPlayers: int, diff: Difficulty, mode: GameMode): void
+    - buildPlayers(nbPlayers: int, diff: Difficulty): List<Player>
+    + getSavedNbPlayers(): int
+    + getSavedDifficulty(): Difficulty
+    + getSavedGameMode(): GameMode
+    + setGameController(gc: GameController): void
   }
+
+  class JuryController {
+    - mainFrame: MainFrame
+    - juryView: JuryView
+    - boardController: BoardController
+    - targetPlayer: Player
+    - creditsLostThisRound: int
+    - onJuryFinished: Runnable
+    - {static} JURY_CARDS: CardType[]
+
+    + startJury(player: Player, creditsLost: int, onFinished: Runnable): void
+    - handleCardPicked(index: int): void
+    - evaluatePostJury(): void
+    - notifyFinished(): void
+    + setBoardController(bc: BoardController): void
+    + getJuryView(): JuryView
+  }
+
+  class BoardController {
+    - mainFrame: MainFrame
+    - game: Game
+    - localPlayer: Player
+    - boardView: BoardView
+    - juryController: JuryController
+    - ruleEngine: RuleEngine
+    - roundInProgress: boolean
+    - currentRoundNumber: int
+    - {static} BOT_DELAY_MS: int = 1200
+
+    + initBoard(): void
+    - bindBoardListeners(): void
+    - bindCardPlayedListener(): void
+    + handlePlayCard(card: CardType): void
+    + handleDrawCard(): void
+    + handleQuitRound(): void
+    - checkBotTurn(): void
+    - executeBotTurn(bot: Bot): void
+    - checkRoundOver(): void
+    - endRound(): void
+    - processPostRoundCascade(players: List<Player>, index: int, onAllDone: Runnable): void
+    + triggerCesure(player: Player, onDone: Runnable): void
+    - prepareNextRound(): void
+    - startRound(): void
+    - applyDetecBonus(): void
+    - endGame(): void
+    - updateView(): void
+    + setGame(game: Game): void
+    + setLocalPlayer(p: Player): void
+    + getBoardView(): BoardView
+  }
+
+  ' Relations Controller
+  GameController "1" *-- "1" MenuController
+  GameController "1" *-- "1" SettingsController
+  GameController "1" *-- "1" JuryController
+  GameController "1" *-- "0..1" BoardController
+
+  MenuController     --> GameController       : notifie
+  SettingsController --> GameController       : notifie
+
+  BoardController ..> Game                   : modifie
+  BoardController ..> BoardView              : met à jour
+  BoardController ..> RuleEngine             : valide les coups
+  BoardController --> JuryController         : déclenche le jury
+  BoardController ..> CesureView             : crée et affiche
+
+  JuryController ..> JuryView               : crée et affiche
+  JuryController --> BoardController        : notifie (onFinished)
+  JuryController ..> Jury                   : instancie
+
+  SettingsController ..> Game               : crée
+  SettingsController ..> Player             : crée
+  SettingsController ..> Bot                : crée
+
+  GameController --> MainFrame              : possède
+  GameController --> Game                   : possède
+  GameController --> Player                 : localPlayer
 }
-
-GameController "1" --> "1" MenuController
-GameController "1" --> "1" BoardController
-GameController "1" --> "1" SettingsController
-
-BoardController ..> Game : modifies
-BoardController ..> BoardView : updates
 
 @enduml
