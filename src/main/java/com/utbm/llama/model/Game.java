@@ -81,23 +81,30 @@ public class Game {
     public boolean beginNextRound() {
         if (currentRoundNumber >= gameMode.getMaxRounds()) {
             gameOver = true;
-            System.out.println("=== FIN DE PARTIE après " + currentRoundNumber + " manches ===");
             return false;
         }
 
         currentRoundNumber++;
         currentPlayerIndex = 0;
 
-        if (drawPile.size() < players.size() * Round.DEFAULT_HAND_SIZE) {
-            rebuildDrawPile();
-        }
+        // ── NOUVEAU : reconstruit toujours le deck proprement ─────────────
+        rebuildDrawPile();
+        // ──────────────────────────────────────────────────────────────────
+
         discardPile.clear();
 
         currentRound = new Round(currentRoundNumber, players, gameMode, ledger);
         currentRound.startRound(drawPile);
 
-        System.out.println("=== MANCHE " + currentRoundNumber + " / "
-                + gameMode.getMaxRounds() + " démarrée ===");
+        // Pose la première carte sur la défausse
+        CardType firstCard = drawPile.draw();
+        if (firstCard != null) {
+            discardPile.add(firstCard);
+            System.out.println("[GAME] Carte initiale défausse : " + firstCard);
+        }
+
+        System.out.println("=== MANCHE " + currentRoundNumber
+                + " / " + gameMode.getMaxRounds() + " démarrée ===");
 
         return true;
     }
@@ -107,10 +114,23 @@ public class Game {
      * Appelé quand la pioche est trop petite pour distribuer les cartes.
      */
     private void rebuildDrawPile() {
+        // 1. Récupère les cartes encore dans les mains (non jouées)
+        //    pour ne pas les perdre — elles retournent dans le pool
+        for (Player p : players) {
+            // On vide juste le tracking — les cartes physiques retournent au deck
+            // (clearHand() sera appelé par Round.startRound())
+        }
+
+        // 2. Crée un deck complet tout neuf et mélangé
+        Deck fresh = Deck.createFull();   // 56 cartes, déjà mélangées
+
+        // 3. Remplace la pioche actuelle proprement
         drawPile.clear();
-        Deck fresh = Deck.createFull();
-        fresh.getCards().forEach(drawPile::add);
-        System.out.println("[GAME] Pioche reconstituée (" + drawPile.size() + " cartes)");
+        for (CardType c : fresh.getCards()) {
+            drawPile.add(c);
+        }
+
+        System.out.println("[GAME] Pioche reconstruite : " + drawPile.size() + " cartes");
     }
 
     /**

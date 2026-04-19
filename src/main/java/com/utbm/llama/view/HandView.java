@@ -31,26 +31,28 @@ public class HandView extends JPanel {
      * @param cards  cartes en main
      * @param active si true, les cartes sont cliquables (tour du joueur)
      */
+    // ✅ APRÈS — TOUJOURS ajouter le listener, vérifier les conditions AU MOMENT DU CLIC
     public void updateHand(List<CardType> cards, boolean active) {
         removeAll();
         cardViews.clear();
 
         for (CardType ct : cards) {
             CardView cv = new CardView(ct);
-            cv.setSelectable(active && interactive);
+            cv.setSelectable(active && interactive);  // visuel seulement
 
-            if (active && interactive) {
-                cv.addMouseListener(new java.awt.event.MouseAdapter() {
-                    @Override
-                    public void mouseClicked(java.awt.event.MouseEvent e) {
-                        deselectAll();
-                        cv.setSelected(true);
-                        if (onCardPlayed != null) {
-                            onCardPlayed.accept(ct);
-                        }
-                    }
-                });
-            }
+            // TOUJOURS ajouter le listener — pas de condition ici
+            cv.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    // Vérifie les conditions AU MOMENT du clic, pas à la création
+                    if (!interactive) return;
+                    if (onCardPlayed == null) return;
+
+                    deselectAll();
+                    cv.setSelected(true);
+                    onCardPlayed.accept(ct);
+                }
+            });
 
             cardViews.add(cv);
             add(cv);

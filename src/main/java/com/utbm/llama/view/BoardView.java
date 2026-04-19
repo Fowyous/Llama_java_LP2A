@@ -184,9 +184,12 @@ public class BoardView extends JPanel {
 
     private void updatePlayers(Game game, Player localPlayer) {
         localPlayerPanel.removeAll();
-        if (localPlayerView == null || !localPlayerView.getPlayerName().equals(localPlayer.getName())) {
-            localPlayerView = new PlayerView(localPlayer.getName(), localPlayer instanceof Bot);
-        }
+
+        localPlayerView = new PlayerView(
+                localPlayer.getName(),
+                localPlayer instanceof Bot
+        );
+
         boolean isLocalActive = game.getCurrentPlayer().equals(localPlayer);
         localPlayerView.update(localPlayer, true, isLocalActive);
         localPlayerPanel.add(localPlayerView, BorderLayout.CENTER);
@@ -194,8 +197,8 @@ public class BoardView extends JPanel {
         opponentsPanel.removeAll();
         JLabel oppTitle = new JLabel("ADVERSAIRES");
         oppTitle.setFont(new Font("Monospaced", Font.BOLD, 10));
-        oppTitle.setForeground(TEXT_SUB);
-        oppTitle.setBorder(new EmptyBorder(0, 0, 10, 0));
+        oppTitle.setForeground(Color.decode("#8A8680"));
+        oppTitle.setBorder(new javax.swing.border.EmptyBorder(0, 0, 10, 0));
         opponentsPanel.add(oppTitle);
 
         for (Player p : game.getPlayers()) {
@@ -207,7 +210,10 @@ public class BoardView extends JPanel {
         }
 
         localPlayerPanel.revalidate();
+        localPlayerPanel.repaint();
         opponentsPanel.revalidate();
+        opponentsPanel.repaint();
+        revalidate();
         repaint();
     }
 

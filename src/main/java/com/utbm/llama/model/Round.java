@@ -92,14 +92,15 @@ public class Round {
                         + " → Semestre à l'étranger : " + handSize + " cartes seulement");
             }
 
+            // ✅ Dans startRound() — vérification robuste
             for (int i = 0; i < handSize; i++) {
                 CardType drawn = drawPile.draw();
-                if (drawn != null) {
-                    p.addCard(drawn);
-                } else {
-                    System.out.println("[ROUND " + roundNumber + "] ⚠ Pioche vide lors de la distribution !");
+                if (drawn == null) {
+                    System.out.println("[ROUND] ⚠ Pioche vide pendant la distribution pour "
+                            + p.getName() + " — arrêt à " + p.getHand().size() + " cartes");
                     break;
                 }
+                p.addCard(drawn);
             }
 
             p.setStudyAbroad(false);

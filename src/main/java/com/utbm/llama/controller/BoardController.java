@@ -4,10 +4,7 @@ import main.java.com.utbm.llama.model.*;
 import main.java.com.utbm.llama.model.enums.CardType;
 import main.java.com.utbm.llama.model.enums.GameMode;
 import main.java.com.utbm.llama.model.enums.State;
-import main.java.com.utbm.llama.view.BoardView;
-import main.java.com.utbm.llama.view.CesureView;
-import main.java.com.utbm.llama.view.HandView;
-import main.java.com.utbm.llama.view.MainFrame;
+import main.java.com.utbm.llama.view.*;
 
 import javax.swing.*;
 import java.util.List;
@@ -158,14 +155,22 @@ public class BoardController {
     /**
      * Si le joueur actuel est un bot, déclenche son tour après un délai visuel.
      */
+    // ✅ checkBotTurn() correct — sans le bloc problématique
     private void checkBotTurn() {
         Player current = game.getCurrentPlayer();
+
         if (!(current instanceof Bot) || current.getState() == State.QUITTING) {
-            bindCardPlayedListener();
+            if (boardView != null && boardView.getLocalPlayerView() != null) {
+                boardView.getLocalPlayerView().getHandView()
+                        .setInteractive(isLocalPlayerTurn());
+            }
+            updateView();
             return;
         }
 
-        setLocalActionsEnabled(false);
+        if (boardView != null && boardView.getLocalPlayerView() != null) {
+            boardView.getLocalPlayerView().getHandView().setInteractive(false);
+        }
 
         Timer botTimer = new Timer(BOT_DELAY_MS, e -> {
             ((Timer) e.getSource()).stop();
@@ -174,7 +179,6 @@ public class BoardController {
         botTimer.setRepeats(false);
         botTimer.start();
     }
-
     /**
      * Exécute le coup décidé par le bot.
      */
@@ -265,48 +269,67 @@ public class BoardController {
      * 6. Prépare la manche suivante ou termine la partie
      */
     private void endRound() {
-        List<Player> activePlayers = game.getPlayers().stream().filter(p -> !p.isSuspended()).toList();
+        roundInProgress = false;
+        System.out.println("[BOARD] Fin de manche " + game.getCurrentRoundNumber());
 
-        for (Player p : activePlayers) {
-            int handValue = p.getHand().stream().mapToInt(CardType::getValue).sum();
-
-            int creditsBefore = p.getCredits();
-            p.addCredits(-handValue);
-            int lost = creditsBefore - p.getCredits();
-            p.setCreditsLostThisRound(Math.max(0, lost));
-
-            System.out.println("[ROUND END] " + p.getName() + " | main = " + handValue + " | crédits avant = " + creditsBefore + " | crédits après = " + p.getCredits());
-
-            if (p.getHand().isEmpty()) {
-                p.setStudyAbroad(true);
-                System.out.println("[ROUND END] " + p.getName() + " → Semestre à l'étranger !");
-            }
+        // Collecte les crédits AVANT pénalités pour le résumé
+        java.util.Map<Player, Integer> creditsBefore = new java.util.HashMap<>();
+        for (Player p : game.getPlayers()) {
+            creditsBefore.put(p, p.getCredits());
         }
-        processPostRoundCascade(activePlayers, 0, this::prepareNextRound);
+
+        // Délègue TOUT à Game/Round — ne pas recalculer ici
+        List<Round.JuryCandidate> candidates = game.endCurrentRound();
+
+        // Calcule les pertes réelles pour le résumé (après pénalités)
+        java.util.Map<Player, Integer> creditsLostMap = new java.util.HashMap<>();
+        for (Player p : game.getPlayers()) {
+            int before = creditsBefore.get(p);
+            int after  = p.getCredits();
+            creditsLostMap.put(p, Math.max(0, before - after));
+        }
+
+        // Traite les jurys en cascade, puis affiche le résumé
+        processPostRoundCascade(
+                new java.util.ArrayList<>(candidates),
+                0,
+                () -> {
+                    // Post-jury : césure + study abroad + detec
+                    boolean detecApplied = checkDetecApplied();
+                    game.endRoundPostJury();
+
+                    // Calcule les gains (jury + detec)
+                    java.util.Map<Player, Integer> creditsGainedMap = new java.util.HashMap<>();
+                    for (Player p : game.getPlayers()) {
+                        int currentCredits = p.getCredits();
+                        int afterPenalty   = creditsBefore.get(p) - creditsLostMap.get(p);
+                        creditsGainedMap.put(p, Math.max(0, currentCredits - afterPenalty));
+                    }
+
+                    showRoundSummary(creditsLostMap, creditsGainedMap, detecApplied);
+                }
+        );
     }
 
     /**
      * Traite en cascade le post-manche pour chaque joueur.
      * La cascade est nécessaire car jury et césure sont asynchrones (vue + interaction).
      */
-    private void processPostRoundCascade(List<Player> players, int index, Runnable onAllDone) {
-        if (index >= players.size()) {
+    private void processPostRoundCascade(
+            List<Round.JuryCandidate> candidates,
+            int index,
+            Runnable onAllDone) {
+
+        if (index >= candidates.size()) {
             onAllDone.run();
             return;
         }
 
-        Player p = players.get(index);
-        Runnable next = () -> processPostRoundCascade(players, index + 1, onAllDone);
+        Round.JuryCandidate candidate = candidates.get(index);
+        Runnable next = () -> processPostRoundCascade(candidates, index + 1, onAllDone);
 
-        if (p.getCreditsLostThisRound() >= 20) {
-            juryController.startJury(p, p.getCreditsLostThisRound(), next);
-        } else {
-            if (p.getCredits() < 0) {
-                triggerCesure(p, next);
-            } else {
-                next.run();
-            }
-        }
+        // Jury — JuryController gère aussi la césure si nécessaire
+        juryController.startJury(candidate.player(), candidate.creditsLost(), next);
     }
 
     /**
@@ -366,38 +389,25 @@ public class BoardController {
     private void startRound() {
         roundInProgress = true;
 
-        /*if (game.getDrawPile().size() < game.getPlayers().size() * 6) {
-            game.getDrawPile().shuffle();
-        }
+        SwingUtilities.invokeLater(() -> {
+            // Retour au plateau
+            mainFrame.showGame(boardView);
 
-        for (Player p : game.getPlayers()) {
-            p.addCredits(35);
-            p.setCreditsLostThisRound(0);
+            // Reconstruit la vue depuis le modèle déjà initialisé par game.beginNextRound()
+            boardView.updateBoard(game, localPlayer);
 
-            if (p.isSuspended()) {
-                p.setSuspended(false);
-                System.out.println("[ROUND START] " + p.getName() + " reprend après césure (+35 crédits)");
-                continue;
+            // Branche le callback APRÈS reconstruction
+            PlayerView lpv = boardView.getLocalPlayerView();
+            if (lpv != null) {
+                lpv.getHandView().setOnCardPlayed(card -> {
+                    if (isLocalPlayerTurn()) handlePlayCard(card);
+                });
+                lpv.getHandView().setInteractive(isLocalPlayerTurn());
             }
 
-            p.changeState(State.PLAYING);
-
-            while (!p.getHand().isEmpty()) p.removeCard(p.getHand().get(0));
-
-            int handSize = p.hasStudyAbroad() ? 4 : 6;
-            for (int i = 0; i < handSize; i++) {
-                CardType drawn = game.getDrawPile().draw();
-                if (drawn != null) p.addCard(drawn);
-            }
-
-            p.setStudyAbroad(false);
-
-            System.out.println("[ROUND START] " + p.getName() + " | " + p.getHand().size() + " cartes | " + p.getCredits() + " crédits");
-        }*/
-
-        updateView();
-        bindCardPlayedListener();
-        checkBotTurn();
+            // Lance le tour
+            checkBotTurn();
+        });
     }
 
     /**
@@ -447,10 +457,51 @@ public class BoardController {
      * Met à jour la vue du plateau depuis le modèle.
      */
     private void updateView() {
-        if (boardView != null) {
-            boardView.updateBoard(game, localPlayer);
-            bindCardPlayedListener();
+        if (boardView == null) return;
+
+        boardView.updateBoard(game, localPlayer);
+
+        // Rebind immédiat — localPlayerView vient d'être recréé
+        PlayerView lpv = boardView.getLocalPlayerView();
+        if (lpv != null) {
+            lpv.getHandView().setOnCardPlayed(card -> {
+                if (isLocalPlayerTurn()) handlePlayCard(card);
+            });
+            lpv.getHandView().setInteractive(isLocalPlayerTurn());
         }
+    }
+
+    private boolean checkDetecApplied() {
+        return game.getGameMode() == GameMode.LONG
+                && game.getCurrentRoundNumber() == GameMode.DETEC_ROUND;
+    }
+
+    private void showRoundSummary(
+            java.util.Map<Player, Integer> creditsLostMap,
+            java.util.Map<Player, Integer> creditsGainedMap,
+            boolean detecApplied) {
+
+        SwingUtilities.invokeLater(() -> {
+            int maxRounds = game.getGameMode().getMaxRounds();
+
+            RoundSummaryView summaryView = new RoundSummaryView();
+            summaryView.setup(
+                    game.getPlayers(),
+                    game.getCurrentRoundNumber(),
+                    maxRounds,
+                    game.getGameMode(),
+                    creditsLostMap,
+                    creditsGainedMap,
+                    detecApplied
+            );
+
+            // Bouton "Manche suivante" → prépare et lance la manche
+            summaryView.addNextRoundListener(e -> {
+                SwingUtilities.invokeLater(this::prepareNextRound);
+            });
+
+            mainFrame.showRoundSummary(summaryView);
+        });
     }
 
     /**

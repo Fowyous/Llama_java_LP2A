@@ -24,6 +24,9 @@ public class MainFrame extends JFrame {
     private final CardLayout cardLayout;
     private final JPanel contentPanel;
 
+    public static final String SCREEN_ROUND_SUMMARY = "ROUND_SUMMARY";
+    private RoundSummaryView roundSummaryView;
+
     public MainFrame() {
         super("LAMA UTBM — Survivre au cursus");
 
@@ -109,6 +112,20 @@ public class MainFrame extends JFrame {
         repaint();
     }
 
+    public void showRoundSummary(RoundSummaryView view) {
+        if (this.roundSummaryView != null) {
+            contentPanel.remove(this.roundSummaryView);
+        }
+        this.roundSummaryView = view;
+        contentPanel.add(view, SCREEN_ROUND_SUMMARY);
+        cardLayout.show(contentPanel, SCREEN_ROUND_SUMMARY);
+        revalidate();
+        repaint();
+    }
+
+    public RoundSummaryView getRoundSummaryView() {
+        return roundSummaryView;
+    }
 
     public MenuView getMenuView() {
         return menuView;
