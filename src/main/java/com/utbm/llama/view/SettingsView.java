@@ -76,31 +76,16 @@ public class SettingsView extends JPanel {
         JPanel form = new JPanel();
         form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
         form.setBackground(PANEL_BG);
-        form.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER, 1),
-                new EmptyBorder(32, 40, 32, 40)
-        ));
+        form.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, 1), new EmptyBorder(32, 40, 32, 40)));
         form.setMaximumSize(new Dimension(600, 500));
 
-        form.add(buildFieldGroup(
-                "NOMBRE DE JOUEURS",
-                "Entre 2 et 6 participants (humains + bots)",
-                comboNbPlayers
-        ));
+        form.add(buildFieldGroup("NOMBRE DE JOUEURS", "Entre 2 et 6 participants (humains + bots)", comboNbPlayers));
         form.add(Box.createVerticalStrut(24));
 
-        form.add(buildFieldGroup(
-                "DIFFICULTÉ DES BOTS",
-                "Niveau des joueurs contrôlés par l'IA",
-                comboDifficulty
-        ));
+        form.add(buildFieldGroup("DIFFICULTÉ DES BOTS", "Niveau des joueurs contrôlés par l'IA", comboDifficulty));
         form.add(Box.createVerticalStrut(24));
 
-        form.add(buildFieldGroup(
-                "MODE DE JEU",
-                "6 manches (180 crédits) ou 10 manches (300 crédits + bonus DETEC)",
-                comboGameMode
-        ));
+        form.add(buildFieldGroup("MODE DE JEU", "6 manches (180 crédits) ou 10 manches (300 crédits + bonus DETEC)", comboGameMode));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;

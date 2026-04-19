@@ -2,7 +2,7 @@ package main.java.com.utbm.llama.view;
 
 import main.java.com.utbm.llama.model.enums.CardType;
 import main.java.com.utbm.llama.model.enums.State;
-import test.java.com.utbm.modeltest.*;
+import main.java.com.utbm.llama.model.*;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -47,10 +47,7 @@ public class PlayerView extends JPanel {
         this.isBot = isBot;
 
         setBackground(BG_IDLE);
-        setBorder(new CompoundBorder(
-                new LineBorder(BORDER_IDL, 1),
-                new EmptyBorder(12, 14, 12, 14)
-        ));
+        setBorder(new CompoundBorder(new LineBorder(BORDER_IDL, 1), new EmptyBorder(12, 14, 12, 14)));
         setLayout(new BorderLayout(8, 8));
 
         activeIndicator = new JLabel("▶", SwingConstants.CENTER);
@@ -131,10 +128,7 @@ public class PlayerView extends JPanel {
     public void updateActive(boolean active) {
         activeIndicator.setVisible(active);
         setBackground(active ? BG_ACTIVE : BG_IDLE);
-        setBorder(new CompoundBorder(
-                new LineBorder(active ? BORDER_ACT : BORDER_IDL, active ? 2 : 1),
-                new EmptyBorder(12, 14, 12, 14)
-        ));
+        setBorder(new CompoundBorder(new LineBorder(active ? BORDER_ACT : BORDER_IDL, active ? 2 : 1), new EmptyBorder(12, 14, 12, 14)));
     }
 
     /**
@@ -157,10 +151,7 @@ public class PlayerView extends JPanel {
         statusBadge.setForeground(color);
         statusBadge.setBackground(new Color(color.getRed(), color.getGreen(), color.getBlue(), 30));
         statusBadge.setOpaque(true);
-        statusBadge.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(color.getRed(), color.getGreen(), color.getBlue(), 80), 1),
-                new EmptyBorder(2, 6, 2, 6)
-        ));
+        statusBadge.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(color.getRed(), color.getGreen(), color.getBlue(), 80), 1), new EmptyBorder(2, 6, 2, 6)));
         statusBadge.setVisible(true);
     }
 

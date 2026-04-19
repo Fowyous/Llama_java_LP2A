@@ -3,7 +3,7 @@ package main.java.com.utbm.llama.view;
 import main.java.com.utbm.llama.model.enums.CardType;
 import main.java.com.utbm.llama.model.enums.GameMode;
 import main.java.com.utbm.llama.model.enums.State;
-import test.java.com.utbm.modeltest.*;
+import main.java.com.utbm.llama.model.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
