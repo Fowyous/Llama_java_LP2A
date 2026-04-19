@@ -1,68 +1,64 @@
 package main.java.com.utbm.llama.model.rules;
 
+import main.java.com.utbm.llama.model.enums.CardType;
 import main.java.com.utbm.llama.model.Game;
 import main.java.com.utbm.llama.model.Move;
-import main.java.com.utbm.llama.model.enums.CardType;
 import main.java.com.utbm.llama.model.enums.MoveType;
-
-import java.util.Map;
-
-import java.util.Map;
-import java.util.Objects;
+import main.java.com.utbm.llama.model.enums.State;
 
 /**
- * this is the rule where we determine what card the player is allowed to play depending on the card on
- * top of the discard pile. For example if the discard pile has a one the player can only play a two.
+ * Règle : JOUER UNE CARTE (PLAY_CARD)
+ * Vérifie les trois conditions nécessaires pour poser une carte :
+ *  1. Le joueur est en état PLAYING (pas QUITTING)
+ *  2. Le joueur possède bien cette carte dans sa main
+ *  3. La carte respecte les règles de succession L.A.M.A :
+ *       - Défausse vide → toute carte est jouable
+ *       - Même valeur que le dessus → jouable
+ *       - Valeur immédiatement supérieure de 1 → jouable
+ *       - SIX en haut + LLAMA → jouable
+ *       - LLAMA en haut + ONE → jouable (cycle)
+ * Effet appliqué : retire la carte de la main et la pose sur la défausse.
+ * (En pratique, Game.applyMove() fait déjà ça — apply() ici est un no-op
+ *  pour respecter le pattern, l'application réelle est dans Game.)
  */
-
 public class PlayCardRule implements Rule {
-
-    //this map contains on the left the card type of the top card and on the right the card type of the card that we can play and doesn't violate the rules of the game.
-    private static final Map<CardType, CardType> VALID_NEXT_CARDS = Map.ofEntries(
-            Map.entry(CardType.ONE, CardType.TWO),
-            Map.entry(CardType.TWO, CardType.THREE),
-            Map.entry(CardType.THREE, CardType.FOUR),
-            Map.entry(CardType.FOUR, CardType.FIVE),
-            Map.entry(CardType.FIVE, CardType.SIX),
-            Map.entry(CardType.SIX, CardType.LLAMA),
-            Map.entry(CardType.LLAMA, CardType.ONE));
-
 
     @Override
     public boolean isApplicable(Move move, Game game) {
-
-        // if the move is not playing a card then it doesn't consern this rule.
-        Objects.requireNonNull(move, "move cannot be null");
-        Objects.requireNonNull(game, "game cannot be null");
-
         return move.getType() == MoveType.PLAY_CARD;
-
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * if the card played is one number above the one on top of the draw pile then the rule is respected. If the card on top of the draw pile is a Llama we return true if the card played is a one.
-     * the discard pile should not be empty before this move is played
-     */
     @Override
     public boolean validate(Move move, Game game) {
-        Objects.requireNonNull(move, "move cannot be null");
-        Objects.requireNonNull(game, "game cannot be null");
-        CardType topCard = game.getDiscardPile().peek();
-
-        if (topCard == null) {
-            throw new IllegalStateException("Discard pile is empty");
+        if (move.getPlayer().getState() == State.QUITTING) {
+            logRefusal(move, "le joueur a déjà passé la manche");
+            return false;
         }
-        // we verify wether the card on top of the pile and the card in the move are applicable.
 
-        CardType allowed = VALID_NEXT_CARDS.get(topCard);
-        return allowed != null && move.getCard() == allowed;
+        if (!move.getPlayer().getHand().contains(move.getCard())) {
+            logRefusal(move, "la carte " + move.getCard() + " n'est pas dans la main du joueur");
+            return false;
+        }
 
+        CardType topOfDiscard = game.getDiscardPile().peek();   // null si vide
+        if (!move.getCard().canBePlayedOn(topOfDiscard)) {
+            logRefusal(move, move.getCard() + " ne peut pas être joué sur " + topOfDiscard);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
     public void apply(Move move, Game game) {
 
+    }
+
+    @Override
+    public String getName() { return "PlayCardRule"; }
+
+    private void logRefusal(Move move, String reason) {
+        System.out.println("[" + getName() + "] ✗ " + move.getPlayer().getName()
+                + " ne peut pas jouer " + move.getCard() + " — " + reason);
     }
 }
