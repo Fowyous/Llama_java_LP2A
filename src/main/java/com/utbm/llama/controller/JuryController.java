@@ -48,7 +48,7 @@ public class JuryController {
         this.creditsLostThisRound = creditsLost;
         this.onJuryFinished       = onFinished;
 
-        this.juryModel = new Jury(player, creditsLost);   // ← NOUVEAU
+        this.juryModel = new Jury(player, creditsLost);
 
         juryView = new JuryView();
         juryView.setup(player.getName(), creditsLost, player.getCredits());

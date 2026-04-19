@@ -40,7 +40,7 @@ public class PlayCardRule implements Rule {
             return false;
         }
 
-        CardType topOfDiscard = game.getDiscardPile().peek();   // null si vide
+        CardType topOfDiscard = game.getDiscardPile().peek();
         if (!move.getCard().canBePlayedOn(topOfDiscard)) {
             logRefusal(move, move.getCard() + " ne peut pas être joué sur " + topOfDiscard);
             return false;

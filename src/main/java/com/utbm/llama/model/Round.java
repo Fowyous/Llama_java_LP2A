@@ -78,8 +78,7 @@ public class Round {
 
             if (p.isSuspended()) {
                 p.setSuspended(false);
-                System.out.println("[ROUND " + roundNumber + "] " + p.getName()
-                        + " reprend après césure | " + p.getCredits() + " crédits");
+                System.out.println("[ROUND " + roundNumber + "] " + p.getName() + " reprend après césure | " + p.getCredits() + " crédits");
                 continue;
             }
 
@@ -88,16 +87,13 @@ public class Round {
 
             int handSize = p.hasStudyAbroad() ? STUDY_ABROAD_HAND_SIZE : DEFAULT_HAND_SIZE;
             if (p.hasStudyAbroad()) {
-                System.out.println("[ROUND " + roundNumber + "] " + p.getName()
-                        + " → Semestre à l'étranger : " + handSize + " cartes seulement");
+                System.out.println("[ROUND " + roundNumber + "] " + p.getName() + " → Semestre à l'étranger : " + handSize + " cartes seulement");
             }
 
-            // ✅ Dans startRound() — vérification robuste
             for (int i = 0; i < handSize; i++) {
                 CardType drawn = drawPile.draw();
                 if (drawn == null) {
-                    System.out.println("[ROUND] ⚠ Pioche vide pendant la distribution pour "
-                            + p.getName() + " — arrêt à " + p.getHand().size() + " cartes");
+                    System.out.println("[ROUND] ⚠ Pioche vide pendant la distribution pour " + p.getName() + " — arrêt à " + p.getHand().size() + " cartes");
                     break;
                 }
                 p.addCard(drawn);
@@ -106,8 +102,7 @@ public class Round {
             p.setStudyAbroad(false);
 
             activePlayers.add(p);
-            System.out.println("[ROUND " + roundNumber + "] " + p.getName()
-                    + " | " + p.getHand().size() + " cartes | " + p.getCredits() + " crédits");
+            System.out.println("[ROUND " + roundNumber + "] " + p.getName() + " | " + p.getHand().size() + " cartes | " + p.getCredits() + " crédits");
         }
     }
 
@@ -123,11 +118,9 @@ public class Round {
     public boolean isOver() {
         if (activePlayers.isEmpty()) return true;
 
-        boolean allQuit = activePlayers.stream()
-                .allMatch(p -> p.getState() == State.QUITTING || p.getHand().isEmpty());
+        boolean allQuit = activePlayers.stream().allMatch(p -> p.getState() == State.QUITTING || p.getHand().isEmpty());
 
-        boolean anyEmptyHand = activePlayers.stream()
-                .anyMatch(p -> p.getHand().isEmpty());
+        boolean anyEmptyHand = activePlayers.stream().anyMatch(p -> p.getHand().isEmpty());
 
         return allQuit || anyEmptyHand;
     }
@@ -150,14 +143,11 @@ public class Round {
                 ledger.record(roundNumber, p, CreditLedger.Reason.HAND_PENALTY, -handValue);
                 int lostActual = creditsBefore - p.getCredits();
 
-                System.out.println("[ROUND END " + roundNumber + "] " + p.getName()
-                        + " | pénalité main = -" + handValue
-                        + " | crédits : " + creditsBefore + " → " + p.getCredits());
+                System.out.println("[ROUND END " + roundNumber + "] " + p.getName() + " | pénalité main = -" + handValue + " | crédits : " + creditsBefore + " → " + p.getCredits());
 
                 if (lostActual >= JURY_TRIGGER_THRESHOLD) {
                     juryCandidates.add(new JuryCandidate(p, lostActual));
-                    System.out.println("[ROUND END " + roundNumber + "] " + p.getName()
-                            + " → convoqué au jury (perte : " + lostActual + " crédits)");
+                    System.out.println("[ROUND END " + roundNumber + "] " + p.getName() + " → convoqué au jury (perte : " + lostActual + " crédits)");
                 }
             }
         }
@@ -174,8 +164,7 @@ public class Round {
         for (Player p : activePlayers) {
             if (p.getHand().isEmpty()) {
                 p.setStudyAbroad(true);
-                System.out.println("[ROUND END " + roundNumber + "] " + p.getName()
-                        + " → Semestre à l'étranger activé ! (4 cartes la prochaine manche)");
+                System.out.println("[ROUND END " + roundNumber + "] " + p.getName() + " → Semestre à l'étranger activé ! (4 cartes la prochaine manche)");
             }
         }
     }
@@ -192,9 +181,7 @@ public class Round {
         for (Player p : allPlayers) {
             if (p.getCredits() >= GameMode.DETEC_THRESHOLD) {
                 ledger.record(roundNumber, p, CreditLedger.Reason.DETEC_BONUS, GameMode.DETEC_BONUS);
-                System.out.println("[DETEC] " + p.getName()
-                        + " valide le DETEC ! +" + GameMode.DETEC_BONUS
-                        + " crédits → " + p.getCredits());
+                System.out.println("[DETEC] " + p.getName() + " valide le DETEC ! +" + GameMode.DETEC_BONUS + " crédits → " + p.getCredits());
             }
         }
     }
@@ -218,8 +205,7 @@ public class Round {
      */
     public void applyCesure(Player player) {
         player.setSuspended(true);
-        System.out.println("[CESURE] " + player.getName()
-                + " part en semestre de césure (crédits : " + player.getCredits() + ")");
+        System.out.println("[CESURE] " + player.getName() + " part en semestre de césure (crédits : " + player.getCredits() + ")");
     }
 
     /**

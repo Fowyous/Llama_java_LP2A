@@ -155,7 +155,6 @@ public class BoardController {
     /**
      * Si le joueur actuel est un bot, déclenche son tour après un délai visuel.
      */
-    // ✅ checkBotTurn() correct — sans le bloc problématique
     private void checkBotTurn() {
         Player current = game.getCurrentPlayer();
 
@@ -272,16 +271,13 @@ public class BoardController {
         roundInProgress = false;
         System.out.println("[BOARD] Fin de manche " + game.getCurrentRoundNumber());
 
-        // Collecte les crédits AVANT pénalités pour le résumé
         java.util.Map<Player, Integer> creditsBefore = new java.util.HashMap<>();
         for (Player p : game.getPlayers()) {
             creditsBefore.put(p, p.getCredits());
         }
 
-        // Délègue TOUT à Game/Round — ne pas recalculer ici
         List<Round.JuryCandidate> candidates = game.endCurrentRound();
 
-        // Calcule les pertes réelles pour le résumé (après pénalités)
         java.util.Map<Player, Integer> creditsLostMap = new java.util.HashMap<>();
         for (Player p : game.getPlayers()) {
             int before = creditsBefore.get(p);
@@ -289,16 +285,13 @@ public class BoardController {
             creditsLostMap.put(p, Math.max(0, before - after));
         }
 
-        // Traite les jurys en cascade, puis affiche le résumé
         processPostRoundCascade(
                 new java.util.ArrayList<>(candidates),
                 0,
                 () -> {
-                    // Post-jury : césure + study abroad + detec
                     boolean detecApplied = checkDetecApplied();
                     game.endRoundPostJury();
 
-                    // Calcule les gains (jury + detec)
                     java.util.Map<Player, Integer> creditsGainedMap = new java.util.HashMap<>();
                     for (Player p : game.getPlayers()) {
                         int currentCredits = p.getCredits();
@@ -328,7 +321,6 @@ public class BoardController {
         Round.JuryCandidate candidate = candidates.get(index);
         Runnable next = () -> processPostRoundCascade(candidates, index + 1, onAllDone);
 
-        // Jury — JuryController gère aussi la césure si nécessaire
         juryController.startJury(candidate.player(), candidate.creditsLost(), next);
     }
 
@@ -390,13 +382,10 @@ public class BoardController {
         roundInProgress = true;
 
         SwingUtilities.invokeLater(() -> {
-            // Retour au plateau
             mainFrame.showGame(boardView);
 
-            // Reconstruit la vue depuis le modèle déjà initialisé par game.beginNextRound()
             boardView.updateBoard(game, localPlayer);
 
-            // Branche le callback APRÈS reconstruction
             PlayerView lpv = boardView.getLocalPlayerView();
             if (lpv != null) {
                 lpv.getHandView().setOnCardPlayed(card -> {
@@ -405,7 +394,6 @@ public class BoardController {
                 lpv.getHandView().setInteractive(isLocalPlayerTurn());
             }
 
-            // Lance le tour
             checkBotTurn();
         });
     }
@@ -461,7 +449,6 @@ public class BoardController {
 
         boardView.updateBoard(game, localPlayer);
 
-        // Rebind immédiat — localPlayerView vient d'être recréé
         PlayerView lpv = boardView.getLocalPlayerView();
         if (lpv != null) {
             lpv.getHandView().setOnCardPlayed(card -> {
@@ -495,7 +482,6 @@ public class BoardController {
                     detecApplied
             );
 
-            // Bouton "Manche suivante" → prépare et lance la manche
             summaryView.addNextRoundListener(e -> {
                 SwingUtilities.invokeLater(this::prepareNextRound);
             });

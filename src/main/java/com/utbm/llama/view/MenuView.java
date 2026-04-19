@@ -13,7 +13,7 @@ import java.awt.geom.RoundRectangle2D;
 public class MenuView extends JPanel {
 
     private static final Color BG = Color.decode("#0D0D0D");
-    private static final Color ACCENT = Color.decode("#C8A84B"); // or UTBM
+    private static final Color ACCENT = Color.decode("#C8A84B");
     private static final Color TEXT_MAIN = Color.decode("#F0EDE6");
     private static final Color TEXT_SUB = Color.decode("#8A8680");
     private static final Color BTN_BG = Color.decode("#1A1A1A");

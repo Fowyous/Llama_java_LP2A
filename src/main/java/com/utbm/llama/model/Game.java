@@ -87,16 +87,13 @@ public class Game {
         currentRoundNumber++;
         currentPlayerIndex = 0;
 
-        // ── NOUVEAU : reconstruit toujours le deck proprement ─────────────
         rebuildDrawPile();
-        // ──────────────────────────────────────────────────────────────────
 
         discardPile.clear();
 
         currentRound = new Round(currentRoundNumber, players, gameMode, ledger);
         currentRound.startRound(drawPile);
 
-        // Pose la première carte sur la défausse
         CardType firstCard = drawPile.draw();
         if (firstCard != null) {
             discardPile.add(firstCard);
@@ -114,17 +111,9 @@ public class Game {
      * Appelé quand la pioche est trop petite pour distribuer les cartes.
      */
     private void rebuildDrawPile() {
-        // 1. Récupère les cartes encore dans les mains (non jouées)
-        //    pour ne pas les perdre — elles retournent dans le pool
-        for (Player p : players) {
-            // On vide juste le tracking — les cartes physiques retournent au deck
-            // (clearHand() sera appelé par Round.startRound())
-        }
 
-        // 2. Crée un deck complet tout neuf et mélangé
-        Deck fresh = Deck.createFull();   // 56 cartes, déjà mélangées
+        Deck fresh = Deck.createFull();
 
-        // 3. Remplace la pioche actuelle proprement
         drawPile.clear();
         for (CardType c : fresh.getCards()) {
             drawPile.add(c);
