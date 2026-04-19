@@ -1,14 +1,7 @@
 package main.java.com.utbm.llama.model;
 
-import main.java.com.utbm.llama.model.Game;
 import main.java.com.utbm.llama.model.enums.CardType;
-import main.java.com.utbm.llama.model.Move;
-import main.java.com.utbm.llama.model.Player;
-import main.java.com.utbm.llama.model.Round;
-import main.java.com.utbm.llama.model.rules.DrawCardRule;
-import main.java.com.utbm.llama.model.rules.PlayCardRule;
-import main.java.com.utbm.llama.model.rules.QuitRoundRule;
-import main.java.com.utbm.llama.model.rules.Rule;
+import main.java.com.utbm.llama.model.rules.*;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -41,7 +34,7 @@ public class RuleEngine {
 
     private final List<Rule> rules = new ArrayList<>();
 
-    private final StudyAbroadRule studyAbroadRule = new StudyAbroadRule();
+    private final StudyBoardRule studyBroadRule = new StudyBoardRule();
     private final JuryRule juryRule = new JuryRule();
     private final CesureRule cesureRule = new CesureRule();
     private final DetecBonusRule detecBonusRule = new DetecBonusRule();
@@ -137,7 +130,7 @@ public class RuleEngine {
         }
 
         for (Player p : game.getCurrentRound().getActivePlayers()) {
-            StudyAbroadRule.applyTo(p);
+            StudyBoardRule.applyTo(p);
         }
 
         DetecBonusRule.applyIfEligible(game, game.getLedger());
