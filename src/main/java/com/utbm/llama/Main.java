@@ -5,6 +5,7 @@ import main.java.com.utbm.llama.view.MainFrame;
 
 import javax.swing.*;
 
+import java.util.Locale;
 /**
  * Point d'entrée de l'application LAMA UTBM.
  * Lance la fenêtre principale et initialise le GameController
@@ -19,7 +20,8 @@ public class Main {
         }
 
         SwingUtilities.invokeLater(() -> {
-            MainFrame mainFrame = new MainFrame();
+        	Locale locale = Locale.ENGLISH;//default language.
+            MainFrame mainFrame = new MainFrame(locale);
             new GameController(mainFrame);
             mainFrame.setVisible(true);
         });

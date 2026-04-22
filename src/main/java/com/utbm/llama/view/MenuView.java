@@ -5,7 +5,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
-
+import java.util.Locale;
+import java.util.ResourceBundle;
 /**
  * Écran d'accueil de LAMA UTBM.
  * Présente le titre du jeu et les trois actions principales.
@@ -24,7 +25,10 @@ public class MenuView extends JPanel {
     private final JButton btnSettings;
     private final JButton btnQuit;
 
-    public MenuView() {
+    private final ResourceBundle bundle;
+    
+    public MenuView(Locale locale) {
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
         setLayout(new BorderLayout());
         setBackground(BG);
         setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -32,9 +36,9 @@ public class MenuView extends JPanel {
         add(buildCenterPanel(), BorderLayout.CENTER);
         add(buildFooter(), BorderLayout.SOUTH);
 
-        btnStart = buildMenuButton("▶  NOUVELLE PARTIE", true);
-        btnSettings = buildMenuButton("⚙  PARAMÈTRES", false);
-        btnQuit = buildMenuButton("✕  QUITTER", false);
+        btnStart = buildMenuButton("▶ "+bundle.getString("new_game"), true);
+        btnSettings = buildMenuButton("⚙  "+bundle.getString("settings"), false);
+        btnQuit = buildMenuButton("✕  "+bundle.getString("exit"), false);
 
         removeAll();
         add(buildCenterPanelWithButtons(), BorderLayout.CENTER);

@@ -2,6 +2,7 @@ package main.java.com.utbm.llama.view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Locale;
 
 /**
  * Fenêtre principale de l'application LAMA UTBM.
@@ -27,8 +28,9 @@ public class MainFrame extends JFrame {
     public static final String SCREEN_ROUND_SUMMARY = "ROUND_SUMMARY";
     private RoundSummaryView roundSummaryView;
 
-    public MainFrame() {
+    public MainFrame(Locale locale) {
         super("LAMA UTBM — Survivre au cursus");
+
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1280, 800));
@@ -39,7 +41,7 @@ public class MainFrame extends JFrame {
         contentPanel = new JPanel(cardLayout);
         contentPanel.setBackground(Color.decode("#0D0D0D"));
 
-        menuView = new MenuView();
+        menuView = new MenuView(locale);
         settingsView = new SettingsView();
 
         contentPanel.add(menuView, SCREEN_MENU);
