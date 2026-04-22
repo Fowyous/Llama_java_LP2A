@@ -1,5 +1,8 @@
 package main.java.com.utbm.llama.model.enums;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Mode de jeu choisi avant le début de la partie.
  * SHORT → 6 manches, seuil honorifique : 180 crédits
@@ -74,5 +77,12 @@ public enum GameMode {
         return this == SHORT
                 ? "Court (6 manches — 180 crédits)"
                 : "Long (10 manches — 300 crédits)";
+    }
+    
+    public String toString(Locale locale) {
+    	ResourceBundle bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+        return this == SHORT
+                ? bundle.getString("gamemode.SIX_ROUNDS")
+                : bundle.getString("gamemode.TEN_ROUNDS");
     }
 }

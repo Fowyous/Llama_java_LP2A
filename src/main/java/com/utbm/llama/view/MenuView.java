@@ -69,7 +69,7 @@ public class MenuView extends JPanel {
         sep.setPreferredSize(new Dimension(300, 1));
         sep.setMaximumSize(new Dimension(300, 1));
 
-        JLabel taglineLabel = new JLabel("Survivre au cursus, c'est tout un art.", SwingConstants.CENTER);
+        JLabel taglineLabel = new JLabel(bundle.getString("tagline"), SwingConstants.CENTER);
         taglineLabel.setFont(new Font("Serif", Font.ITALIC, 18));
         taglineLabel.setForeground(TEXT_SUB);
         taglineLabel.setBorder(new EmptyBorder(16, 0, 60, 0));

@@ -22,7 +22,7 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
         	Locale locale = Locale.ENGLISH;//default language.
             MainFrame mainFrame = new MainFrame(locale);
-            new GameController(mainFrame);
+            new GameController(mainFrame, locale);
             mainFrame.setVisible(true);
         });
     }

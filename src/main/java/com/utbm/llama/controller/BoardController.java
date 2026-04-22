@@ -8,6 +8,7 @@ import main.java.com.utbm.llama.view.*;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Contrôleur du plateau de jeu.
@@ -45,7 +46,10 @@ public class BoardController {
 
     private static final int BOT_DELAY_MS = 1200;
 
-    public BoardController(MainFrame mainFrame, Game game, Player localPlayer, JuryController juryController) {
+    private final Locale locale;
+    public BoardController(MainFrame mainFrame, Game game, Player localPlayer, JuryController juryController, Locale locale) {
+    	this.locale = locale;
+    	
         this.mainFrame = mainFrame;
         this.game = game;
         this.localPlayer = localPlayer;
@@ -61,7 +65,7 @@ public class BoardController {
      * puis démarre le premier tour.
      */
     public void initBoard() {
-        boardView = new BoardView();
+        boardView = new BoardView(locale);
         bindBoardListeners();
 
         mainFrame.showGame(boardView);

@@ -7,6 +7,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Écran de configuration d'une partie.
@@ -28,7 +30,11 @@ public class SettingsView extends JPanel {
     private final JButton btnSave;
     private final JButton btnBack;
 
-    public SettingsView() {
+    private final ResourceBundle bundle;
+
+    public SettingsView(Locale locale) {
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+
         setLayout(new BorderLayout());
         setBackground(BG);
 
@@ -36,8 +42,8 @@ public class SettingsView extends JPanel {
         comboDifficulty = buildCombo(Difficulty.values());
         comboGameMode = buildCombo(GameMode.values());
 
-        btnSave = buildButton("SAUVEGARDER", true);
-        btnBack = buildButton("← RETOUR", false);
+        btnSave = buildButton(bundle.getString("settings.save"), true);
+        btnBack = buildButton(bundle.getString("settings.back"), false);
 
         add(buildHeader(), BorderLayout.NORTH);
         add(buildForm(), BorderLayout.CENTER);
@@ -49,11 +55,11 @@ public class SettingsView extends JPanel {
         header.setBackground(BG);
         header.setBorder(new EmptyBorder(40, 60, 24, 60));
 
-        JLabel title = new JLabel("PARAMÈTRES DE PARTIE");
+        JLabel title = new JLabel(bundle.getString("settings.title"));
         title.setFont(new Font("Monospaced", Font.BOLD, 28));
         title.setForeground(TEXT_MAIN);
 
-        JLabel sub = new JLabel("Configurez votre cursus avant de commencer");
+        JLabel sub = new JLabel(bundle.getString("settings.subtitle"));
         sub.setFont(new Font("Serif", Font.ITALIC, 15));
         sub.setForeground(TEXT_SUB);
         sub.setBorder(new EmptyBorder(6, 0, 0, 0));
@@ -79,13 +85,13 @@ public class SettingsView extends JPanel {
         form.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, 1), new EmptyBorder(32, 40, 32, 40)));
         form.setMaximumSize(new Dimension(600, 500));
 
-        form.add(buildFieldGroup("NOMBRE DE JOUEURS", "Entre 2 et 6 participants (humains + bots)", comboNbPlayers));
+        form.add(buildFieldGroup(bundle.getString("settings.nb_players.label"), bundle.getString("settings.nb_players.hint"), comboNbPlayers));
         form.add(Box.createVerticalStrut(24));
 
-        form.add(buildFieldGroup("DIFFICULTÉ DES BOTS", "Niveau des joueurs contrôlés par l'IA", comboDifficulty));
+        form.add(buildFieldGroup(bundle.getString("settings.difficulty.label"), bundle.getString("settings.difficulty.hint"), comboDifficulty));
         form.add(Box.createVerticalStrut(24));
 
-        form.add(buildFieldGroup("MODE DE JEU", "6 manches (180 crédits) ou 10 manches (300 crédits + bonus DETEC)", comboGameMode));
+        form.add(buildFieldGroup(bundle.getString("settings.mode.label"), bundle.getString("settings.mode.hint"), comboGameMode));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;

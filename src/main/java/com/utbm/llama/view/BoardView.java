@@ -11,6 +11,8 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Vue principale du plateau de jeu.
@@ -51,14 +53,18 @@ public class BoardView extends JPanel {
     private final JPanel centerPanel;
     private final JPanel localPlayerPanel;
 
-    public BoardView() {
+    private final ResourceBundle bundle;
+
+    public BoardView(Locale locale) {
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+
         setBackground(BG);
         setLayout(new BorderLayout(0, 0));
 
         drawPileView = new DrawPileView();
         discardPileView = new DiscardPileView();
 
-        roundLabel = buildHudLabel("MANCHE 1 / 6", 20, Font.BOLD);
+        roundLabel = buildHudLabel(bundle.getString("hud.default.round"), 20, Font.BOLD);
         modeLabel = buildHudLabel("MODE COURT — 180 crédits", 12, Font.PLAIN);
         thresholdLabel = buildHudLabel("", 12, Font.ITALIC);
         detecBonusLabel = buildHudLabel("🎓 BONUS DETEC +30 crédits !", 13, Font.BOLD);

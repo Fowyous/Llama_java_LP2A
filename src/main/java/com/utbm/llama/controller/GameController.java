@@ -4,6 +4,8 @@ import main.java.com.utbm.llama.model.Game;
 import main.java.com.utbm.llama.model.Player;
 import main.java.com.utbm.llama.view.MainFrame;
 
+import java.util.Locale;
+
 /**
  * Contrôleur racine de l'application LAMA UTBM.
  * Rôle : chef d'orchestre.
@@ -32,6 +34,8 @@ public class GameController {
     private final SettingController settingController;
     private final JuryController juryController;
     private BoardController boardController;
+    
+    private final Locale locale;
 
     /**
      * Initialise l'application entière.
@@ -39,10 +43,12 @@ public class GameController {
      *
      * @param mainFrame la fenêtre principale déjà construite
      */
-    public GameController(MainFrame mainFrame) {
+    public GameController(MainFrame mainFrame, Locale locale) {
+    	this.locale = locale;
+    	
         this.mainFrame = mainFrame;
 
-        this.menuController = new MenuController(mainFrame);
+        this.menuController = new MenuController(mainFrame, locale);
         this.settingController = new SettingController(mainFrame);
         this.juryController = new JuryController(mainFrame);
 
@@ -70,7 +76,7 @@ public class GameController {
         System.out.println("[GAME] Démarrage d'une partie | " + game.getPlayers().size() + " joueurs | " + game.getGameMode());
         game.start();
 
-        boardController = new BoardController(mainFrame, game, localPlayer, juryController);
+        boardController = new BoardController(mainFrame, game, localPlayer, juryController, locale);
 
         boardController.initBoard();
     }

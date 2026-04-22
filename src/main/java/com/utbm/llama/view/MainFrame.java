@@ -42,7 +42,7 @@ public class MainFrame extends JFrame {
         contentPanel.setBackground(Color.decode("#0D0D0D"));
 
         menuView = new MenuView(locale);
-        settingsView = new SettingsView();
+        settingsView = new SettingsView(locale);
 
         contentPanel.add(menuView, SCREEN_MENU);
         contentPanel.add(settingsView, SCREEN_SETTINGS);

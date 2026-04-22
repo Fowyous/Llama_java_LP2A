@@ -3,6 +3,7 @@ package main.java.com.utbm.llama.controller;
 import main.java.com.utbm.llama.view.MainFrame;
 import main.java.com.utbm.llama.view.MenuView;
 
+import java.util.Locale;
 /**
  * Contrôleur du menu principal.
  * Responsabilités :
@@ -14,8 +15,12 @@ public class MenuController {
     private final MainFrame mainFrame;
     private final MenuView menuView;
     private GameController gameController;
+    
+    private final Locale locale;
 
-    public MenuController(MainFrame mainFrame) {
+
+    public MenuController(MainFrame mainFrame, Locale locale) {
+    	this.locale = locale;
         this.mainFrame = mainFrame;
         this.menuView = mainFrame.getMenuView();
         initListeners();
