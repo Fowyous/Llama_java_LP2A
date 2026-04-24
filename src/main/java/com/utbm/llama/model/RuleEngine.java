@@ -1,6 +1,7 @@
 package main.java.com.utbm.llama.model;
 
 import main.java.com.utbm.llama.model.enums.CardType;
+import main.java.com.utbm.llama.model.enums.MoveType;
 import main.java.com.utbm.llama.model.rules.*;
 
 import java.util.List;
@@ -110,6 +111,14 @@ public class RuleEngine {
         return candidates;
     }
 
+    public void applyMove(Game game, Move move) {
+    	if (move.getType() == MoveType.PLAY_CARD) {
+    		CardType card = move.getCard();
+    		move.getPlayer().removeCard(card);
+        	game.getDiscardPile().add(move.getCard());
+        	
+    	}
+    }
     /**
      * Exécute la phase 2 de fin de manche, APRÈS résolution de tous les jurys :
      * 1. Vérifie la césure pour chaque joueur encore en négatif

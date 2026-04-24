@@ -37,6 +37,7 @@ public class Move {
      */
     public static Move playCard(Player player, CardType card) {
         return new Move(player, MoveType.PLAY_CARD, card);
+        
     }
 
     /**

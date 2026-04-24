@@ -40,7 +40,8 @@ public class BoardController {
     private Player localPlayer;
     private BoardView boardView;
     private JuryController juryController;
-
+    private RuleEngine ruleEngine;
+    
     private boolean roundInProgress = false;
     private int currentRoundNumber = 1;
 
@@ -54,7 +55,7 @@ public class BoardController {
         this.game = game;
         this.localPlayer = localPlayer;
         this.juryController = juryController;
-
+        this.ruleEngine = new RuleEngine();
         if (juryController != null) {
             juryController.setBoardController(this);
         }
@@ -98,14 +99,34 @@ public class BoardController {
      * ou être un LLAMA si le dessus est un SIX, ou le dessus est vide.
      */
     public void handlePlayCard(CardType card) {
-        if (!validatePlayCard(card)) {
+    	Move move = Move.playCard(localPlayer, card);
+    	
+    	if (!ruleEngine.validateMove(move, game)) {
+            System.out.println("[BOARD] Coup invalide : " + card.name());
+            updateView();
+            return;
+    	}
+    	ruleEngine.applyMove(game, move);
+    	
+        System.out.println("[BOARD] " + localPlayer.getName() + " joue " + card.name());
+
+        updateView();
+        checkRoundOver();
+
+        if (roundInProgress) {
+            game.nextTurn();
+            updateView();
+            checkBotTurn();
+        }
+  /*		// a effacer j'ai laisser ca pour alban
+        if (!validatePlayCard(card)) {// Il faut utiliser le rule engine
             System.out.println("[BOARD] Coup invalide : " + card.name());
             updateView();
             return;
         }
 
-        localPlayer.removeCard(card);
-        game.getDiscardPile().add(card);
+        localPlayer.removeCard(card);//fait par ruleEngine.applyMove(move)
+        game.getDiscardPile().add(card);//fait par ruleEngine.applyMove(move)
 
         System.out.println("[BOARD] " + localPlayer.getName() + " joue " + card.name());
 
@@ -117,6 +138,7 @@ public class BoardController {
             updateView();
             checkBotTurn();
         }
+        */
     }
 
     /**
