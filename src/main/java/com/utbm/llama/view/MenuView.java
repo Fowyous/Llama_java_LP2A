@@ -11,7 +11,7 @@ import java.util.ResourceBundle;
  * Écran d'accueil de LAMA UTBM.
  * Présente le titre du jeu et les trois actions principales.
  */
-public class MenuView extends JPanel {
+public class MenuView extends JPanel  implements LocaleChangeListener{
 
     private static final Color BG = Color.decode("#0D0D0D");
     private static final Color ACCENT = Color.decode("#C8A84B");
@@ -30,9 +30,12 @@ public class MenuView extends JPanel {
     
     private JLabel taglineLabel;
     
-    public MenuView(Locale locale) {
-    	this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
-    	this.currentLocale = locale;
+    public MenuView(MainFrame mainFrame) {
+        mainFrame.addLocaleChangeListener(this);
+        
+    	this.currentLocale = mainFrame.getCurrentLocale();
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+    	
         setLayout(new BorderLayout());
         setBackground(BG);
         setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -167,7 +170,8 @@ public class MenuView extends JPanel {
         return btn;
     }
     
-    public void updateLanguage(Locale locale) {
+    @Override    
+    public void onLocaleChange(Locale locale) {
         this.currentLocale = locale;
         ResourceBundle newBundle = ResourceBundle.getBundle("main.resources.strings", locale);
         

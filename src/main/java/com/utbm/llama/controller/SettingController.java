@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 /**
  * Contrôleur de l'écran de paramètres.
  * Responsabilités :
@@ -27,7 +28,8 @@ public class SettingController {
     private GameController gameController;
     
     private Locale currentLocale;
-
+    private ResourceBundle bundle;
+    
     private int savedNbPlayers = 3;
     private Difficulty savedDifficulty = Difficulty.MEDIUM;
     private GameMode savedGameMode = GameMode.SHORT;
@@ -35,6 +37,8 @@ public class SettingController {
     public SettingController(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         this.settingsView = mainFrame.getSettingsView();
+        this.currentLocale = mainFrame.getCurrentLocale();
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
         initListeners();
     }
 
@@ -55,8 +59,6 @@ public class SettingController {
         this.currentLocale = newLocale;
         
         // updates the view
-        settingsView.updateLanguage(newLocale);
-        
         mainFrame.updateApplicationLocale(newLocale);
     }
     /**
@@ -89,12 +91,18 @@ public class SettingController {
     private List<Player> buildPlayers(int nbPlayers, Difficulty difficulty) {
         List<Player> players = new ArrayList<>();
 
-        players.add(new Player("Joueur"));
+        players.add(new Player(bundle.getString("player_human")));
 
-        String[] botNames = {"IA — Étudiant A", "IA — Étudiant B", "IA — Étudiant C", "IA — Étudiant D", "IA — Étudiant E"};
-
+        String[] botNameKeys = {            
+        		"bot_student_a",             
+        		"bot_student_b",             
+        		"bot_student_c",             
+        		"bot_student_d",             
+        		"bot_student_e" 
+        		};
         for (int i = 1; i < nbPlayers; i++) {
-            players.add(new Bot(botNames[i - 1], difficulty));
+            String botName = bundle.getString(botNameKeys[i - 1]);
+            players.add(new Bot(botName, difficulty));
         }
 
         return players;

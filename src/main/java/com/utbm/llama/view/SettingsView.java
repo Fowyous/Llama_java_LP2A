@@ -15,8 +15,9 @@ import java.util.ResourceBundle;
  * Permet de choisir le nombre de joueurs, leur difficulté (bots)
  * et le mode de jeu (6 ou 10 manches).
  */
-public class SettingsView extends JPanel {
+public class SettingsView extends JPanel implements LocaleChangeListener{
 
+	
     private static final Color BG = Color.decode("#0D0D0D");
     private static final Color PANEL_BG = Color.decode("#141414");
     private static final Color ACCENT = Color.decode("#C8A84B");
@@ -33,11 +34,22 @@ public class SettingsView extends JPanel {
 
     private ResourceBundle bundle;
     private Locale currentLocale;
+    
+    private JLabel lblNbPlayers;    
+    private JLabel hintNbPlayers;   
+    private JLabel lblDifficulty;    
+    private JLabel hintDifficulty;   
+    private JLabel lblMode;    
+    private JLabel hintMode;    
+    private JLabel lblLanguage;    
+    private JLabel hintLanguage;
     private JLabel title;
     private JLabel sub;
     private JLabel lbl, hintLbl;
-    public SettingsView(Locale locale) {
-    	this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+    public SettingsView(MainFrame mainFrame) {
+        mainFrame.addLocaleChangeListener(this);
+
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", mainFrame.getCurrentLocale());
 
         setLayout(new BorderLayout());
         setBackground(BG);
@@ -46,7 +58,7 @@ public class SettingsView extends JPanel {
         comboDifficulty = buildCombo(Difficulty.values());
         comboGameMode = buildCombo(GameMode.values());
         comboLanguage = buildCombo(new String[]{"English", "Français", "Deutsch"});
-        setLanguageSelection(locale);
+        setLanguageSelection(mainFrame.getCurrentLocale());
         btnSave = buildButton(bundle.getString("settings.save"), true);
         btnBack = buildButton(bundle.getString("settings.back"), false);
 
@@ -90,19 +102,15 @@ public class SettingsView extends JPanel {
         form.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, 1), new EmptyBorder(32, 40, 32, 40)));
         form.setMaximumSize(new Dimension(600, 500));
 
-        form.add(buildFieldGroup(bundle.getString("settings.nb_players.label"), bundle.getString("settings.nb_players.hint"), comboNbPlayers));
+        form.add(buildFieldGroupNbPlayers());
         form.add(Box.createVerticalStrut(24));
 
-        form.add(buildFieldGroup(bundle.getString("settings.difficulty.label"), bundle.getString("settings.difficulty.hint"), comboDifficulty));
+        form.add(buildFieldGroupDifficulty());
         form.add(Box.createVerticalStrut(24));
 
-        form.add(buildFieldGroup(bundle.getString("settings.mode.label"), bundle.getString("settings.mode.hint"), comboGameMode));
+        form.add(buildFieldGroupMode());
 
-        form.add(buildFieldGroup(
-        	    bundle.getString("settings.language.label"),
-        	    bundle.getString("settings.language.hint"),
-        	    comboLanguage
-        	));
+        form.add(buildFieldGroupLanguage());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -140,7 +148,111 @@ public class SettingsView extends JPanel {
 
         return group;
     }
+    private JPanel buildFieldGroupNbPlayers() {  
+    	JPanel group = new JPanel();        
+    	group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));        
+    	group.setBackground(PANEL_BG);        
+    	group.setAlignmentX(Component.LEFT_ALIGNMENT);
+    	
+    	lblNbPlayers = new JLabel(bundle.getString("settings.nb_players.label"));        
+    	lblNbPlayers.setFont(new Font("Monospaced", Font.BOLD, 12));        
+    	lblNbPlayers.setForeground(ACCENT);      
+    	lblNbPlayers.setAlignmentX(Component.LEFT_ALIGNMENT);
+    	
+    	hintNbPlayers = new JLabel(bundle.getString("settings.nb_players.hint"));        
+    	hintNbPlayers.setFont(new Font("Serif", Font.ITALIC, 13));        
+    	hintNbPlayers.setForeground(TEXT_SUB);        
+    	hintNbPlayers.setAlignmentX(Component.LEFT_ALIGNMENT);        
+    	hintNbPlayers.setBorder(new EmptyBorder(2, 0, 8, 0));
+    	
+    	styleCombo(comboNbPlayers);        	
+    	comboNbPlayers.setAlignmentX(Component.LEFT_ALIGNMENT);        
+    	comboNbPlayers.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+    	group.add(lblNbPlayers);        
+    	group.add(hintNbPlayers);        
+    	group.add(comboNbPlayers);
+    
+    	return group;
+    	}
 
+    private JPanel buildFieldGroupDifficulty() {    
+    	JPanel group = new JPanel();      
+    	group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));     
+    	group.setBackground(PANEL_BG);    
+    	group.setAlignmentX(Component.LEFT_ALIGNMENT);
+    	
+    	lblDifficulty = new JLabel(bundle.getString("settings.difficulty.label"));      
+    	lblDifficulty.setFont(new Font("Monospaced", Font.BOLD, 12));     
+    	lblDifficulty.setForeground(ACCENT);     
+    	lblDifficulty.setAlignmentX(Component.LEFT_ALIGNMENT);
+    	
+    	hintDifficulty = new JLabel(bundle.getString("settings.difficulty.hint"));      
+    	hintDifficulty.setFont(new Font("Serif", Font.ITALIC, 13));   
+    	hintDifficulty.setForeground(TEXT_SUB);    
+    	hintDifficulty.setAlignmentX(Component.LEFT_ALIGNMENT);  
+    	hintDifficulty.setBorder(new EmptyBorder(2, 0, 8, 0));
+    	
+    	styleCombo(comboDifficulty);    
+    	comboDifficulty.setAlignmentX(Component.LEFT_ALIGNMENT);   
+    	comboDifficulty.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+    	group.add(lblDifficulty);      
+    	group.add(hintDifficulty);     
+    	group.add(comboDifficulty);
+    	return group; 
+    	}
+    
+    private JPanel buildFieldGroupLanguage() {  
+    	JPanel group = new JPanel();  
+    	group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
+    	group.setBackground(PANEL_BG);      
+    	group.setAlignmentX(Component.LEFT_ALIGNMENT);
+    	lblLanguage = new JLabel(bundle.getString("settings.language.label"));    
+    	lblLanguage.setFont(new Font("Monospaced", Font.BOLD, 12)); 
+    	lblLanguage.setForeground(ACCENT);  
+    	lblLanguage.setAlignmentX(Component.LEFT_ALIGNMENT);
+   
+    	hintLanguage = new JLabel(bundle.getString("settings.language.hint"));  
+    	hintLanguage.setFont(new Font("Serif", Font.ITALIC, 13));     
+    	hintLanguage.setForeground(TEXT_SUB); 
+    	hintLanguage.setAlignmentX(Component.LEFT_ALIGNMENT);      
+    	hintLanguage.setBorder(new EmptyBorder(2, 0, 8, 0));
+   
+    	styleCombo(comboLanguage);  
+    	comboLanguage.setAlignmentX(Component.LEFT_ALIGNMENT);    
+    	comboLanguage.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+    
+    	group.add(lblLanguage);      
+    	group.add(hintLanguage);     
+    	group.add(comboLanguage);
+    
+    	return group;    
+    	}
+    private JPanel buildFieldGroupMode() { 
+    	JPanel group = new JPanel();  
+    	group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));  
+    	group.setBackground(PANEL_BG);   
+    	group.setAlignmentX(Component.LEFT_ALIGNMENT);
+    	
+    	lblMode = new JLabel(bundle.getString("settings.mode.label"));   
+    	lblMode.setFont(new Font("Monospaced", Font.BOLD, 12));     
+    	lblMode.setForeground(ACCENT);     
+    	lblMode.setAlignmentX(Component.LEFT_ALIGNMENT);
+  
+    	hintMode = new JLabel(bundle.getString("settings.mode.hint"));     
+    	hintMode.setFont(new Font("Serif", Font.ITALIC, 13));   
+    	hintMode.setForeground(TEXT_SUB);   
+    	hintMode.setAlignmentX(Component.LEFT_ALIGNMENT);      
+    	hintMode.setBorder(new EmptyBorder(2, 0, 8, 0));
+    
+    	styleCombo(comboGameMode);    
+    	comboGameMode.setAlignmentX(Component.LEFT_ALIGNMENT);       
+    	comboGameMode.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+    	group.add(lblMode);     
+    	group.add(hintMode);   
+    	group.add(comboGameMode);
+    	
+    	return group;   
+    	}
     private JPanel buildActions() {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 24));
         actions.setBackground(BG);
@@ -237,15 +349,31 @@ public class SettingsView extends JPanel {
         };
         comboLanguage.setSelectedItem(language);
     }
-    public void updateLanguage(Locale locale) {
+    @Override    
+    public void onLocaleChange(Locale locale) {
         this.currentLocale = locale;
         ResourceBundle newBundle = ResourceBundle.getBundle("main.resources.strings", locale);
         bundle = newBundle;
-        // updating texts and buttons.
-        btnSave.setText(newBundle.getString("settings.save"));
-        btnBack.setText(newBundle.getString("settings.back"));
+        
+        // update header.
         title.setText(newBundle.getString("settings.title"));
         sub.setText(newBundle.getString("settings.subtitle"));
+        //update all groups
+        lblNbPlayers.setText(newBundle.getString("settings.nb_players.label"));  
+        hintNbPlayers.setText(newBundle.getString("settings.nb_players.hint"));
+        lblDifficulty.setText(newBundle.getString("settings.difficulty.label"));  
+        hintDifficulty.setText(newBundle.getString("settings.difficulty.hint"));
+        lblMode.setText(newBundle.getString("settings.mode.label"));   
+        
+        hintMode.setText(newBundle.getString("settings.mode.hint"));
+        lblLanguage.setText(newBundle.getString("settings.language.label"));    
+        hintLanguage.setText(newBundle.getString("settings.language.hint"));
+        // Update buttons       
+        btnSave.setText(newBundle.getString("settings.save"));     
+        btnBack.setText(newBundle.getString("settings.back"));
+        // Update language selection display        
+        setLanguageSelection(locale);
         
     }
+
 }

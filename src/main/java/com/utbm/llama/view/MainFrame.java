@@ -3,10 +3,11 @@ package main.java.com.utbm.llama.view;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Locale;
-
+import java.util.ArrayList;
+import java.util.List;
 /**
- * Fenêtre principale de l'application LAMA UTBM.
- * Gère la navigation entre les différents écrans via un CardLayout.
+ * Main window of the lama game
+ * Manages the navigation between windows via a CardLayout.
  */
 public class MainFrame extends JFrame {
 
@@ -29,7 +30,7 @@ public class MainFrame extends JFrame {
     private RoundSummaryView roundSummaryView;
 
     private Locale currentLocale;
-    
+    private List<LocaleChangeListener> localeListeners = new ArrayList<>();
     public MainFrame(Locale locale) {
         super("LAMA UTBM — Survivre au cursus");
 
@@ -45,8 +46,8 @@ public class MainFrame extends JFrame {
         contentPanel = new JPanel(cardLayout);
         contentPanel.setBackground(Color.decode("#0D0D0D"));
 
-        menuView = new MenuView(locale);
-        settingsView = new SettingsView(locale);
+        menuView = new MenuView(this);
+        settingsView = new SettingsView(this);
 
         contentPanel.add(menuView, SCREEN_MENU);
         contentPanel.add(settingsView, SCREEN_SETTINGS);
@@ -56,14 +57,14 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Affiche le menu principal.
+     * Display the main menu.
      */
     public void showMenu() {
         cardLayout.show(contentPanel, SCREEN_MENU);
     }
 
     /**
-     * Affiche l'écran de paramètres.
+     * Display the settings menu.
      */
     public void showSettings() {
         cardLayout.show(contentPanel, SCREEN_SETTINGS);
@@ -132,34 +133,17 @@ public class MainFrame extends JFrame {
     public void updateApplicationLocale(Locale locale) {
         this.currentLocale = locale;
         
-        // updates menu
-        if (menuView != null) {
-            menuView.updateLanguage(locale);
+        for (LocaleChangeListener listener : localeListeners) {   
+        	listener.onLocaleChange(locale);  
         }
         
-        // updates settings
-        if (settingsView != null) {
-            settingsView.updateLanguage(locale);
-        }
-        
-        // todo
-        if (boardView != null) {
-            // boardView.updateLanguage(locale);
-        }
-        
-        if (juryView != null) {
-            // juryView.updateLanguage(locale);
-        }
-        
-        if (cesureView != null) {
-            // cesureView.updateLanguage(locale);
-        }
-        
-        if (roundSummaryView != null) {
-            // roundSummaryView.updateLanguage(locale);
-        }
     }
-    
+    public void addLocaleChangeListener(LocaleChangeListener listener) { 
+    	localeListeners.add(listener);
+    }
+    public void removeLocaleChangeListener(LocaleChangeListener listener) {   
+    	localeListeners.remove(listener);
+    }
     public Locale getCurrentLocale() {
         return currentLocale;
     }
