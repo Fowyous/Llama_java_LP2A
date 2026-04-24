@@ -111,14 +111,8 @@ public class RuleEngine {
         return candidates;
     }
 
-    public void applyMove(Game game, Move move) {
-    	if (move.getType() == MoveType.PLAY_CARD) {
-    		CardType card = move.getCard();
-    		move.getPlayer().removeCard(card);
-        	game.getDiscardPile().add(move.getCard());
-        	
-    	}
-    }
+
+
     /**
      * Exécute la phase 2 de fin de manche, APRÈS résolution de tous les jurys :
      * 1. Vérifie la césure pour chaque joueur encore en négatif

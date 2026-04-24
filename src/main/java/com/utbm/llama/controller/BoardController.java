@@ -106,8 +106,10 @@ public class BoardController {
             updateView();
             return;
     	}
-    	ruleEngine.applyMove(game, move);
+    	game.applyMove(move);
     	
+    	//apply rules  in this case there are no new rules to apply
+    	ruleEngine.applyRules(move, game);
         System.out.println("[BOARD] " + localPlayer.getName() + " joue " + card.name());
 
         updateView();
@@ -125,8 +127,8 @@ public class BoardController {
             return;
         }
 
-        localPlayer.removeCard(card);//fait par ruleEngine.applyMove(move)
-        game.getDiscardPile().add(card);//fait par ruleEngine.applyMove(move)
+        localPlayer.removeCard(card);//fait par game.applyMove(move)
+        game.getDiscardPile().add(card);//fait par game.applyMove(move)
 
         System.out.println("[BOARD] " + localPlayer.getName() + " joue " + card.name());
 
@@ -145,6 +147,18 @@ public class BoardController {
      * Le joueur pioche une carte.
      */
     public void handleDrawCard() {
+        Move move = Move.drawCard(localPlayer);
+        
+        if (!ruleEngine.validateMove(move, game)) {
+            System.out.println("[BOARD] Coup invalide : impossible de piocher");
+            updateView();
+            return;
+        }
+        
+        game.applyMove(move);
+        //apply rules in this case there are no rules to apply
+        ruleEngine.applyRules(move, game);
+        
         if (game.getDrawPile().isEmpty()) {
             System.out.println("[BOARD] Pioche vide !");
             return;

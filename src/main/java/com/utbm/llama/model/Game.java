@@ -145,10 +145,11 @@ public class Game {
     }
 
     /**
-     * Applique un coup au jeu SANS validation (la validation est faite
-     * par RuleEngine dans le Controller).
+     *applies the move by making the necessary modifications to the game and players.
      *
-     * @param move le coup à appliquer
+     *no validation happens here the validation is done by the rule engine
+     *
+     * @param move move the move to be applied 
      * @throws IllegalArgumentException si le coup est mal formé
      */
     public void applyMove(Move move) {
