@@ -252,27 +252,6 @@ public class BoardController {
         }
     }
 
-    /**
-     * Vérifie si une carte peut être jouée sur la défausse actuelle.
-     * Règles L.A.M.A :
-     * - Défausse vide → toute carte est jouable
-     * - Même valeur que le dessus → jouable
-     * - Valeur supérieure de 1 → jouable
-     * - SIX en haut → LLAMA jouable
-     * - LLAMA en haut → ONE jouable (cycle)
-     */
-    private boolean validatePlayCard(CardType card) {
-        if (game.getDiscardPile().isEmpty()) return true;
-
-        CardType top = game.getDiscardPile().peek();
-
-        if (card == top) return true;
-        if (card.getValue() == top.getValue() + 1) return true;
-        if (top == CardType.SIX && card == CardType.LLAMA) return true;
-        if (top == CardType.LLAMA && card == CardType.ONE) return true;
-
-        return false;
-    }
 
     private boolean isLocalPlayerTurn() {
         return game.getCurrentPlayer().equals(localPlayer) && localPlayer.getState() == State.PLAYING && roundInProgress;
