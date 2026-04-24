@@ -234,24 +234,13 @@ public class BoardController {
 
         Move move = bot.decideMove(game);
 
-        switch (move.getType()) {
-            case PLAY_CARD -> {
-                bot.removeCard(move.getCard());
-                game.getDiscardPile().add(move.getCard());
-                System.out.println("[BOARD] " + bot.getName() + " joue " + move.getCard().name());
-            }
-            case DRAW_CARD -> {
-                if (!game.getDrawPile().isEmpty()) {
-                    CardType drawn = game.getDrawPile().draw();
-                    bot.addCard(drawn);
-                    System.out.println("[BOARD] " + bot.getName() + " pioche");
-                }
-            }
-            case QUIT_ROUND -> {
-                bot.changeState(State.QUITTING);
-                System.out.println("[BOARD] " + bot.getName() + " passe la manche");
-            }
+        // Validate the move using the rule engine
+        if (!ruleEngine.validateMove(move, game)) {
+            System.out.println("[BOARD] Coup du bot invalide : " + bot.getName());
+            return;
         }
+        
+        game.applyMove(move);
 
         updateView();
         checkRoundOver();
