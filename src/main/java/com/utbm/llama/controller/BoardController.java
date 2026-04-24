@@ -159,15 +159,13 @@ public class BoardController {
         //apply rules in this case there are no rules to apply
         ruleEngine.applyRules(move, game);
         
-        if (game.getDrawPile().isEmpty()) {
-            System.out.println("[BOARD] Pioche vide !");
-            return;
-        }
+        System.out.println("[BOARD] " + localPlayer.getName() + " pioche");
 
-        CardType drawn = game.getDrawPile().draw();
-        localPlayer.addCard(drawn);
-        System.out.println("[BOARD] " + localPlayer.getName() + " pioche " + drawn.name());
-
+        game.applyMove(move);
+        
+    	//apply rules  if there are any that are applicable
+    	ruleEngine.applyRules(move, game);
+    	
         updateView();
 
         game.nextTurn();
@@ -179,8 +177,18 @@ public class BoardController {
      * Le joueur passe la manche (ne joue plus jusqu'à la fin).
      */
     public void handleQuitRound() {
-        localPlayer.changeState(State.QUITTING);
-        System.out.println("[BOARD] " + localPlayer.getName() + " passe la manche");
+    	Move move = Move.quitRound(localPlayer);
+    	
+        // Validate the move using the rule engine
+        if (!ruleEngine.validateMove(move, game)) {
+            System.out.println("[BOARD] Coup invalide : impossible de passer la manche");
+            updateView();
+            return;
+        }
+        
+        game.applyMove(move);
+        //localPlayer.changeState(State.QUITTING);
+        //System.out.println("[BOARD] " + localPlayer.getName() + " passe la manche");
 
         updateView();
         checkRoundOver();
