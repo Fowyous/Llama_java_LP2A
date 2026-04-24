@@ -11,6 +11,7 @@ import main.java.com.utbm.llama.view.SettingsView;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Locale;
 /**
  * Contrôleur de l'écran de paramètres.
  * Responsabilités :
@@ -24,6 +25,8 @@ public class SettingController {
     private final MainFrame mainFrame;
     private final SettingsView settingsView;
     private GameController gameController;
+    
+    private Locale currentLocale;
 
     private int savedNbPlayers = 3;
     private Difficulty savedDifficulty = Difficulty.MEDIUM;
@@ -40,8 +43,22 @@ public class SettingController {
         settingsView.addSaveListener(e -> handleSaveSettings(settingsView.getNbPlayers(), settingsView.getDifficulty(), settingsView.getGameMode()));
 
         settingsView.addBackListener(e -> mainFrame.showMenu());
+        
+        settingsView.addLanguageChangeListener(e -> handleLanguageChange());
     }
 
+    private void handleLanguageChange() {
+        // gets the new selected locale.
+        Locale newLocale = settingsView.getSelectedLanguage();
+        
+        // updates it.
+        this.currentLocale = newLocale;
+        
+        // updates the view
+        settingsView.updateLanguage(newLocale);
+        
+        mainFrame.updateApplicationLocale(newLocale);
+    }
     /**
      * Sauvegarde les paramètres, construit le modèle Game et démarre la partie.
      *

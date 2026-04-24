@@ -28,10 +28,14 @@ public class MainFrame extends JFrame {
     public static final String SCREEN_ROUND_SUMMARY = "ROUND_SUMMARY";
     private RoundSummaryView roundSummaryView;
 
+    private Locale currentLocale;
+    
     public MainFrame(Locale locale) {
         super("LAMA UTBM — Survivre au cursus");
 
 
+        this.currentLocale = locale;
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1280, 800));
         setPreferredSize(new Dimension(1440, 900));
@@ -125,6 +129,41 @@ public class MainFrame extends JFrame {
         repaint();
     }
 
+    public void updateApplicationLocale(Locale locale) {
+        this.currentLocale = locale;
+        
+        // updates menu
+        if (menuView != null) {
+            menuView.updateLanguage(locale);
+        }
+        
+        // updates settings
+        if (settingsView != null) {
+            settingsView.updateLanguage(locale);
+        }
+        
+        // todo
+        if (boardView != null) {
+            // boardView.updateLanguage(locale);
+        }
+        
+        if (juryView != null) {
+            // juryView.updateLanguage(locale);
+        }
+        
+        if (cesureView != null) {
+            // cesureView.updateLanguage(locale);
+        }
+        
+        if (roundSummaryView != null) {
+            // roundSummaryView.updateLanguage(locale);
+        }
+    }
+    
+    public Locale getCurrentLocale() {
+        return currentLocale;
+    }
+    
     public RoundSummaryView getRoundSummaryView() {
         return roundSummaryView;
     }

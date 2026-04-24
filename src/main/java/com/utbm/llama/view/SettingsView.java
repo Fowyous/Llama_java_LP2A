@@ -27,11 +27,15 @@ public class SettingsView extends JPanel {
     private final JComboBox<Integer> comboNbPlayers;
     private final JComboBox<Difficulty> comboDifficulty;
     private final JComboBox<GameMode> comboGameMode;
+    private final JComboBox<String> comboLanguage;
     private final JButton btnSave;
     private final JButton btnBack;
 
-    private final ResourceBundle bundle;
-
+    private ResourceBundle bundle;
+    private Locale currentLocale;
+    private JLabel title;
+    private JLabel sub;
+    private JLabel lbl, hintLbl;
     public SettingsView(Locale locale) {
     	this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
 
@@ -41,7 +45,8 @@ public class SettingsView extends JPanel {
         comboNbPlayers = buildCombo(new Integer[]{2, 3, 4});
         comboDifficulty = buildCombo(Difficulty.values());
         comboGameMode = buildCombo(GameMode.values());
-
+        comboLanguage = buildCombo(new String[]{"English", "Français", "Deutsch"});
+        setLanguageSelection(locale);
         btnSave = buildButton(bundle.getString("settings.save"), true);
         btnBack = buildButton(bundle.getString("settings.back"), false);
 
@@ -55,11 +60,11 @@ public class SettingsView extends JPanel {
         header.setBackground(BG);
         header.setBorder(new EmptyBorder(40, 60, 24, 60));
 
-        JLabel title = new JLabel(bundle.getString("settings.title"));
+        title = new JLabel(bundle.getString("settings.title"));
         title.setFont(new Font("Monospaced", Font.BOLD, 28));
         title.setForeground(TEXT_MAIN);
 
-        JLabel sub = new JLabel(bundle.getString("settings.subtitle"));
+        sub = new JLabel(bundle.getString("settings.subtitle"));
         sub.setFont(new Font("Serif", Font.ITALIC, 15));
         sub.setForeground(TEXT_SUB);
         sub.setBorder(new EmptyBorder(6, 0, 0, 0));
@@ -93,6 +98,11 @@ public class SettingsView extends JPanel {
 
         form.add(buildFieldGroup(bundle.getString("settings.mode.label"), bundle.getString("settings.mode.hint"), comboGameMode));
 
+        form.add(buildFieldGroup(
+        	    bundle.getString("settings.language.label"),
+        	    bundle.getString("settings.language.hint"),
+        	    comboLanguage
+        	));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -109,12 +119,12 @@ public class SettingsView extends JPanel {
         group.setBackground(PANEL_BG);
         group.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lbl = new JLabel(label);
+        lbl = new JLabel(label);
         lbl.setFont(new Font("Monospaced", Font.BOLD, 12));
         lbl.setForeground(ACCENT);
         lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel hintLbl = new JLabel(hint);
+        hintLbl = new JLabel(hint);
         hintLbl.setFont(new Font("Serif", Font.ITALIC, 13));
         hintLbl.setForeground(TEXT_SUB);
         hintLbl.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -180,6 +190,10 @@ public class SettingsView extends JPanel {
         btnBack.addActionListener(l);
     }
 
+    public void addLanguageChangeListener(ActionListener l) {
+        comboLanguage.addActionListener(l);
+    }
+    
     public int getNbPlayers() {
         return (Integer) comboNbPlayers.getSelectedItem();
     }
@@ -202,5 +216,36 @@ public class SettingsView extends JPanel {
 
     public void setGameMode(GameMode m) {
         comboGameMode.setSelectedItem(m);
+    }
+    public Locale getSelectedLanguage() {
+        String selected = (String) comboLanguage.getSelectedItem();
+        return switch (selected) {
+            case "English" -> Locale.of("en");
+            case "Français" -> Locale.of("fr");
+            case "Deutsch" -> Locale.of("de");
+            default -> currentLocale;
+        };
+    }
+    
+    private void setLanguageSelection(Locale locale) {
+        String language = switch (locale.getLanguage()) {
+            case "en" -> "English";
+            case "fr" -> "Français";
+            case "de" -> "Deutsch";
+            case "es" -> "Español";
+            default -> "English";
+        };
+        comboLanguage.setSelectedItem(language);
+    }
+    public void updateLanguage(Locale locale) {
+        this.currentLocale = locale;
+        ResourceBundle newBundle = ResourceBundle.getBundle("main.resources.strings", locale);
+        bundle = newBundle;
+        // updating texts and buttons.
+        btnSave.setText(newBundle.getString("settings.save"));
+        btnBack.setText(newBundle.getString("settings.back"));
+        title.setText(newBundle.getString("settings.title"));
+        sub.setText(newBundle.getString("settings.subtitle"));
+        
     }
 }

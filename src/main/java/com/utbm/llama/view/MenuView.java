@@ -26,9 +26,13 @@ public class MenuView extends JPanel {
     private final JButton btnQuit;
 
     private final ResourceBundle bundle;
+    private Locale currentLocale;
+    
+    private JLabel taglineLabel;
     
     public MenuView(Locale locale) {
     	this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+    	this.currentLocale = locale;
         setLayout(new BorderLayout());
         setBackground(BG);
         setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -69,7 +73,7 @@ public class MenuView extends JPanel {
         sep.setPreferredSize(new Dimension(300, 1));
         sep.setMaximumSize(new Dimension(300, 1));
 
-        JLabel taglineLabel = new JLabel(bundle.getString("tagline"), SwingConstants.CENTER);
+        taglineLabel = new JLabel(bundle.getString("tagline"), SwingConstants.CENTER);
         taglineLabel.setFont(new Font("Serif", Font.ITALIC, 18));
         taglineLabel.setForeground(TEXT_SUB);
         taglineLabel.setBorder(new EmptyBorder(16, 0, 60, 0));
@@ -162,7 +166,26 @@ public class MenuView extends JPanel {
 
         return btn;
     }
+    
+    public void updateLanguage(Locale locale) {
+        this.currentLocale = locale;
+        ResourceBundle newBundle = ResourceBundle.getBundle("main.resources.strings", locale);
+        
+        // updates the text on buttons
+        btnStart.setText("▶ " + newBundle.getString("new_game"));
+        btnSettings.setText("⚙  " + newBundle.getString("settings"));
+        btnQuit.setText("✕  " + newBundle.getString("exit"));
+        
+        // updates the tagline
+        if (taglineLabel != null) {
+            taglineLabel.setText(newBundle.getString("tagline"));
+        }
+    }
 
+    public Locale getCurrentLocale() {
+        return currentLocale;
+    }
+    
     public void addStartListener(ActionListener l) {
         btnStart.addActionListener(l);
     }
