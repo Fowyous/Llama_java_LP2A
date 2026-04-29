@@ -11,16 +11,16 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Vue du mini-jeu "Jury".
- * Contexte : Le joueur a perdu ≥ 20 crédits dans la manche.
- * Il voit 7 cartes face cachée, en choisit une,
- * et gagne la valeur de cette carte (1 à 10) en crédits.
- * Layout :
+ * View of the "Jury" mini-game.
+ * Context: The player lost ≥ 20 credits in the round.
+ * He sees 7 cards face down, chooses one,
+ * and wins the value of this card (1 to 10) in credits.
+ * Layout:
  * ┌──────────────────────────────────────────────────────┐
- * │  En-tête dramatique (titre + contexte)               │
- * │  Crédits perdus                                      │
- * │  7 cartes face cachée                                │
- * │  [CONFIRMER MON CHOIX]                               │
+ * │           Dramatic header (title + context)          │
+ * │                    Lost credits                      │
+ * │                  7 cards face down                   │
+ * │                 [CONFIRM MY CHOICE]                  │
  * └──────────────────────────────────────────────────────┘
  */
 public class JuryView extends JPanel {
@@ -43,6 +43,10 @@ public class JuryView extends JPanel {
     private final JButton btnConfirm;
     private final JLabel resultLabel;
 
+    /**
+     * Initializes the mini-game interface, setting up the dramatic dark theme,
+     * building the layout structure, and preparing the initial set of hidden cards.
+     */
     public JuryView() {
         setBackground(BG);
         setLayout(new BorderLayout());
@@ -73,6 +77,10 @@ public class JuryView extends JPanel {
         buildHiddenCards();
     }
 
+    /**
+     * Constructs the top panel containing the jury title,
+     * contextual subtitles, and the current player's financial status.
+     */
     private JPanel buildHeader() {
         JPanel header = new JPanel();
         header.setBackground(Color.decode("#0A0A0A"));
@@ -108,6 +116,10 @@ public class JuryView extends JPanel {
         return header;
     }
 
+    /**
+     * Sets up the central gameplay area where the instruction label,
+     * the card selection panel, and the eventual result label are positioned.
+     */
     private JPanel buildCenter() {
         JPanel center = new JPanel(new GridBagLayout());
         center.setBackground(BG);
@@ -134,6 +146,9 @@ public class JuryView extends JPanel {
         return center;
     }
 
+    /**
+     * Creates the bottom action area containing the confirmation button for the player's card choice.
+     */
     private JPanel buildFooter() {
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         footer.setBackground(BG);
@@ -142,6 +157,10 @@ public class JuryView extends JPanel {
         return footer;
     }
 
+    /**
+     * Generates seven interactive face-down cards, clears previous selections,
+     * and attaches click listeners to handle card selection and UI highlighting.
+     */
     private void buildHiddenCards() {
         cardsPanel.removeAll();
         hiddenCards.clear();
@@ -173,10 +192,10 @@ public class JuryView extends JPanel {
     }
 
     /**
-     * Révèle la carte choisie et affiche le résultat.
+     * Reveals the chosen card and displays the result.
      *
-     * @param index    index de la carte choisie (0-6)
-     * @param revealed le type de carte révélé
+     * @param index    index of the chosen map (0-6)
+     * @param revealed the type of map revealed
      */
     public void revealCard(int index, CardType revealed) {
         if (index < 0 || index >= hiddenCards.size()) return;
@@ -197,11 +216,11 @@ public class JuryView extends JPanel {
     }
 
     /**
-     * Initialise la vue pour le joueur passant devant le jury.
+     * Initializes the view for the player passing in front of the jury.
      *
-     * @param playerName     nom du joueur
-     * @param creditsLost    crédits perdus cette manche
-     * @param currentCredits crédits actuels avant le jury
+     * @param playerName     name
+     * @param creditsLost    lost credits this round
+     * @param currentCredits current credits before the jury
      */
     public void setup(String playerName, int creditsLost, int currentCredits) {
         playerNameLabel.setText(playerName + " est convoqué·e devant le jury");
@@ -213,7 +232,7 @@ public class JuryView extends JPanel {
     }
 
     /**
-     * Callback appelé quand le joueur valide son choix — reçoit l'index (0-6).
+     * Callback called when the player validates their choice—receives the index (0-6).
      */
     public void setOnCardPicked(Consumer<Integer> callback) {
         this.onCardPicked = callback;
@@ -224,15 +243,23 @@ public class JuryView extends JPanel {
         });
     }
 
+    /**
+     * Attaches a standard ActionListener to the confirmation button for external controller management.
+     */
     public void addConfirmListener(ActionListener l) {
         btnConfirm.addActionListener(l);
     }
 
+    /**
+     * Returns the index of the currently selected card (0 through 6).
+     */
     public int getSelectedIndex() {
         return selectedIndex;
     }
 
-
+    /**
+     * Utility helper to create a stylized JLabel with specific font properties and alignment for a consistent UI look.
+     */
     private JLabel buildLabel(String text, int size, int style, Color color) {
         JLabel lbl = new JLabel(text, SwingConstants.CENTER);
         lbl.setFont(new Font("Serif", style, size));

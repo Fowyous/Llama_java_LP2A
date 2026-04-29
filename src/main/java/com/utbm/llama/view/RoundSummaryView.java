@@ -12,14 +12,14 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 
 /**
- * Écran de résumé affiché entre chaque manche.
- * Affiche pour chaque joueur :
- * - Crédits perdus cette manche (pénalité de main)
- * - Crédits gagnés (jury, detec)
- * - Solde net de la manche
- * - Total actuel
- * - Badges : Semestre à l'étranger / Césure
- * Un bouton "Manche suivante" permet de continuer.
+ * Summary screen displayed between each round.
+ * Poster for each player:
+ *  - Credits lost this round (hand penalty)
+ *  - Earned credits (jury, debt)
+ * - Net balance of the round
+ * - Current Total
+ * - Badges: Semester abroad / Gap year
+ * A "Next Handle" button allows you to continue.
  */
 public class RoundSummaryView extends JPanel {
 
@@ -40,6 +40,9 @@ public class RoundSummaryView extends JPanel {
     private final JButton btnNext;
     private final JLabel bonusLabel;
 
+    /**
+     *  Initializes the view with a dark theme, sets up the layout, and builds the header, player panel, and "Next Round" button.
+     */
     public RoundSummaryView() {
         setBackground(BG);
         setLayout(new BorderLayout(0, 0));
@@ -68,7 +71,9 @@ public class RoundSummaryView extends JPanel {
         add(buildFooter(), BorderLayout.SOUTH);
     }
 
-
+    /**
+     *  Constructs the top section of the screen containing the end-of-round title, the game mode label, and the DETEC bonus indicator.
+     */
     private JPanel buildHeader() {
         JPanel header = new JPanel();
         header.setBackground(Color.decode("#0A0A0A"));
@@ -91,6 +96,9 @@ public class RoundSummaryView extends JPanel {
         return header;
     }
 
+    /**
+     *  Creates a scrollable container for the players' statistics to handle different screen sizes or large player counts.
+     */
     private JScrollPane buildCenter() {
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(BG);
@@ -110,6 +118,9 @@ public class RoundSummaryView extends JPanel {
         return scroll;
     }
 
+    /**
+     *  Sets up the bottom section of the screen containing the navigation button to proceed to the next round.
+     */
     private JPanel buildFooter() {
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         footer.setBackground(BG);
@@ -119,15 +130,14 @@ public class RoundSummaryView extends JPanel {
     }
 
     /**
-     * Remplit la vue avec les données de fin de manche.
-     *
-     * @param players          liste des joueurs
-     * @param roundNumber      numéro de la manche qui vient de se terminer
-     * @param maxRounds        nombre total de manches
-     * @param gameMode         mode de jeu
-     * @param creditsLostMap   crédits perdus par joueur cette manche (pénalité)
-     * @param creditsGainedMap crédits gagnés par joueur (jury, detec)
-     * @param detecApplied     true si le bonus DETEC a été appliqué
+     * Populates the view with endgame data.
+     * @param players list of players
+     * @param roundNumber round number that has just ended
+     * @param maxRounds total number of rounds
+     * @param gameMode game mode
+     * @param creditsLostMap lost credits per player this round (penalty)
+     * @param creditsGainedMap credits earned per player (jury, debrief)
+     * @param detecApplied true if the DETEC bonus has been applied
      */
     public void setup(List<Player> players,
                       int roundNumber, int maxRounds,
@@ -156,7 +166,7 @@ public class RoundSummaryView extends JPanel {
     }
 
     /**
-     * Construit la ligne d'un joueur dans le résumé.
+     * Builds a player’s line in the summary.
      */
     private JPanel buildPlayerRow(Player player, int lost, int gained, int net) {
         JPanel row = new JPanel() {
@@ -217,6 +227,9 @@ public class RoundSummaryView extends JPanel {
         return row;
     }
 
+    /**
+     *  Helper method to add a formatted row of statistics (label and value) to a player's summary panel.
+     */
     private void addStatLine(JPanel panel, String labelText, String valueText, Color valueColor) {
         JLabel lbl = new JLabel(labelText);
         lbl.setFont(new Font("Monospaced", Font.PLAIN, 11));
@@ -230,6 +243,9 @@ public class RoundSummaryView extends JPanel {
         panel.add(val);
     }
 
+    /**
+     *  Creates a small, colored indicator label for specific player statuses like academic semesters abroad or suspensions.
+     */
     private JLabel buildBadge(String text, Color color) {
         JLabel badge = new JLabel(text);
         badge.setFont(new Font("Monospaced", Font.PLAIN, 10));
@@ -238,6 +254,9 @@ public class RoundSummaryView extends JPanel {
         return badge;
     }
 
+    /**
+     *  Utility method to create a standardized JLabel with specific font settings and colors.
+     */
     private JLabel buildLabel(String text, int size, int style, Color color) {
         JLabel lbl = new JLabel(text, SwingConstants.CENTER);
         lbl.setFont(new Font("Serif", style, size));
@@ -245,6 +264,9 @@ public class RoundSummaryView extends JPanel {
         return lbl;
     }
 
+    /**
+     *  Attaches an event listener to the "Next Round" button to handle screen transitions.
+     */
     public void addNextRoundListener(ActionListener l) {
         btnNext.addActionListener(l);
     }

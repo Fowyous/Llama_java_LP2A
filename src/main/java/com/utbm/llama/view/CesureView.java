@@ -7,11 +7,11 @@ import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
 
 /**
- * Vue du "Semestre de Césure".
- * Contexte : le joueur a des crédits négatifs après le jury.
- * Il passe toute une manche sans jouer mais reçoit quand même
- * les 35 crédits au début de la manche suivante.
- * En 1v1 : les deux joueurs passent la manche simultanément.
+ * View of the "Gap Semester".
+ * Context: the player has negative credits after the jury.
+ * He goes through a whole round without playing but still gets it
+ * the 35 credits at the beginning of the next round.
+ * In 1v1: both players complete the round simultaneously.
  */
 public class CesureView extends JPanel {
 
@@ -28,6 +28,9 @@ public class CesureView extends JPanel {
     private final JLabel roundInfoLabel;
     private final JButton btnContinue;
 
+    /**
+     * Initializes the Gap Semester view, setting up the layout, typography, and action buttons for the academic suspension screen.
+     */
     public CesureView() {
         setBackground(BG);
         setLayout(new GridBagLayout());
@@ -75,6 +78,9 @@ public class CesureView extends JPanel {
         add(btnContinue, gbc);
     }
 
+    /**
+     * Constructs the visual header featuring a custom-painted airplane icon and the primary screen title.
+     */
     private JPanel buildIconPanel() {
         JPanel icon = new JPanel() {
             @Override
@@ -122,6 +128,9 @@ public class CesureView extends JPanel {
         return wrapper;
     }
 
+    /**
+     * Creates a stylized information panel that lists the consequences and rules of being in a "Gap Semester" status.
+     */
     private JPanel buildInfoCard() {
         JPanel card = new JPanel() {
             @Override
@@ -163,12 +172,12 @@ public class CesureView extends JPanel {
     }
 
     /**
-     * Configure la vue pour un joueur spécifique.
+     * Sets up the view for a specific player.
      *
-     * @param playerName     nom du joueur en césure
-     * @param currentCredits crédits actuels (négatifs)
-     * @param nextRound      numéro de la manche sautée
-     * @param isBothSkipping true si les deux joueurs sautent (1v1)
+     * @param playerName     player name in gap
+     * @param currentCredits current credits (negative)
+     * @param nextRound      jump sleeve number
+     * @param isBothSkipping true if both players jump (1v1)
      */
     public void setup(String playerName, int currentCredits, int nextRound, boolean isBothSkipping) {
         playerNameLabel.setText(playerName + " part en césure");
@@ -183,10 +192,16 @@ public class CesureView extends JPanel {
         }
     }
 
+    /**
+     * Registers an ActionListener to the continue button to proceed after the player acknowledges their status.
+     */
     public void addContinueListener(ActionListener l) {
         btnContinue.addActionListener(l);
     }
 
+    /**
+     * Helper method to create a standardized JLabel with specific font properties and colors used throughout the view.
+     */
     private JLabel buildLabel(String text, int size, int style, Color color) {
         JLabel lbl = new JLabel(text, SwingConstants.CENTER);
         lbl.setFont(new Font("Serif", style, size));

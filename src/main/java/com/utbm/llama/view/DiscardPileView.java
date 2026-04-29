@@ -7,7 +7,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * Affiche la carte du dessus de la défausse.
+ * Show the top card of the discard pile.
  */
 class DiscardPileView extends JPanel {
 
@@ -18,6 +18,9 @@ class DiscardPileView extends JPanel {
     private final JLabel label;
     private final JPanel cardHolder;
 
+    /**
+     * Initializes the discard pile component, setting up a card holder container and the "DÉFAUSSE" label with a default empty state.
+     */
     public DiscardPileView() {
         setOpaque(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -46,9 +49,9 @@ class DiscardPileView extends JPanel {
     }
 
     /**
-     * Met à jour la carte affichée sur la défausse.
+     * Updates the card displayed on the discard.
      *
-     * @param topCard null si la défausse est vide
+     * @param topCard null if the discard is empty
      */
     public void render(CardType topCard) {
         cardHolder.removeAll();
@@ -67,6 +70,9 @@ class DiscardPileView extends JPanel {
         cardHolder.repaint();
     }
 
+    /**
+     * Retrieves the CardView instance currently displayed at the top of the discard pile.
+     */
     public CardView getTopCardView() {
         return topCardView;
     }

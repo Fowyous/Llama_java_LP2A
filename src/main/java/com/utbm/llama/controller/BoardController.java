@@ -108,7 +108,6 @@ public class BoardController {
     	}
     	game.applyMove(move);
     	
-    	//apply rules  in this case there are no new rules to apply
     	ruleEngine.applyRules(move, game);
         System.out.println("[BOARD] " + localPlayer.getName() + " joue " + card.name());
 
@@ -156,14 +155,12 @@ public class BoardController {
         }
         
         game.applyMove(move);
-        //apply rules in this case there are no rules to apply
         ruleEngine.applyRules(move, game);
         
         System.out.println("[BOARD] " + localPlayer.getName() + " pioche");
 
         game.applyMove(move);
         
-    	//apply rules  if there are any that are applicable
     	ruleEngine.applyRules(move, game);
     	
         updateView();
@@ -179,7 +176,6 @@ public class BoardController {
     public void handleQuitRound() {
     	Move move = Move.quitRound(localPlayer);
     	
-        // Validate the move using the rule engine
         if (!ruleEngine.validateMove(move, game)) {
             System.out.println("[BOARD] Coup invalide : impossible de passer la manche");
             updateView();
@@ -234,7 +230,6 @@ public class BoardController {
 
         Move move = bot.decideMove(game);
 
-        // Validate the move using the rule engine
         if (!ruleEngine.validateMove(move, game)) {
             System.out.println("[BOARD] Coup du bot invalide : " + bot.getName());
             return;

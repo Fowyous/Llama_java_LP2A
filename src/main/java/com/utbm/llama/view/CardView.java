@@ -9,11 +9,11 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 
 /**
- * Composant visuel représentant une carte du jeu LAMA.
- * Peut être :
- * - face visible  (type connu)
- * - face cachée   (mode jury ou dos de pioche)
- * - sélectionnable (dans HandView ou JuryView)
+ * Visual component representing a map of the game LAMA.
+ * Maybe:
+ * - visible face (known type)
+ * - hidden side (jury mode or back of the pickaxe)
+ * - selectable (in HandView or JuryView)
  */
 public class CardView extends JPanel {
 
@@ -37,7 +37,7 @@ public class CardView extends JPanel {
     private boolean selectable = false;
 
     /**
-     * Carte face visible.
+     * face-up card.
      */
     public CardView(CardType type) {
         this.type = type;
@@ -45,7 +45,7 @@ public class CardView extends JPanel {
     }
 
     /**
-     * Carte face cachée (dos).
+     * Face down (back) card.
      */
     public CardView() {
         this.type = null;
@@ -53,6 +53,9 @@ public class CardView extends JPanel {
         init();
     }
 
+    /**
+     * Configures the component's dimensions and attaches mouse listeners to handle hover effects and cursor changes.
+     */
     private void init() {
         setOpaque(false);
         setPreferredSize(new Dimension(CARD_W, CARD_H));
@@ -80,6 +83,9 @@ public class CardView extends JPanel {
         });
     }
 
+    /**
+     * Manages the custom rendering of the card, including shadows, selection highlights, hover offsets, and face/back switching.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -115,6 +121,9 @@ public class CardView extends JPanel {
         g2.dispose();
     }
 
+    /**
+     * Renders the front of the card, applying a background color and delegating to number or llama drawing logic.
+     */
     private void drawFace(Graphics2D g2, int x, int y, int w, int h) {
         g2.setColor(CARD_BG);
         g2.fill(new RoundRectangle2D.Float(x, y, w, h, ARC, ARC));
@@ -130,6 +139,9 @@ public class CardView extends JPanel {
         }
     }
 
+    /**
+     * Draws the numeric value of the card in the center and in the corners for easy identification in a hand.
+     */
     private void drawNumber(Graphics2D g2, int x, int y, int w, int h) {
         String val = String.valueOf(type.getValue());
         g2.setColor(NUMBER_COLOR);
@@ -145,6 +157,9 @@ public class CardView extends JPanel {
         g2.drawString(val, x + w - 6 - g2.getFontMetrics().stringWidth(val), y + h - 6);
     }
 
+    /**
+     * Renders the special LAMA card with a specific color scheme and icon.
+     */
     private void drawLlama(Graphics2D g2, int x, int y, int w, int h) {
         g2.setColor(new Color(212, 82, 110, 30));
         g2.fill(new RoundRectangle2D.Float(x, y, w, h, ARC, ARC));
@@ -162,6 +177,9 @@ public class CardView extends JPanel {
         g2.drawString("10", x + w - 18, y + 15);
     }
 
+    /**
+     * Renders the back of the card with a dark blue pattern and the game's logo.
+     */
     private void drawBack(Graphics2D g2, int x, int y, int w, int h) {
         g2.setColor(CARD_BACK_BG);
         g2.fill(new RoundRectangle2D.Float(x, y, w, h, ARC, ARC));
@@ -183,6 +201,9 @@ public class CardView extends JPanel {
         g2.drawString(logo, x + (w - fm.stringWidth(logo)) / 2, y + h / 2 + fm.getAscent() / 2);
     }
 
+    /**
+     * Enables or disables user interaction for the card and updates the mouse cursor accordingly.
+     */
     public void setSelectable(boolean selectable) {
         this.selectable = selectable;
         setCursor(selectable
@@ -190,20 +211,32 @@ public class CardView extends JPanel {
                 : Cursor.getDefaultCursor());
     }
 
+    /**
+     * Toggles the selected state of the card and triggers a repaint to show the highlight border.
+     */
     public void setSelected(boolean selected) {
         this.selected = selected;
         repaint();
     }
 
+    /**
+     * Flips the card between face-up and face-down views.
+     */
     public void setFaceDown(boolean faceDown) {
         this.faceDown = faceDown;
         repaint();
     }
 
+    /**
+     * Returns whether the card is currently selected by the user.
+     */
     public boolean isSelected() {
         return selected;
     }
 
+    /**
+     * Retrieves the CardType associated with this view (returns null if the card is face-down).
+     */
     public CardType getCardType() {
         return type;
     }

@@ -7,9 +7,9 @@ import javax.swing.*;
 
 import java.util.Locale;
 /**
- * Point d'entrée de l'application LAMA UTBM.
- * Lance la fenêtre principale et initialise le GameController
- * qui orchestre tous les sous-contrôleurs.
+ * Entry point of the LAMA UTBM application.
+ * Launch the main window and initialize the GameController
+ * which orchestrates all the subcontrollers.
  */
 public class Main {
 
@@ -20,7 +20,7 @@ public class Main {
         }
 
         SwingUtilities.invokeLater(() -> {
-        	Locale locale = Locale.ENGLISH;//default language.
+        	Locale locale = Locale.ENGLISH;
             MainFrame mainFrame = new MainFrame(locale);
             new GameController(mainFrame, locale);
             mainFrame.setVisible(true);

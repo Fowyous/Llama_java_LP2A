@@ -175,12 +175,10 @@ public class MenuView extends JPanel  implements LocaleChangeListener{
         this.currentLocale = locale;
         ResourceBundle newBundle = ResourceBundle.getBundle("main.resources.strings", locale);
         
-        // updates the text on buttons
         btnStart.setText("▶ " + newBundle.getString("new_game"));
         btnSettings.setText("⚙  " + newBundle.getString("settings"));
         btnQuit.setText("✕  " + newBundle.getString("exit"));
         
-        // updates the tagline
         if (taglineLabel != null) {
             taglineLabel.setText(newBundle.getString("tagline"));
         }

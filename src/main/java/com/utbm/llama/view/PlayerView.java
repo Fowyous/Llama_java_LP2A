@@ -1,6 +1,5 @@
 package main.java.com.utbm.llama.view;
 
-import main.java.com.utbm.llama.model.enums.CardType;
 import main.java.com.utbm.llama.model.enums.State;
 import main.java.com.utbm.llama.model.*;
 
@@ -9,16 +8,15 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.util.List;
 
 /**
- * Panneau représentant un joueur (humain ou bot) sur le plateau.
- * Affiche :
- * - le nom et le type (bot/humain)
- * - les crédits actuels
- * - la main (visible pour le joueur local, cachée pour les autres)
- * - les états spéciaux : "Semestre à l'étranger", "Jury", "Césure"
- * - un indicateur "tour actif"
+ * Panel representing a player (human or bot) on the board.
+ * Poster:
+ * - the name and type (bot/human)
+ * - current credits
+ * - the hand (visible to the local player, hidden from others)
+ * - special conditions: "Semester abroad," "Jury," "Gap"
+ * - an indicator "active turn"
  */
 public class PlayerView extends JPanel {
 
@@ -42,6 +40,9 @@ public class PlayerView extends JPanel {
     private final HandView handView;
     private final JLabel activeIndicator;
 
+    /**
+     *  Initializes the player panel with name and type, setting up the layout for the header (name, credits, status) and the hand container.
+     */
     public PlayerView(String playerName, boolean isBot) {
         this.playerName = playerName;
         this.isBot = isBot;
@@ -88,11 +89,11 @@ public class PlayerView extends JPanel {
     }
 
     /**
-     * Met à jour l'intégralité du panneau depuis le modèle Player.
+     * Updates the entire panel from the Player template.
      *
-     * @param player   le modèle à afficher
-     * @param isLocal  true si c'est le joueur local (main visible)
-     * @param isActive true si c'est le tour de ce joueur
+     * @param player the template to display
+     * @param isLocal true if it’s the local player (visible hand)
+     * @param isActive true if it’s that player’s turn
      */
     public void update(Player player, boolean isLocal, boolean isActive) {
         updateCredits(player.getCredits());
@@ -107,7 +108,7 @@ public class PlayerView extends JPanel {
     }
 
     /**
-     * Met à jour l'affichage des crédits avec couleur selon la valeur.
+     * Updates the display of credits with color according to value.
      */
     public void updateCredits(int credits) {
         creditsLabel.setText(credits + " crédits");
@@ -123,7 +124,7 @@ public class PlayerView extends JPanel {
     }
 
     /**
-     * Bascule l'indicateur de tour actif.
+     * Toggles the active tower indicator.
      */
     public void updateActive(boolean active) {
         activeIndicator.setVisible(active);
@@ -132,7 +133,7 @@ public class PlayerView extends JPanel {
     }
 
     /**
-     * Met à jour les badges d'état spéciaux.
+     * Updates special state badges.
      */
     public void updateStatus(Player player) {
         if (player.isSuspended()) {
@@ -146,6 +147,9 @@ public class PlayerView extends JPanel {
         }
     }
 
+    /**
+     *  Configures and displays a formatted status badge with specific colors and borders to highlight a player's temporary condition.
+     */
     private void showBadge(String text, Color color) {
         statusBadge.setText(text);
         statusBadge.setForeground(color);
@@ -155,18 +159,30 @@ public class PlayerView extends JPanel {
         statusBadge.setVisible(true);
     }
 
+    /**
+     *  Returns the HandView component associated with this player to allow interaction with the cards.
+     */
     public HandView getHandView() {
         return handView;
     }
 
+    /**
+     *  Retrieves the name of the player associated with this view.
+     */
     public String getPlayerName() {
         return playerName;
     }
 
+    /**
+     * Returns true if the player represented by this view is an AI-controlled bot.
+     */
     public boolean isBot() {
         return isBot;
     }
 
+    /**
+     *  Generates the display string for the player's name, appending a robot icon if the player is a bot.
+     */
     private String buildNameText() {
         return playerName + (isBot ? "  🤖" : "");
     }

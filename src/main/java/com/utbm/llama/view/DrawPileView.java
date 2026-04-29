@@ -7,8 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
 
 /**
- * Affiche la pioche.
- * Un clic déclenche l'action "piocher une carte" via un ActionListener.
+ * Show pickup.
+ * One click triggers the "draw a card" action via an ActionListener.
  */
 class DrawPileView extends JPanel {
 
@@ -21,6 +21,9 @@ class DrawPileView extends JPanel {
     private final JLabel countLabel;
     private int remaining = 0;
 
+    /**
+     * Initializes the draw pile component, creating a layered UI that features a custom-painted stack of cards and an invisible interactive button.
+     */
     public DrawPileView() {
         setOpaque(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -97,7 +100,7 @@ class DrawPileView extends JPanel {
     }
 
     /**
-     * Met à jour le nombre de cartes restantes dans la pioche.
+     * Updates the number of cards remaining in the deck.
      */
     public void render(int remaining) {
         this.remaining = remaining;
@@ -105,7 +108,7 @@ class DrawPileView extends JPanel {
     }
 
     /**
-     * Active ou désactive le bouton de pioche.
+     * Activates or deactivates the draw button.
      */
     public void setDrawable(boolean drawable) {
         drawButton.setEnabled(drawable);
@@ -114,6 +117,9 @@ class DrawPileView extends JPanel {
                 : Cursor.getDefaultCursor());
     }
 
+    /**
+     * Registers an ActionListener to the draw button to handle card-drawing logic within the game controller.
+     */
     public void addDrawListener(ActionListener l) {
         drawButton.addActionListener(l);
     }

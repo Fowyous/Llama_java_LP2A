@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Affiche les cartes en main d'un joueur.
- * Gère l'affichage en éventail et la sélection d'une carte à jouer.
+ * Shows a player’s cards in hand.
+ * Handles fanning and selecting a playing card.
  */
 public class HandView extends JPanel {
 
@@ -26,10 +26,10 @@ public class HandView extends JPanel {
     }
 
     /**
-     * Recharge la main à partir d'une liste de types de cartes.
+     * Reload the hand from a list of card types.
      *
-     * @param cards  cartes en main
-     * @param active si true, les cartes sont cliquables (tour du joueur)
+     * @param cards  cards in hand
+     * @param active if true, the cards are clickable (player’s turn)
      */
     public void updateHand(List<CardType> cards, boolean active) {
         removeAll();
@@ -60,9 +60,9 @@ public class HandView extends JPanel {
     }
 
     /**
-     * Masque toutes les cartes (dos visible) — utile pour les adversaires.
+     * Hide all cards (visible back) — useful for opponents.
      *
-     * @param count nombre de cartes à afficher face cachée
+     * @param count number of cards to display face down
      */
     public void showHidden(int count) {
         removeAll();
@@ -84,7 +84,7 @@ public class HandView extends JPanel {
     }
 
     /**
-     * @return la carte actuellement sélectionnée, ou null si aucune.
+     * @return the currently selected card, or null if none.
      */
     public CardType getSelectedCard() {
         return cardViews.stream()
@@ -95,14 +95,14 @@ public class HandView extends JPanel {
     }
 
     /**
-     * Enregistre le callback appelé quand le joueur clique sur une carte.
+     * Save the callback called when the player clicks on a card.
      */
     public void setOnCardPlayed(Consumer<CardType> callback) {
         this.onCardPlayed = callback;
     }
 
     /**
-     * Active ou désactive l'interactivité de la main.
+     * Enables or disables hand interactivity.
      */
     public void setInteractive(boolean interactive) {
         this.interactive = interactive;
@@ -110,7 +110,7 @@ public class HandView extends JPanel {
     }
 
     /**
-     * Retourne le nombre de cartes affichées.
+     * Returns the number of cards displayed.
      */
     public int getCardCount() {
         return cardViews.size();

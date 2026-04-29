@@ -5,6 +5,7 @@ import java.awt.*;
 import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * Main window of the lama game
  * Manages the navigation between windows via a CardLayout.
@@ -31,12 +32,16 @@ public class MainFrame extends JFrame {
 
     private Locale currentLocale;
     private List<LocaleChangeListener> localeListeners = new ArrayList<>();
+
+    /**
+     * Initializes the main application window, sets up the CardLayout navigation system, and loads the initial menu and settings views.
+     */
     public MainFrame(Locale locale) {
         super("LAMA UTBM — Survivre au cursus");
 
 
         this.currentLocale = locale;
-        
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1280, 800));
         setPreferredSize(new Dimension(1440, 900));
@@ -71,10 +76,10 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Affiche le plateau de jeu.
-     * Remplace la BoardView existante si une nouvelle est fournie.
+     * Show the game board.
+     * Replaces the existing BoardView if a new one is provided.
      *
-     * @param boardView la vue du plateau à afficher
+     * @param boardView the board view to display
      */
     public void showGame(BoardView boardView) {
         if (this.boardView != null) {
@@ -88,9 +93,9 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Affiche le mini-jeu du Jury pour un joueur donné.
+     * Displays the Jury’s mini-game for a given player.
      *
-     * @param juryView la vue du jury à afficher
+     * @param juryView the jury view to display
      */
     public void showJury(JuryView juryView) {
         if (this.juryView != null) {
@@ -104,9 +109,9 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Affiche l'écran de semestre de césure.
+     * Displays the semester screen of the gap.
      *
-     * @param cesureView la vue de césure à afficher
+     * @param cesureView the hyphenation view to display
      */
     public void showCesure(CesureView cesureView) {
         if (this.cesureView != null) {
@@ -119,6 +124,9 @@ public class MainFrame extends JFrame {
         repaint();
     }
 
+    /**
+     * Dynamically replaces and displays the round results screen at the end of a game round.
+     */
     public void showRoundSummary(RoundSummaryView view) {
         if (this.roundSummaryView != null) {
             contentPanel.remove(this.roundSummaryView);
@@ -130,44 +138,77 @@ public class MainFrame extends JFrame {
         repaint();
     }
 
+    /**
+     * Updates the internal language state and notifies all registered listeners to refresh their text components.
+     */
     public void updateApplicationLocale(Locale locale) {
         this.currentLocale = locale;
-        
-        for (LocaleChangeListener listener : localeListeners) {   
-        	listener.onLocaleChange(locale);  
+
+        for (LocaleChangeListener listener : localeListeners) {
+            listener.onLocaleChange(locale);
         }
-        
+
     }
-    public void addLocaleChangeListener(LocaleChangeListener listener) { 
-    	localeListeners.add(listener);
+
+    /**
+     * Registers a new component to receive notifications whenever the application's language is changed.
+     */
+    public void addLocaleChangeListener(LocaleChangeListener listener) {
+        localeListeners.add(listener);
     }
-    public void removeLocaleChangeListener(LocaleChangeListener listener) {   
-    	localeListeners.remove(listener);
+
+    /**
+     * Removes a listener from the notification list, typically called when a view is destroyed.
+     */
+    public void removeLocaleChangeListener(LocaleChangeListener listener) {
+        localeListeners.remove(listener);
     }
+
+    /**
+     * Returns the current Locale (language and region) being used by the application.
+     */
     public Locale getCurrentLocale() {
         return currentLocale;
     }
-    
+
+    /**
+     * Retrieves the current instance of the round summary screen.
+     */
     public RoundSummaryView getRoundSummaryView() {
         return roundSummaryView;
     }
 
+    /**
+     * Retrieves the main menu view instance.
+     */
     public MenuView getMenuView() {
         return menuView;
     }
 
+    /**
+     * Retrieves the settings view instance.
+     */
     public SettingsView getSettingsView() {
         return settingsView;
     }
 
+    /**
+     * Retrieves the current game board view instance.
+     */
     public BoardView getBoardView() {
         return boardView;
     }
 
+    /**
+     * Retrieves the current Jury mini-game view instance.
+     */
     public JuryView getJuryView() {
         return juryView;
     }
 
+    /**
+     * Retrieves the current Gap Year (Cesure) view instance.
+     */
     public CesureView getCesureView() {
         return cesureView;
     }

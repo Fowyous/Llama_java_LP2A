@@ -1,6 +1,5 @@
 package main.java.com.utbm.llama.view;
 
-import main.java.com.utbm.llama.model.enums.CardType;
 import main.java.com.utbm.llama.model.enums.GameMode;
 import main.java.com.utbm.llama.model.enums.State;
 import main.java.com.utbm.llama.model.*;
@@ -15,16 +14,16 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Vue principale du plateau de jeu.
- * Organisation :
+ * Main view of the game board.
+ * Organization:
  * ┌─────────────────────────────────────────────────┐
- * │  HUD (manche, mode, crédits à valider)          │  NORTH
+ * │  HUD (round, mode, credits to validate)         │  NORTH
  * ├────────────────┬────────────────────────────────┤
- * │  Adversaires   │   Zone centrale                │
- * │  (colonne G)   │   Pioche | Défausse            │  CENTER
- * │                │   Actions du joueur local      │
+ * │    Opponents   │       Central area             │
+ * │    (G column)  │       Draw | Discard           │  CENTER
+ * │                │       Local player actions     │
  * ├────────────────┴────────────────────────────────┤
- * │  Panneau du joueur local                        │  SOUTH
+ * │             Local player panel                  │  SOUTH
  * └─────────────────────────────────────────────────┘
  */
 public class BoardView extends JPanel {
@@ -55,8 +54,12 @@ public class BoardView extends JPanel {
 
     private final ResourceBundle bundle;
 
+    /**
+     * Initializes the game board with the specified locale, setting up the HUD,
+     * draw/discard piles, and the various layout panels for opponents and the local player.
+     */
     public BoardView(Locale locale) {
-    	this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
 
         setBackground(BG);
         setLayout(new BorderLayout(0, 0));
@@ -95,6 +98,10 @@ public class BoardView extends JPanel {
         add(localPlayerPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Constructs the top navigation bar containing round information,
+     * game mode details, and the dynamic DETEC bonus indicator.
+     */
     private JPanel buildHud() {
         JPanel hud = new JPanel(new BorderLayout(12, 0));
         hud.setBackground(Color.decode("#0A0A0A"));
@@ -120,6 +127,10 @@ public class BoardView extends JPanel {
         return hud;
     }
 
+    /**
+     * Sets up the central gameplay area where the draw pile, discard pile,
+     * and primary player action buttons (Draw/Quit) are located.
+     */
     private JPanel buildCenterPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(BG);
@@ -156,10 +167,10 @@ public class BoardView extends JPanel {
     }
 
     /**
-     * Rafraîchit entièrement la vue depuis l'état du modèle Game.
+     * Completely refreshes the view from the state of the Game model.
      *
-     * @param game        le modèle de jeu
-     * @param localPlayer le joueur local (main visible)
+     * @param game        the game model
+     * @param localPlayer the local player (visible hand)
      */
     public void updateBoard(Game game, Player localPlayer) {
         updateHud(game);
@@ -168,6 +179,10 @@ public class BoardView extends JPanel {
         updateActions(game, localPlayer);
     }
 
+    /**
+     * Refreshes the HUD labels with the current round number, graduation threshold,
+     * and toggles the visibility of special event bonuses.
+     */
     private void updateHud(Game game) {
         if (game.getCurrentRound() == null) return;
         int maxRounds = game.getGameMode() == GameMode.SHORT ? 6 : 10;
@@ -181,6 +196,9 @@ public class BoardView extends JPanel {
         detecBonusLabel.setVisible(showDetec);
     }
 
+    /**
+     * Updates the visual state of the deck and discard pile based on the current number of cards and the top card's value.
+     */
     private void updatePiles(Game game) {
         drawPileView.render(game.getDrawPile().size());
         discardPileView.render(game.getDiscardPile().isEmpty()
@@ -188,6 +206,10 @@ public class BoardView extends JPanel {
                 : game.getDiscardPile().peek());
     }
 
+    /**
+     * Rebuilds the player list and local player panel, updating names,
+     * bots icons, active turn indicators, and academic statuses.
+     */
     private void updatePlayers(Game game, Player localPlayer) {
         localPlayerPanel.removeAll();
 
@@ -223,6 +245,10 @@ public class BoardView extends JPanel {
         repaint();
     }
 
+    /**
+     * Enables or disables the game controls (Draw, Quit, Card selection)
+     * based on whether it is currently the local player's turn.
+     */
     private void updateActions(Game game, Player localPlayer) {
         boolean isActive = game.getCurrentPlayer().equals(localPlayer)
                 && !localPlayer.isSuspended();
@@ -231,6 +257,9 @@ public class BoardView extends JPanel {
         localPlayerView.getHandView().setInteractive(isActive);
     }
 
+    /**
+     * Utility method to create a standardized label for the HUD using a monospaced font and consistent coloring.
+     */
     private JLabel buildHudLabel(String text, int size, int style) {
         JLabel lbl = new JLabel(text);
         lbl.setFont(new Font("Monospaced", style, size));
@@ -238,6 +267,9 @@ public class BoardView extends JPanel {
         return lbl;
     }
 
+    /**
+     * Creates a stylized JButton for game actions with specific dimensions, colors, and a hand cursor.
+     */
     private JButton buildActionButton(String text, Color bg, Color fg) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("Monospaced", Font.BOLD, 13));
@@ -251,26 +283,44 @@ public class BoardView extends JPanel {
         return btn;
     }
 
+    /**
+     * Registers an event listener for the "Draw" button.
+     */
     public void addDrawListener(ActionListener l) {
         btnDraw.addActionListener(l);
     }
 
+    /**
+     * Registers an event listener for the "Quit Round" button.
+     */
     public void addQuitRoundListener(ActionListener l) {
         btnQuit.addActionListener(l);
     }
 
+    /**
+     * Returns the component representing the draw pile.
+     */
     public DrawPileView getDrawPileView() {
         return drawPileView;
     }
 
+    /**
+     * Returns the component representing the discard pile.
+     */
     public DiscardPileView getDiscardPileView() {
         return discardPileView;
     }
 
+    /**
+     * Returns the view component specifically assigned to the local human player.
+     */
     public PlayerView getLocalPlayerView() {
         return localPlayerView;
     }
 
+    /**
+     * Returns the list of all player view components on the board.
+     */
     public List<PlayerView> getPlayerViews() {
         return playerViews;
     }
