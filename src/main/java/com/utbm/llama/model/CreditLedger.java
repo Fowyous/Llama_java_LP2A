@@ -8,51 +8,51 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Registre comptable des crédits pour toute la partie.
- * Centralise l'historique de toutes les opérations de crédits,
- * manche par manche et joueur par joueur.
- * Avantages :
- * - Évite de surcharger Game et Round avec de la comptabilité
- * - Permet d'afficher un récapitulatif clair en fin de partie
- * - Facilite le débogage (trace de chaque opération)
- * Utilisation typique :
+ * Accounting record of credits for the entire game.
+ * Centralizes the history of all credit operations,
+ * round by round and player by player.
+ * Benefits:
+ * - Avoid overloading Game and Round with accounting
+ * - Allows you to display a clear summary at the end of the game
+ * - Facilitates debugging (tracing each operation)
+ * Typical use:
  * CreditLedger ledger = new CreditLedger();
  * ledger.record(1, player, CreditLedger.Reason.ROUND_START,  +35);
  * ledger.record(1, player, CreditLedger.Reason.HAND_PENALTY, -12);
- * ledger.record(1, player, CreditLedger.Reason.JURY_GAIN,    +6);
- * int lost = ledger.getLostThisRound(1, player);   // → 12
- * int total = ledger.getTotal(player);             // → 35 - 12 + 6 = 29
+ * ledger.record(1, player, CreditLedger.Reason.JURY_GAIN,   +6);
+ * int lost = ledger.getLostThisRound(1, player);
+ * int total = ledger.getTotal(player);
  */
 public class CreditLedger {
 
     /**
-     * Catégorie d'une opération de crédits.
-     * Utilisée pour filtrer l'historique et générer des résumés.
+     * Category of a credit transaction.
+     * Used to filter history and generate summaries.
      */
     public enum Reason {
 
         /**
-         * +35 crédits au début de chaque manche.
+         * +35 credits at the beginning of each round.
          */
         ROUND_START("Début de manche", true),
 
         /**
-         * Déduction de la valeur des cartes restantes en main.
+         * Deduction of the value of the remaining cards in hand.
          */
         HAND_PENALTY("Pénalité de main", false),
 
         /**
-         * Gain de crédits suite au mini-jeu du Jury.
+         * Gain credits following the Jury’s mini-game.
          */
         JURY_GAIN("Gain au jury", true),
 
         /**
-         * +30 crédits pour avoir validé le DETEC (mode LONG, manche 4).
+         * +30 credits for having validated the DETEC (long mode, round 4).
          */
         DETEC_BONUS("Bonus DETEC", true),
 
         /**
-         * Correction manuelle (usage exceptionnel).
+         * Manual correction (exceptional use).
          */
         MANUAL_CORRECTION("Correction", true);
 
@@ -78,7 +78,7 @@ public class CreditLedger {
     }
 
     /**
-     * Une ligne du registre : qui, quand, pourquoi, combien.
+     * A line in the ledger: who, when, why, how much.
      */
     public static class Entry {
         private final int roundNumber;
@@ -87,6 +87,15 @@ public class CreditLedger {
         private final int delta;
         private final int balanceAfter;
 
+        /**
+         * Initialize a new credit entry.
+         *
+         * @param roundNumber  the index of the round when the transaction occurred
+         * @param player       the player affected by the credit change
+         * @param reason       the justification for the transaction (penalty, jury, bonus, etc.)
+         * @param delta        the amount of credits added or removed
+         * @param balanceAfter the total credit balance of the player after this entry
+         */
         public Entry(int roundNumber, Player player, Reason reason, int delta, int balanceAfter) {
             this.roundNumber = roundNumber;
             this.player = player;
@@ -95,26 +104,56 @@ public class CreditLedger {
             this.balanceAfter = balanceAfter;
         }
 
+        /**
+         * Get the round number associated with this transaction.
+         *
+         * @return the round number
+         */
         public int getRoundNumber() {
             return roundNumber;
         }
 
+        /**
+         * Retrieve the player who owns this entry.
+         *
+         * @return the player instance
+         */
         public Player getPlayer() {
             return player;
         }
 
+        /**
+         * Get the reason for this credit modification.
+         *
+         * @return the reason enum value
+         */
         public Reason getReason() {
             return reason;
         }
 
+        /**
+         * Get the amount of credits gained or lost in this transaction.
+         *
+         * @return the credit delta
+         */
         public int getDelta() {
             return delta;
         }
 
+        /**
+         * Retrieve the final balance after the transaction was applied.
+         *
+         * @return the resulting credit total
+         */
         public int getBalanceAfter() {
             return balanceAfter;
         }
 
+        /**
+         * Provide a formatted string representation of the credit entry.
+         *
+         * @return a formatted string containing round, player name, reason, delta, and balance
+         */
         @Override
         public String toString() {
             return String.format("[Manche %d] %-20s | %-15s | %+4d crédits → %d",
@@ -123,17 +162,17 @@ public class CreditLedger {
     }
 
     /**
-     * Toutes les entrées dans l'ordre chronologique.
+     * All entries in chronological order.
      */
     private final List<Entry> entries = new ArrayList<>();
 
     /**
-     * Enregistre une opération de crédits ET l'applique sur le modèle Player.
+     * Saves a credit operation AND applies it to the Player template.
      *
-     * @param roundNumber numéro de la manche
-     * @param player      le joueur concerné
-     * @param reason      la raison de l'opération
-     * @param delta       montant (positif = gain, négatif = perte)
+     * @param roundNumber round number
+     * @param player      the player in question
+     * @param reason      the reason for the operation
+     * @param delta       amount (positive = gain, negative = loss)
      */
     public void record(int roundNumber, Player player, Reason reason, int delta) {
         player.addCredits(delta);
@@ -145,26 +184,26 @@ public class CreditLedger {
     }
 
     /**
-     * Enregistre une opération SANS l'appliquer (le Player a déjà été modifié).
-     * Utile pour synchroniser le ledger avec des opérations externes.
+     * Records an operation WITHOUT applying it (the Player has already been modified).
+     * Useful to synchronize the ledger with external operations.
      *
-     * @param roundNumber  numéro de la manche
-     * @param player       le joueur concerné
-     * @param reason       la raison
-     * @param delta        montant appliqué
-     * @param balanceAfter solde actuel du joueur (après application)
+     * @param roundNumber  round number
+     * @param player       the player in question
+     * @param reason       the reason
+     * @param delta        amount applied
+     * @param balanceAfter player’s current balance (after application)
      */
     public void recordOnly(int roundNumber, Player player, Reason reason, int delta, int balanceAfter) {
         entries.add(new Entry(roundNumber, player, reason, delta, balanceAfter));
     }
 
     /**
-     * Calcule les crédits PERDUS par un joueur lors d'une manche donnée.
-     * Seules les pertes (delta < 0) sont comptées.
+     * Calculates the LOST credits of a player in a given round.
+     * Only losses (delta > 0) are counted.
      *
-     * @param roundNumber numéro de la manche
-     * @param player      le joueur
-     * @return somme des pertes (valeur positive)
+     * @param roundNumber round number
+     * @param player      the player
+     * @return sum of losses (positive value)
      */
     public int getLostThisRound(int roundNumber, Player player) {
         return entries.stream()
@@ -176,11 +215,11 @@ public class CreditLedger {
     }
 
     /**
-     * Calcule les crédits GAGNÉS par un joueur lors d'une manche donnée.
+     * Calculates the EARNED credits of a player in a given round.
      *
-     * @param roundNumber numéro de la manche
-     * @param player      le joueur
-     * @return somme des gains
+     * @param roundNumber round number
+     * @param player      the player
+     * @return sum of winnings
      */
     public int getGainedThisRound(int roundNumber, Player player) {
         return entries.stream()
@@ -192,8 +231,8 @@ public class CreditLedger {
     }
 
     /**
-     * Retourne le delta net d'un joueur sur une manche.
-     * (gains - pertes)
+     * Returns a player’s net delta in one round.
+     * (gains - losses)
      */
     public int getNetForRound(int roundNumber, Player player) {
         return entries.stream()
@@ -203,7 +242,7 @@ public class CreditLedger {
     }
 
     /**
-     * Retourne toutes les entrées d'un joueur pour une manche.
+     * Returns all the entries of a player for one round.
      */
     public List<Entry> getEntriesForRound(int roundNumber, Player player) {
         return entries.stream()
@@ -212,7 +251,7 @@ public class CreditLedger {
     }
 
     /**
-     * Retourne toutes les entrées d'un joueur sur toute la partie.
+     * Returns all of a player’s entries over the entire game.
      */
     public List<Entry> getEntriesForPlayer(Player player) {
         return entries.stream()
@@ -221,19 +260,19 @@ public class CreditLedger {
     }
 
     /**
-     * Retourne toutes les entrées dans l'ordre chronologique (copie défensive).
+     * Returns all entries in chronological order (defensive copy).
      */
     public List<Entry> getAllEntries() {
         return Collections.unmodifiableList(entries);
     }
 
     /**
-     * Génère un tableau récapitulatif par joueur et par manche.
-     * Format : Joueur → [manche 1 net, manche 2 net, ..., total]
+     * Generates a summary table by player and by round.
+     * Format: Player → [net round 1, net round 2, ..., total]
      *
-     * @param players  liste des joueurs de la partie
-     * @param nbRounds nombre de manches jouées
-     * @return map joueur → tableau des deltas par manche
+     * @param players  list of players in the game
+     * @param nbRounds number of rounds played
+     * @return map player → deltas table per round
      */
     public Map<Player, int[]> buildSummary(List<Player> players, int nbRounds) {
         Map<Player, int[]> summary = new LinkedHashMap<>();
@@ -250,7 +289,7 @@ public class CreditLedger {
     }
 
     /**
-     * Affiche l'historique complet dans la console (debug).
+     * Displays the full console history (debug).
      */
     public void printFull() {
         System.out.println("══════════════ REGISTRE DES CRÉDITS ══════════════");
@@ -259,7 +298,7 @@ public class CreditLedger {
     }
 
     /**
-     * @return le nombre total d'entrées enregistrées
+     * @return the total number of entries recorded
      */
     public int size() {
         return entries.size();

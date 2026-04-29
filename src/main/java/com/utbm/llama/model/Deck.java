@@ -9,21 +9,21 @@ import java.util.Deque;
 import java.util.List;
 
 /**
- * Représente un tas de cartes (pioche ou défausse).
- * Implémenté comme une Deque :
- * - On pioche depuis le HAUT (pollFirst)
- * - On ajoute au HAUT (addFirst = défausse) ou en bas (addLast = remplissage)
- * Usage :
- * Deck draw    = Deck.createFull();   // pioche complète mélangée
- * Deck discard = Deck.empty();        // défausse vide
+ * Represents a pile of cards (draw or discard).
+ * Implemented as a Deque:
+ * - We draw from the TOP (pollFirst)
+ * - We add to the TOP (addFirst = discard) or at the bottom (addLast = filling)
+ * Usage:
+ * Deck draw   = Deck.createFull();
+ * Deck discard = Deck.empty();
  */
 public class Deck {
 
     private final Deque<CardType> cards = new ArrayDeque<>();
 
     /**
-     * Crée une pioche complète (8 exemplaires de chaque carte = 56 cartes)
-     * et la mélange.
+     * Creates a full draw pile (8 copies of each card = 56 cards)
+     * and the mixture.
      */
     public static Deck createFull() {
         Deck deck = new Deck();
@@ -37,7 +37,7 @@ public class Deck {
     }
 
     /**
-     * Crée une pile vide (utilisée pour la défausse au démarrage).
+     * Creates an empty stack (used for the discard at startup).
      */
     public static Deck empty() {
         return new Deck();
@@ -47,7 +47,7 @@ public class Deck {
     }
 
     /**
-     * Mélange aléatoirement toutes les cartes du tas.
+     * Shuffle randomly all cards in the pile.
      */
     public void shuffle() {
         List<CardType> list = new ArrayList<>(cards);
@@ -57,27 +57,27 @@ public class Deck {
     }
 
     /**
-     * Retire et retourne la carte du dessus.
+     * Remove and turn over the top card.
      *
-     * @return la carte du dessus, ou {@code null} si le tas est vide
+     * @return the top card, or {@code null} if the heap is empty
      */
     public CardType draw() {
         return cards.pollFirst();
     }
 
     /**
-     * Retourne la carte du dessus SANS la retirer.
+     * Turn over the top card WITHOUT removing it.
      *
-     * @return la carte du dessus, ou {@code null} si le tas est vide
+     * @return the top card, or {@code null} if the heap is empty
      */
     public CardType peek() {
         return cards.peekFirst();
     }
 
     /**
-     * Ajoute une carte AU DESSUS du tas (pour la défausse).
+     * Add a card ABOVE the pile (for discard).
      *
-     * @param card la carte à poser
+     * @param card the card to put on
      */
     public void add(CardType card) {
         if (card == null) throw new IllegalArgumentException("Impossible d'ajouter une carte null");
@@ -85,30 +85,30 @@ public class Deck {
     }
 
     /**
-     * @return true si le tas ne contient aucune carte
+     * @return true if the heap does not contain any cards
      */
     public boolean isEmpty() {
         return cards.isEmpty();
     }
 
     /**
-     * @return le nombre de cartes dans le tas
+     * @return the number of cards in the pile
      */
     public int size() {
         return cards.size();
     }
 
     /**
-     * Retourne toutes les cartes sous forme de liste (copie défensive).
-     * La première carte de la liste est celle du dessus du tas.
+     * Returns all cards as a list (defensive copy).
+     * The first card in the list is the one on top of the pile.
      */
     public List<CardType> getCards() {
         return new ArrayList<>(cards);
     }
 
     /**
-     * Vide complètement le tas.
-     * Utilisé en début de manche pour réinitialiser la défausse.
+     * Empty the pile completely.
+     * Used at the beginning of the round to reset the discard.
      */
     public void clear() {
         cards.clear();

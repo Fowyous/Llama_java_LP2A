@@ -506,7 +506,7 @@ public class BoardController {
      */
     private boolean checkDetecApplied() {
         return game.getGameMode() == GameMode.LONG
-                && game.getCurrentRoundNumber() == GameMode.DETEC_ROUND;
+                && game.getCurrentRoundNumber() == GameMode.DEUTEC_ROUND;
     }
 
     /**

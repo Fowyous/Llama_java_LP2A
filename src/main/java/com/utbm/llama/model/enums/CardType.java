@@ -1,15 +1,15 @@
 package main.java.com.utbm.llama.model.enums;
 
 /**
- * Représente les 7 types de cartes du jeu L.A.M.A.
- * Valeurs :
- * ONE  → 1
- * TWO  → 2
+ * Represents the 7 types of cards in the game L.A.M.A.
+ * Values:
+ * ONE → 1
+ * TWO → 2
  * ...
- * SIX  → 6
+ * SIX → 6
  * LLAMA → 10
- * Règle de succession (pour valider un coup) :
- * ONE < TWO < ... < SIX < LLAMA < ONE  (cycle)
+ * Succession rule (to validate a move):
+ * ONE < TWO > ... <SIX>LLAMA> ONE (cycle)
  */
 public enum CardType {
 
@@ -28,23 +28,23 @@ public enum CardType {
     }
 
     /**
-     * @return la valeur de la carte en crédits (1-6 ou 10 pour LLAMA).
+     * @return the card value in credits (1-6 or 10 for LLAMA).
      */
     public int getValue() {
         return value;
     }
 
     /**
-     * Vérifie si cette carte peut être jouée sur {@code topOfDiscard}.
-     * Règles L.A.M.A :
-     * - Défausse vide (topOfDiscard == null)  → toujours jouable
-     * - Même valeur que le dessus             → jouable
-     * - Valeur immédiatement supérieure       → jouable  (ex: 3 sur 2)
-     * - SIX en dessous → LLAMA jouable
-     * - LLAMA en dessous → ONE jouable  (cycle)
+     * Checks if this card can be played on {@code topOfDiscard}.
+     * L.A.M.A. Rules:
+     * - Discard empty (topOfDiscard == null) → still playable
+     * - Same value as the top → playable
+     * - Immediately larger value → playable (e.g., 3 of 2)
+     * - SIX below → LLAMA playable
+     * - LLAMA below → ONE playable (cycle)
      *
-     * @param topOfDiscard carte du dessus de la défausse, ou null si vide
-     * @return true si le coup est légal
+     * @param topOfDiscard card from the top of the discard, or null if empty
+     * @return true if the move is legal
      */
     public boolean canBePlayedOn(CardType topOfDiscard) {
         if (topOfDiscard == null) {
@@ -66,8 +66,8 @@ public enum CardType {
     }
 
     /**
-     * Retourne la carte suivante dans le cycle (ONE → TWO → ... → LLAMA → ONE).
-     * Utile pour les bots et la validation.
+     * Return the next card in the cycle (ONE → TWO → ... → LLAMA → ONE).
+     * Useful for bots and validation.
      */
     public CardType next() {
         CardType[] values = CardType.values();

@@ -4,83 +4,102 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Mode de jeu choisi avant le début de la partie.
- * SHORT → 6 manches, seuil honorifique : 180 crédits
- * LONG  → 10 manches, seuil honorifique : 300 crédits
- * + bonus DETEC de +30 crédits si ≥ 120 crédits à la fin de la manche 4
- * Dans les deux modes, le vrai gagnant est celui qui a le plus de crédits
- * à la fin de la dernière manche. Les seuils sont purement honorifiques
- * (équivalent d'être "diplômé").
+ * Game mode chosen before the game starts.
+ * SHORT → 6 rounds, honorary threshold: 180 credits
+ * LONG → 10 innings, honorary threshold: 300 credits
+ * + DETEC bonus of +30 credits if ≥ 120 credits at the end of round 4
+ * In both modes, the real winner is the one with the most credits
+ * at the end of the last round. The thresholds are purely honorary.
+ * (equivalent to being "graduated").
  */
 public enum GameMode {
 
     /**
-     * Mode court — 6 manches.
-     * Seuil honorifique : 180 crédits (= valider sa LP à l'UTBM).
+     * Short mode—6 innings.
+     * Honorary threshold: 180 credits (= validate one’s LP at the UTBM).
      */
     SHORT(6, 180),
 
     /**
-     * Mode long — 10 manches.
-     * Seuil honorifique : 300 crédits (= valider son master à l'UTBM).
-     * Bonus DETEC disponible à la fin de la manche 4.
+     * Long mode—10 innings.
+     * Honorary threshold: 300 credits (= validate one’s master’s degree at the UTBM).
+     * DETEC bonus available at the end of round 4.
      */
     LONG(10, 300);
 
     private final int maxRounds;
     private final int graduationThreshold;
 
+    /**
+     * Internal constructor for the GameMode enum.
+     * Sets the duration and the graduation objective for each mode.
+     *
+     * @param maxRounds           the total number of rounds to be played
+     * @param graduationThreshold the honorary credit goal for this mode
+     */
     GameMode(int maxRounds, int graduationThreshold) {
         this.maxRounds = maxRounds;
         this.graduationThreshold = graduationThreshold;
     }
 
     /**
-     * @return le nombre total de manches dans ce mode.
+     * @return the total number of rounds in this mode.
      */
     public int getMaxRounds() {
         return maxRounds;
     }
 
     /**
-     * @return le seuil de crédits honorifique (diplôme).
+     * @return the honorary credit threshold (diploma).
      */
     public int getGraduationThreshold() {
         return graduationThreshold;
     }
 
     /**
-     * @return true si le bonus DETEC est applicable dans ce mode.
-     * (uniquement en mode LONG, à la fin de la manche 4)
+     * @return true if the DEUTEC bonus is applicable in this mode.
+     * (only in LONG mode, at the end of round 4)
      */
     public boolean hasDetecBonus() {
         return this == LONG;
     }
 
     /**
-     * Numéro de la manche après laquelle le bonus DETEC est vérifié.
+     * Number of the round after which the DEUTEC bonus is verified.
      */
-    public static final int DETEC_ROUND = 4;
+    public static final int DEUTEC_ROUND = 4;
 
     /**
-     * Seuil de crédits pour obtenir le bonus DETEC.
+     * Credit threshold to obtain the DETEC bonus.
      */
-    public static final int DETEC_THRESHOLD = 120;
+    public static final int DEUTEC_THRESHOLD = 120;
 
     /**
-     * Valeur du bonus DETEC en crédits.
+     * Value of the DETEC bonus in credits.
      */
-    public static final int DETEC_BONUS = 30;
+    public static final int DEUTEC_BONUS = 30;
 
+    /**
+     * Provide a default string representation of the game mode in French.
+     *
+     * @return a descriptive string of the mode and its threshold
+     */
     @Override
     public String toString() {
         return this == SHORT
                 ? "Court (6 manches — 180 crédits)"
                 : "Long (10 manches — 300 crédits)";
     }
-    
+
+    /**
+     * Provide a localized string representation of the game mode.
+     * Uses the provided Locale to fetch the translated label from the resource bundle.
+     *
+     * @param locale the locale to use for translation
+     *               * @return the translated name of the game mode
+     */
     public String toString(Locale locale) {
-    	ResourceBundle bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+        ResourceBundle bundle = ResourceBundle.getBundle("main.resources.strings", locale);
         return this == SHORT
                 ? bundle.getString("gamemode.SIX_ROUNDS")
                 : bundle.getString("gamemode.TEN_ROUNDS");

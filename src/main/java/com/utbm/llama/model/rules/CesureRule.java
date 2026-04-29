@@ -27,17 +27,39 @@ import main.java.com.utbm.llama.model.Player;
  * isApplicable() retourne false pendant le jeu (règle de fin de manche).
  */
 public class CesureRule implements Rule {
-
+    /**
+     * Determine if this rule should be triggered during standard gameplay turns.
+     * Since the Gap Semester (Césure) is an end-of-round event, this returns false for normal moves.
+     *
+     * @param move the move to evaluate
+     * @param game the current game state
+     * @return {@code false} as this rule is not applicable during active turns
+     */
     @Override
     public boolean isApplicable(Move move, Game game) {
         return false;
     }
 
+    /**
+     * Validate the legality of a move in the context of this rule.
+     * As this is an automated end-of-round rule, it always returns true.
+     *
+     * @param move the move to validate
+     * @param game the current game state
+     * @return {@code true} consistently
+     */
     @Override
     public boolean validate(Move move, Game game) {
         return true;
     }
 
+    /**
+     * Apply the consequences of the rule to the game state.
+     * Note: For CesureRule, the logic is handled via static triggers during the round finalization.
+     *
+     * @param move the move to apply
+     * @param game the game state to update
+     */
     @Override
     public void apply(Move move, Game game) {
     }
@@ -66,9 +88,14 @@ public class CesureRule implements Rule {
 
         System.out.println("[CesureRule] ✓ " + player.getName()
                 + " → Semestre de césure (crédits : " + player.getCredits() + ")"
-                + (allSuspended ? " | ⚠ 1v1 — les deux joueurs sautent la manche" : ""));
+                + (allSuspended ? " |  1v1 — les deux joueurs sautent la manche" : ""));
     }
 
+    /**
+     * Get the formal name of this rule for identification and debugging purposes.
+     *
+     * @return the string "CesureRule"
+     */
     @Override
     public String getName() {
         return "CesureRule";

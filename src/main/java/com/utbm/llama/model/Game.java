@@ -8,25 +8,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Modèle central du jeu LAMA UTBM.
- * Game est le point d'entrée unique pour accéder à l'état complet d'une partie.
- * Il coordonne les interactions entre :
- * - Les joueurs (liste + joueur courant)
- * - La pioche et la défausse
- * - La manche en cours (Round)
- * - Le registre de crédits (CreditLedger)
- * - Le mode de jeu (SHORT ou LONG)
- * Ce que Game fait :
- * - Démarrer la partie (start)
- * - Passer au tour suivant (nextTurn)
- * - Appliquer un coup (applyMove) via validation
- * - Démarrer / terminer une manche
- * - Vérifier si la partie est terminée
- * - Identifier le gagnant
- * Ce que Game ne fait PAS (délégué à Round) :
- * - La logique détaillée de début/fin de manche
- * - Le déclenchement du jury (asynchrone, géré par le Controller)
- * - L'affichage
+ * Central model of the LAMA UTBM game.
+ * Game is the single point of entry to access the full state of a game.
+ * He coordinates the interactions between:
+ * - The players (list + current player)
+ * - The pickaxe and the discard
+ * - The current round
+ * - The credit register (CreditLedger)
+ * - The game mode (SHORT or LONG)
+ * What Game does:
+ * - Start the game
+ * - Go to the next round (nextTurn)
+ * - Apply a move (applyMove) via validation
+ * - Start/end a round
+ * - Check if the game is finished
+ * - Identify the winner
+ * What Game DOESN’T do (delegated to Round):
+ * - The detailed logic for the beginning/end of the round
+ * - The triggering of the jury (asynchronous, managed by the Controller)
+ * - The display
  */
 public class Game {
 
@@ -46,7 +46,7 @@ public class Game {
     /**
      * Crée une nouvelle partie.
      *
-     * @param players  liste des joueurs (index 0 = humain local)
+     * @param players  list of players (index 0 = humain local)
      * @param gameMode SHORT (6 manches) ou LONG (10 manches)
      */
     public Game(List<Player> players, GameMode gameMode) {
@@ -63,7 +63,7 @@ public class Game {
     }
 
     /**
-     * Démarre la partie : initialise la première manche.
+     * Start the game: initializes the first round.
      */
     public void start() {
         System.out.println("=== DÉBUT DE PARTIE | " + gameMode
@@ -72,11 +72,11 @@ public class Game {
     }
 
     /**
-     * Prépare et démarre la manche suivante.
-     * Vérifie d'abord si la partie est terminée.
+     * Prepare and start the next round.
+     * First check if the game is over.
      *
-     * @return true si une nouvelle manche a été démarrée,
-     * false si la partie est terminée
+     * @return true if a new round has been started,
+     * false if the game is over
      */
     public boolean beginNextRound() {
         if (currentRoundNumber >= gameMode.getMaxRounds()) {
@@ -107,8 +107,8 @@ public class Game {
     }
 
     /**
-     * Recrée une pioche complète mélangée.
-     * Appelé quand la pioche est trop petite pour distribuer les cartes.
+     * Recreate a mixed complete pickaxe.
+     * Called when the draw pile is too small to deal the cards.
      */
     private void rebuildDrawPile() {
 
@@ -123,8 +123,8 @@ public class Game {
     }
 
     /**
-     * Passe au joueur suivant.
-     * Saute automatiquement les joueurs en état QUITTING ou SUSPENDED.
+     * Passes to the next player.
+     * Automatically jumps players into the QUITTING or SUSPENDED state.
      */
     public void nextTurn() {
         int attempts = 0;
@@ -136,7 +136,7 @@ public class Game {
     }
 
     /**
-     * @return true si le joueur courant doit être sauté.
+     * @return true if the running player needs to be jumped.
      */
     private boolean shouldSkipCurrentPlayer() {
         Player current = getCurrentPlayer();
@@ -145,13 +145,13 @@ public class Game {
     }
 
     /**
-     *applies the move by making the necessary modifications to the game and players.
+     * applies the movement by making the necessary changes to the game and the players.
+     * No validation occurs here, the validation is carried out by the rule engine
      *
-     *no validation happens here the validation is done by the rule engine
-     *
-     * @param move move the move to be applied 
-     * @throws IllegalArgumentException si le coup est mal formé
+     * @param move the movement so that it is applied
+     * @throws IllegalArgumentException if the blow is malformed
      */
+
     public void applyMove(Move move) {
         if (move == null) throw new IllegalArgumentException("Move null impossible");
 
@@ -180,19 +180,19 @@ public class Game {
     }
 
     /**
-     * Exécute la séquence de fin de manche (phase 3 de Round).
-     * Retourne la liste des joueurs à passer devant le jury.
-     * Le Controller est responsable d'orchestrer les jurys (asynchrone)
-     * puis d'appeler checkStudyAbroad(), checkDetecBonus() et beginNextRound().
-     * Ordre OBLIGATOIRE respecté :
-     * 1. Déduit les pénalités de main
-     * 2. Retourne les candidats au jury
-     * (3. Jury → géré par JuryController)
-     * (4. Césure → géré par BoardController)
-     * 5. Semestre à l'étranger  → appelé par endRoundPostJury()
-     * 6. Bonus DETEC            → appelé par endRoundPostJury()
+     * Execute the end-of-inning sequence (round phase 3).
+     * Return the list of players to be judged by the jury.
+     * The Controller is responsible for orchestrating juries (asynchronous)
+     * then call checkStudyAbroad(), checkDetecBonus() and beginNextRound().
+     * MANDATORY order respected:
+     * 1. Deducts the penalties from hand
+     * 2. Return the candidates to the jury
+     * (3. Jury → managed by JuryController)
+     * (4. Gap → managed by BoardController)
+     * 5. Semester abroad → called by endRoundPostJury()
+     * 6. DETEC bonus → called by endRoundPostJury()
      *
-     * @return liste des candidats au jury (peut être vide)
+     * @return list of jury candidates (can be empty)
      */
     public List<Round.JuryCandidate> endCurrentRound() {
         currentRound.markEnded();
@@ -200,9 +200,9 @@ public class Game {
     }
 
     /**
-     * Finalise la fin de manche après résolution de tous les jurys.
-     * Vérifie le semestre à l'étranger et le bonus DETEC.
-     * Doit être appelé par BoardController une fois tous les jurys terminés.
+     * Finalize the end of the round after all juries have been resolved.
+     * Check the semester abroad and the DETEC bonus.
+     * Must be called by BoardController once all juries have been completed.
      */
     public void endRoundPostJury() {
         currentRound.checkStudyAbroad();
@@ -210,17 +210,17 @@ public class Game {
     }
 
     /**
-     * @return true si la partie est terminée (toutes les manches jouées)
+     * @return true if the game is over (all rounds played)
      */
     public boolean isOver() {
         return gameOver || currentRoundNumber >= gameMode.getMaxRounds();
     }
 
     /**
-     * Détermine le vainqueur : le joueur avec le plus de crédits.
-     * En cas d'égalité, retourne le premier de la liste.
+     * Determines the winner: the player with the most credits.
+     * In case of a tie, returns the first one from the list.
      *
-     * @return le joueur vainqueur
+     * @return the winning player
      */
     public Player getWinner() {
         return players.stream()
@@ -229,21 +229,21 @@ public class Game {
     }
 
     /**
-     * @return true si le joueur a atteint le seuil honorifique (diplôme)
+     * @return true if the player reached the honorary threshold (diploma)
      */
     public boolean isGraduated(Player player) {
         return player.getCredits() >= gameMode.getGraduationThreshold();
     }
 
     /**
-     * @return le seuil de crédits honorifique (180 ou 300)
+     * @return the honorary credit threshold (180 or 300)
      */
     public int getGraduationThreshold() {
         return gameMode.getGraduationThreshold();
     }
 
     /**
-     * Affiche un résumé complet de la partie dans la console.
+     * Displays a full game summary in the console.
      */
     public void printSummary() {
         System.out.println("\n╔══════════════════════════════════════╗");
@@ -268,42 +268,92 @@ public class Game {
         ledger.printFull();
     }
 
+    /**
+     * Retrieve the list of all players participating in the game.
+     *
+     * @return the list of players
+     */
     public List<Player> getPlayers() {
         return players;
     }
 
+    /**
+     * Get the current game mode (SHORT or LONG).
+     *
+     * @return the selected game mode
+     */
     public GameMode getGameMode() {
         return gameMode;
     }
 
+    /**
+     * Get the ledger responsible for tracking player credits.
+     *
+     * @return the credit ledger instance
+     */
     public CreditLedger getLedger() {
         return ledger;
     }
 
+    /**
+     * Get the deck representing the draw pile.
+     *
+     * @return the draw pile deck
+     */
     public Deck getDrawPile() {
         return drawPile;
     }
 
+    /**
+     * Get the deck representing the discard pile.
+     *
+     * @return the discard pile deck
+     */
     public Deck getDiscardPile() {
         return discardPile;
     }
 
+    /**
+     * Retrieve the current round object.
+     *
+     * @return the active round, or {@code null} if no round is in progress
+     */
     public Round getCurrentRound() {
         return currentRound;
     }
 
+    /**
+     * Get the sequence number of the current round.
+     *
+     * @return the round number (starting from 1)
+     */
     public int getCurrentRoundNumber() {
         return currentRoundNumber;
     }
 
+    /**
+     * Get the player whose turn it is currently.
+     *
+     * @return the active player
+     */
     public Player getCurrentPlayer() {
         return players.get(currentPlayerIndex);
     }
 
+    /**
+     * Get the index of the current player in the players list.
+     *
+     * @return the current player index
+     */
     public int getCurrentPlayerIndex() {
         return currentPlayerIndex;
     }
 
+    /**
+     * Check if the entire game session has ended.
+     *
+     * @return {@code true} if the game is over, {@code false} otherwise
+     */
     public boolean isGameOver() {
         return gameOver;
     }

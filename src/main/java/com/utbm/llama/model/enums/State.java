@@ -1,24 +1,24 @@
 package main.java.com.utbm.llama.model.enums;
 
 /**
- * État d'un joueur au cours d'une manche.
- * PLAYING  → le joueur est actif et doit jouer à son tour
- * QUITTING → le joueur a passé la manche (QUIT_ROUND)
- * il attend la fin de manche sans jouer
- * Transitions autorisées :
- * PLAYING → QUITTING  (action QUIT_ROUND, irréversible dans la manche)
- * QUITTING → PLAYING  (uniquement au début de la manche suivante)
+ * State of a player during a round.
+ * PLAYING  → the player is active and must play in turn
+ * QUITTING → the player has passed the round (QUIT_ROUND)
+ * he’s waiting for the end of the round without playing
+ * Allowed Transitions:
+ * PLAYING → QUITTING  (action QUIT_ROUND, irreversible in the round)
+ * QUITTING → PLAYING  (only at the beginning of the next round)
  */
 public enum State {
 
     /**
-     * Le joueur participe activement à la manche en cours.
+     * The player actively participates in the current round.
      */
     PLAYING,
 
     /**
-     * Le joueur a passé sa manche.
-     * Il ne joue plus mais ses cartes restantes lui seront déduites en fin de manche.
+     * The player passed his sleeve.
+     * He no longer plays, but his remaining cards will be deducted from him at the end of the round.
      */
     QUITTING;
 

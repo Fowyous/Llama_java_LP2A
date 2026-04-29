@@ -135,7 +135,7 @@ public class Round {
     /**
      * Applies the end-of-round penalty to all active players.
      * Deducts the total value of cards remaining in each player's hand.
-     * ⚠ Must be called FIRST in the end-of-round sequence.
+     * Must be called FIRST in the end-of-round sequence.
      *
      * @return list of jury candidates (players who lost ≥ 20 credits)
      */
@@ -167,7 +167,7 @@ public class Round {
 
     /**
      * Checks and applies the study abroad flag for players who emptied their hand.
-     * ⚠ Must be called AFTER deductHandPenalties() and jury resolution.
+     * Must be called AFTER deductHandPenalties() and jury resolution.
      */
     public void checkStudyAbroad() {
         for (Player p : activePlayers) {
@@ -182,17 +182,17 @@ public class Round {
     /**
      * Checks and applies the DETEC bonus.
      * Conditions: LONG mode + end of round 4 + credits ≥ 120.
-     * ⚠ Should only be called at the end of round 4.
+     * Should only be called at the end of round 4.
      */
     public void checkDetecBonus() {
         if (!gameMode.hasDetecBonus())           return;
-        if (roundNumber != GameMode.DETEC_ROUND) return;
+        if (roundNumber != GameMode.DEUTEC_ROUND) return;
 
         for (Player p : allPlayers) {
-            if (p.getCredits() >= GameMode.DETEC_THRESHOLD) {
-                ledger.record(roundNumber, p, CreditLedger.Reason.DETEC_BONUS, GameMode.DETEC_BONUS);
+            if (p.getCredits() >= GameMode.DEUTEC_THRESHOLD) {
+                ledger.record(roundNumber, p, CreditLedger.Reason.DETEC_BONUS, GameMode.DEUTEC_BONUS);
                 System.out.println("[DETEC] " + p.getName()
-                        + " validates the DETEC! +" + GameMode.DETEC_BONUS
+                        + " validates the DETEC! +" + GameMode.DEUTEC_BONUS
                         + " credits → " + p.getCredits());
             }
         }

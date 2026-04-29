@@ -5,29 +5,29 @@ import main.java.com.utbm.llama.model.Move;
 import main.java.com.utbm.llama.model.Player;
 
 /**
- * Règle : SEMESTRE À L'ÉTRANGER
- * Contexte : règle de FIN DE MANCHE, pas de validation de coup.
- * Condition :
- * Un joueur qui termine la manche avec une main VIDE obtient le
- * "Semestre à l'étranger" : il commence la manche suivante avec
- * 4 cartes au lieu de 6.
- * Règles supplémentaires :
- * - Non cumulable : si le joueur vide à nouveau sa main lors du semestre
- * à l'étranger, l'avantage ne s'additionne pas (toujours 4 cartes max).
- * - Temporaire : l'avantage dure UNE SEULE manche, puis revient à 6 cartes.
- * isApplicable() / validate() :
- * Cette règle n'est pas une règle de coup — elle ne valide rien pendant
- * le jeu. Elle s'applique automatiquement lors de Round.checkStudyAbroad().
- * isApplicable() retourne toujours false pour ne pas interférer avec
- * la validation normale des coups.
- * apply() :
- * Utilisé par RuleEngine en fin de manche pour activer le flag sur le joueur.
+ * Rule: SEMESTER ABROAD
+ * Context: END OF ROUND rule, no hit validation.
+ * Condition:
+ * A player who ends the round with an EMPTY hand gets the
+ * "Semester abroad": he starts the next round with
+ * 4 cards instead of 6.
+ * Additional rules:
+ * - Not accumulative: if the player empties his hand again during the semester
+ * Abroad, the advantage does not add up (always 4 cards max).
+ * - Temporary: the advantage lasts ONE round, then comes back to 6 cards.
+ * isApplicable() / validate():
+ * This rule is not a hit rule—it does not validate anything during
+ * the game. It is automatically applied during Round.checkStudyAbroad().
+ * isApplicable() always returns false so as not to interfere with
+ * the normal validation of the moves.
+ * apply():
+ * Used by RuleEngine at the end of the inning to activate the flag on the player.
  */
 public class StudyBoardRule implements Rule {
 
     /**
-     * Cette règle ne s'applique à AUCUN coup pendant la manche.
-     * Elle est déclenchée explicitement par Round.checkStudyAbroad().
+     * This rule does not apply to ANY moves during the round.
+     * It is explicitly triggered by Round.checkStudyAbroad().
      */
     @Override
     public boolean isApplicable(Move move, Game game) {
@@ -40,11 +40,11 @@ public class StudyBoardRule implements Rule {
     }
 
     /**
-     * Active le semestre à l'étranger sur le joueur du coup.
-     * Appelé explicitement par Round après la fin d'une manche.
+     * Activates the semester abroad on the player of the coup.
+     * Explicitly called by Round after the end of a round.
      *
-     * @param move coup dont le joueur a vidé sa main
-     * @param game état du jeu
+     * @param move whose player has emptied his hand
+     * @param game game state
      */
     @Override
     public void apply(Move move, Game game) {
@@ -56,21 +56,21 @@ public class StudyBoardRule implements Rule {
     }
 
     /**
-     * Vérifie si un joueur est éligible au semestre à l'étranger.
-     * Peut être appelée directement sans passer par RuleEngine.
+     * Check if a player is eligible for the semester abroad.
+     * Can be called directly without going through RuleEngine.
      *
-     * @param player le joueur à vérifier
-     * @return true si la main est vide
+     * @param player the player to check
+     * @return true if the hand is empty
      */
     public static boolean isEligible(Player player) {
         return player.getHand().isEmpty();
     }
 
     /**
-     * Applique directement le semestre à l'étranger sur un joueur.
-     * Méthode utilitaire appelée par Round.checkStudyAbroad().
+     * Applies the semester abroad directly to a player.
+     * Utility method called by Round.checkStudyAbroad().
      *
-     * @param player le joueur éligible
+     * @param player the eligible player
      */
     public static void applyTo(Player player) {
         if (isEligible(player)) {

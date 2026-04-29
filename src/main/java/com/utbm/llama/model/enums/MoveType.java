@@ -1,30 +1,30 @@
 package main.java.com.utbm.llama.model.enums;
 
 /**
- * Les trois actions qu'un joueur peut effectuer pendant son tour.
- * PLAY_CARD  → jouer une carte de sa main sur la défausse
- * DRAW_CARD  → piocher une carte (met fin au tour)
- * QUIT_ROUND → passer le reste de la manche (irréversible)
- * Note : les actions automatiques de fin de manche (jury, césure,
- * distribution de crédits) ne sont PAS des MoveType — elles sont
- * gérées directement par Round et RuleEngine.
+ * The three actions a player can perform during their turn.
+ * PLAY_CARD  → play a card from your hand on the discard
+ * DRAW_CARD  → draw a card (ends the turn)
+ * QUIT_ROUND → pass the rest of the round (irreversible)
+ * Note: the automatic actions at the end of the round (jury, caesura,
+ * credit distribution) are NOT MoveType—they are
+ * managed directly by Round and RuleEngine.
  */
 public enum MoveType {
 
     /**
-     * Le joueur pose une carte de sa main sur la défausse.
+     * The player places a card from his hand on the discard pile.
      */
     PLAY_CARD,
 
     /**
-     * Le joueur pioche une carte depuis la pioche. Son tour se termine.
+     * The player draws a card from the draw pile. Their turn ends.
      */
     DRAW_CARD,
 
     /**
-     * Le joueur abandonne le reste de la manche.
-     * Il ne jouera plus jusqu'au début de la manche suivante.
-     * Ses crédits seront déduits de la valeur des cartes encore en main.
+     * The player abandons the rest of the round.
+     * He will not play again until the beginning of the next round.
+     * His credits will be deducted from the value of the cards still in hand.
      */
     QUIT_ROUND;
 

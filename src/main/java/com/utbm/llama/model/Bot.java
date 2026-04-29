@@ -5,30 +5,29 @@ import main.java.com.utbm.llama.model.enums.Difficulty;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 /**
- * Joueur contrôlé par l'IA.
- * Hérite de Player — un Bot est un Player avec une logique de décision automatique.
+ * Player controlled by AI.
+ * Inherits from Player—a Bot is a Player with automatic decision logic.
  * ┌─ EASY ──────────────────────────────────────────────────────────────────────┐
- * │  Joue une carte légale au hasard.                                           │
- * │  Si aucune carte jouable → pioche.                                          │
- * │  Ne passe jamais la manche volontairement (sauf si forcé).                  │
+ * │                 Play a legal card at random.                                │
+ * │                If no playable cards → draw.                                 │
+ * │            Never pass the sleeve willingly (unless forced).                 │
  * └─────────────────────────────────────────────────────────────────────────────┘
  * ┌─ MEDIUM ────────────────────────────────────────────────────────────────────┐
- * │  Préfère jouer une carte plutôt que piocher.                                │
- * │  Choisit la carte jouable de PLUS GRANDE valeur (vide la main plus vite).   │
- * │  Pioche si aucune carte jouable et que la pioche n'est pas vide.            │
- * │  Passe la manche si aucun coup possible.                                    │
+ * │        Prefers to play a card rather than draw it.                          │
+ * │        Choose the HIGHEST value playable card (empty hand faster).          │
+ * │        Draw if no playable card and the draw isn’t empty.                   │
+ * │        Pass the sleeve if no shot is possible.                              │
  * └─────────────────────────────────────────────────────────────────────────────┘
  * ┌─ HARD ──────────────────────────────────────────────────────────────────────┐
- * │  Minimise la valeur des cartes restantes en main.                           │
- * │  Joue la carte de PLUS PETITE valeur parmi les jouables (garde les grosses  │
- * │  cartes pour plus tard si possible).                                        │
- * │  Passe la manche si la main restante vaut > 15 crédits ET qu'il ne peut    │
- * │  rien jouer (limite les dégâts).                                            │
- * │  Ne pioche JAMAIS si la main contient déjà ≥ 4 cartes.                     │
+ * │  Minimizes the value of the remaining cards in hand.                        │
+ * │  Play the SMALLEST value card among the playable ones (keep the large ones  │
+ * │  cards for later if possible).                                              │
+ * │  Pass the round if the remaining hand is worth > 15 credits AND he can’t    │
+ * │  nothing to play (limits the damage).                                       │
+ * │  NEVER draw if the hand already contains ≥ 4 cards.                         │
  * └─────────────────────────────────────────────────────────────────────────────┘
  */
 public class Bot extends Player {
@@ -36,6 +35,13 @@ public class Bot extends Player {
     private final Difficulty difficulty;
     private final Random rng = new Random();
 
+    /**
+     * Initialize a new Bot with a specific name and difficulty level.
+     *
+     * @param name       the name of the bot
+     * @param difficulty the AI behavior level (EASY, MEDIUM, HARD)
+     *                   * @throws IllegalArgumentException if the difficulty is null
+     */
     public Bot(String name, Difficulty difficulty) {
         super(name);
         if (difficulty == null) throw new IllegalArgumentException("La difficulté d'un bot ne peut pas être null");
@@ -43,10 +49,10 @@ public class Bot extends Player {
     }
 
     /**
-     * Décide du meilleur coup à jouer selon la difficulté.
+     * Decide the best move to play depending on difficulty.
      *
-     * @param game l'état courant du jeu (lecture seule pour la prise de décision)
-     * @return un Move valide pour ce bot
+     * @param game the current state of the game (read only for decision-making)
+     * @return a valid Move for this bot
      */
     public Move decideMove(Game game) {
         return switch (difficulty) {
@@ -56,6 +62,13 @@ public class Bot extends Player {
         };
     }
 
+    /**
+     * Determine a move using Easy logic: play a random legal card, or draw if none available.
+     * Never quits the round voluntarily if drawing is an option.
+     *
+     * @param game the current state of the game
+     *             * @return the chosen move (PLAY_CARD, DRAW_CARD, or QUIT_ROUND)
+     */
     private Move decideMoveEasy(Game game) {
         List<CardType> playable = getPlayableCards(game);
 
@@ -71,6 +84,13 @@ public class Bot extends Player {
         return Move.quitRound(this);
     }
 
+    /**
+     * Determine a move using Medium logic: prefer playing the highest value card.
+     * Quits the round only if no cards are playable and the draw pile is empty.
+     *
+     * @param game the current state of the game
+     *             * @return the chosen move (PLAY_CARD, DRAW_CARD, or QUIT_ROUND)
+     */
     private Move decideMovemedium(Game game) {
         List<CardType> playable = getPlayableCards(game);
 
@@ -86,6 +106,13 @@ public class Bot extends Player {
         return Move.quitRound(this);
     }
 
+    /**
+     * Determine a move using Hard logic: play the smallest card or quit to minimize point loss.
+     * Stops drawing if the hand is too large and quits if the hand value is dangerously high.
+     *
+     * @param game the current state of the game
+     *             * @return the chosen move (PLAY_CARD, DRAW_CARD, or QUIT_ROUND)
+     */
     private Move decideMoveHard(Game game) {
         List<CardType> playable = getPlayableCards(game);
 
@@ -112,20 +139,30 @@ public class Bot extends Player {
     }
 
     /**
-     * Retourne la liste des cartes de la main jouables sur la défausse actuelle.
+     * Returns the list of playable hand cards to the current discard pile.
      *
-     * @param game état du jeu
-     * @return cartes jouables (peut être vide)
+     * @param game game state
+     * @return playable cards (can be empty)
      */
     private List<CardType> getPlayableCards(Game game) {
         CardType top = game.getDiscardPile().peek();
         return getHand().stream().filter(card -> card.canBePlayedOn(top)).toList();
     }
 
+    /**
+     * Get the difficulty setting of this bot.
+     *
+     * @return the difficulty level (EASY, MEDIUM, or HARD)
+     */
     public Difficulty getDifficulty() {
         return difficulty;
     }
 
+    /**
+     * Return a string representation of the Bot for debugging or display.
+     *
+     * @return a string containing name, difficulty, and credits
+     */
     @Override
     public String toString() {
         return "Bot[" + getName() + " | " + difficulty + " | " + getCredits() + " crédits]";
