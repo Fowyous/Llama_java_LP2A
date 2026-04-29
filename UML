@@ -1,11 +1,11 @@
 @startuml
 
 skinparam packageStyle rectangle
-skinparam classBackgroundColor #1A1A1A
+skinparam classBackgroundColor #FFFFFF
 skinparam classBorderColor #C8A84B
 skinparam classArrowColor #C8A84B
 skinparam classFontColor #F0EDE6
-skinparam packageBackgroundColor #111111
+skinparam packageBackgroundColor #FFFFFF
 skinparam packageBorderColor #2E2E2E
 skinparam packageFontColor #C8A84B
 skinparam noteBackgroundColor #141414
@@ -694,22 +694,23 @@ package "controller" {
   SettingsController --> GameController       : notifie
 
   BoardController ..> Game                   : modifie
-  BoardController ..> BoardView              : met à jour
-  BoardController ..> RuleEngine             : valide les coups
-  BoardController --> JuryController         : déclenche le jury
-  BoardController ..> CesureView             : crée et affiche
+  BoardController ..> BoardView              : updates
+  BoardController ..> RuleEngine             : validates move
+  BoardController --> JuryController         : Calls the jury
+  BoardController ..> CesureView             : Créates and displays
 
-  JuryController ..> JuryView               : crée et affiche
-  JuryController --> BoardController        : notifie (onFinished)
-  JuryController ..> Jury                   : instancie
+  JuryController ..> JuryView               : Creates and displays
+  JuryController --> BoardController        : notifies (onFinished)
+  JuryController ..> Jury                   : instantiate
 
-  SettingsController ..> Game               : crée
-  SettingsController ..> Player             : crée
-  SettingsController ..> Bot                : crée
+  SettingsController ..> Game               : Creates
+  SettingsController ..> Player             : Creates
+  SettingsController ..> Bot                : Creates
 
-  GameController --> MainFrame              : possède
-  GameController --> Game                   : possède
+  GameController --> MainFrame              : Owns
+  GameController --> Game                   : Owns
   GameController --> Player                 : localPlayer
 }
 
 @enduml
+
