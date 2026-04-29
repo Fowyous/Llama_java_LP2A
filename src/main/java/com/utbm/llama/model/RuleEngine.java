@@ -8,27 +8,25 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Moteur de règles du jeu LAMA UTBM.
- * Rôle :
- * - Agrège toutes les règles de validation de coup (PlayCard, Draw, Quit)
- * - Expose deux méthodes principales :
- * * validateMove()  → vérifie qu'un coup est légal
- * * applyRules()    → applique les effets des règles après un coup valide
- * - Expose des méthodes utilitaires pour les règles de fin de manche
- * * processEndOfRound() → séquence complète de fin de manche
- * Ce que RuleEngine ne fait PAS :
- * - Il ne modifie pas directement le modèle (c'est Game.applyMove())
- * - Il ne gère pas le jury ni la césure de façon asynchrone
- * (ces éléments nécessitent une interaction UI → BoardController)
- * Utilisation typique dans BoardController :
+ * LAMA UTBM game rules engine.
+ * Role:
+ * - Aggregate all the hit validation rules (PlayCard, Draw, Quit)
+ * - Outlines two main methods:
+ * * validateMove()  → verifies that a move is legal
+ * * applyRules()   → applies the effects of rules after a valid move
+ * - Exposes utility methods for endgame rules
+ * * processEndOfRound() → complete end-of-inning sequence
+ * What RuleEngine does NOT do:
+ * - It does not directly modify the template (that’s Game.applyMove())
+ * - He does not manage the jury or the trial asynchronously.
+ * (these elements require a UI interaction → BoardController)
+ * Typical usage in BoardController:
  * Move move = Move.playCard(player, card);
  * if (ruleEngine.validateMove(move, game)) {
  * game.applyMove(move);
  * ruleEngine.applyRules(move, game);
  * }
- * // En fin de manche :
  * List<Round.JuryCandidate> candidates = ruleEngine.processEndOfRound(game);
- * // → déclencher les jurys via JuryController
  * ruleEngine.processPostJury(game);
  */
 public class RuleEngine {
@@ -42,7 +40,7 @@ public class RuleEngine {
 
 
     /**
-     * Crée le moteur de règles avec toutes les règles de coup enregistrées.
+     * Creates the rule engine with all saved move rules.
      */
     public RuleEngine() {
         rules.add(new PlayCardRule());
@@ -51,13 +49,13 @@ public class RuleEngine {
     }
 
     /**
-     * Vérifie si un coup est légal selon toutes les règles applicables.
-     * Seules les règles dont isApplicable() retourne true sont évaluées.
-     * Si une seule règle échoue, le coup est refusé.
+     * Checks if a hit is legal according to all applicable rules.
+     * Only rules that isApplicable() returns true are evaluated.
+     * If only one rule fails, the move is rejected.
      *
-     * @param move le coup à valider
-     * @param game l'état courant du jeu
-     * @return true si le coup est légal
+     * @param move the move to validate
+     * @param game the current state of the game
+     * @return true if the move is legal
      */
     public boolean validateMove(Move move, Game game) {
         if (move == null || game == null) return false;
@@ -75,11 +73,11 @@ public class RuleEngine {
     }
 
     /**
-     * Applique les effets des règles après qu'un coup valide a été exécuté.
-     * Appelé APRÈS Game.applyMove().
+     * Applies rule effects after a valid move is executed.
+     * Called AFTER Game.applyMove().
      *
-     * @param move le coup qui vient d'être appliqué
-     * @param game l'état du jeu après le coup
+     * @param move the move that just was applied
+     * @param game the state of the game after the coup
      */
     public void applyRules(Move move, Game game) {
         for (Rule rule : rules) {
@@ -90,15 +88,15 @@ public class RuleEngine {
     }
 
     /**
-     * Exécute la phase 1 de fin de manche :
-     * 1. Déduit les pénalités de main (via Game.endCurrentRound())
-     * 2. Identifie les joueurs à passer devant le jury (perte ≥ 20)
-     * ⚠ Après cette méthode, BoardController doit :
-     * - Déclencher les jurys un par un (JuryController.startJury())
-     * - Appeler processPostJury() une fois tous les jurys résolus
+     * Execute end-of-inning phase 1:
+     * 1. Deducts the penalties from the hand (via Game.endCurrentRound())
+     * 2. Identifies the players to be judged by the jury (loss ≥ 20)
+     * After this method, BoardController must:
+     * - Trigger juries one by one (JuryController.startJury())
+     * - Call processPostJury() once all juries are resolved
      *
-     * @param game l'état du jeu en fin de manche
-     * @return liste des joueurs convoqués au jury (peut être vide)
+     * @param game the state of play at the end of the round
+     * @return list of players summoned to the jury (can be empty)
      */
     public List<Round.JuryCandidate> processEndOfRound(Game game) {
         System.out.println("[RuleEngine] === Début de la séquence de fin de manche ===");
@@ -114,13 +112,13 @@ public class RuleEngine {
 
 
     /**
-     * Exécute la phase 2 de fin de manche, APRÈS résolution de tous les jurys :
-     * 1. Vérifie la césure pour chaque joueur encore en négatif
-     * 2. Active le semestre à l'étranger pour ceux qui ont vidé leur main
-     * 3. Applique le bonus DETEC si les conditions sont remplies
+     * Execute the end-of-inning phase 2, AFTER resolving all juries:
+     * 1. Check the gap for each player still in negative
+     * 2. Activate the semester abroad for those who have emptied their hand
+     * 3. Applies the DETEC bonus if the conditions are met
      *
-     * @param game l'état du jeu après résolution des jurys
-     * @return liste des joueurs partant en semestre de césure
+     * @param game the state of the game after jury resolutions
+     * @return list of players leaving for gap semesters
      */
     public List<Player> processPostJury(Game game) {
         List<Player> cesurePlayers = new ArrayList<>();
@@ -147,12 +145,12 @@ public class RuleEngine {
     }
 
     /**
-     * Vérifie si un joueur peut encore jouer dans la manche (possède une carte jouable).
-     * Utile pour les bots et l'affichage de la vue.
+     * Check if a player can still play in the hand (has a playable card).
+     * Useful for bots and view display.
      *
-     * @param player le joueur à vérifier
-     * @param game   l'état du jeu
-     * @return true si le joueur a au moins une carte jouable
+     * @param player the player to check
+     * @param game the game state
+     * @return true if the player has at least one playable card
      */
     public boolean hasPlayableCard(Player player, Game game) {
         CardType top = game.getDiscardPile().peek();
@@ -160,11 +158,11 @@ public class RuleEngine {
     }
 
     /**
-     * Retourne la liste des cartes jouables dans la main d'un joueur.
+     * Returns the list of playable cards in a player’s hand.
      *
-     * @param player le joueur
-     * @param game   l'état du jeu
-     * @return liste des cartes légalement jouables (peut être vide)
+     * @param player the player
+     * @param game the game state
+     * @return list of legally playable cards (can be empty)
      */
     public List<CardType> getPlayableCards(Player player, Game game) {
         CardType top = game.getDiscardPile().peek();
@@ -174,28 +172,28 @@ public class RuleEngine {
     }
 
     /**
-     * Vérifie si la manche en cours est terminée
-     * (tous les joueurs actifs ont passé ou un a vidé sa main).
+     * Check if the current round is finished
+     * (all active players have passed or one has emptied their hand).
      *
-     * @param game l'état du jeu
-     * @return true si la manche doit se terminer
+     * @param game the game state
+     * @return true if the round should end
      */
     public boolean isRoundOver(Game game) {
         return game.getCurrentRound() != null && game.getCurrentRound().isOver();
     }
 
     /**
-     * Ajoute une règle personnalisée au moteur.
-     * Utile pour les extensions ou les tests.
+     * Adds a custom rule to the engine.
+     * Useful for extensions or tests.
      *
-     * @param rule la règle à ajouter
+     * @param rule the rule to add
      */
     public void addRule(Rule rule) {
         if (rule != null) rules.add(rule);
     }
 
     /**
-     * @return liste non modifiable de toutes les règles enregistrées
+     * @return uneditable list of all saved rules
      */
     public List<Rule> getRules() {
         return java.util.Collections.unmodifiableList(rules);

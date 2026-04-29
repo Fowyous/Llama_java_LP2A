@@ -8,25 +8,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Modélise une manche complète du jeu LAMA UTBM.
- * Une manche se déroule en trois phases :
+ * Model a complete sleeve of the LAMA UTBM game.
+ * One round takes place in three phases:
  * ┌─ Phase 1 : Début de manche ─────────────────────────────────────────────────┐
- * │  - Chaque joueur reçoit +35 crédits                                         │
- * │  - Les joueurs en césure reçoivent les crédits MAIS ne jouent pas           │
- * │  - Les joueurs normaux reçoivent 6 cartes (ou 4 si semestre à l'étranger)   │
- * │  - Le flag studyAbroad est remis à false après distribution                 │
+ * │  - Each player receives +35 credits                                         │
+ * │  - Players on a break receive the credits BUT do not play                   │
+ * │  - Normal players receive 6 cards (or 4 if semester abroad)                 │
+ * │  - The Abroad study flag is reset to false after distribution               │
  * └─────────────────────────────────────────────────────────────────────────────┘
  * ┌─ Phase 2 : Jeu ─────────────────────────────────────────────────────────────┐
- * │  - Les joueurs jouent tour par tour                                          │
- * │  - Fin de manche : tous les joueurs actifs ont passé OU un a vidé sa main   │
+ * │  - The players play turn-based                                              │
+ * │  - End of round: all active players have passed OR one has emptied his hand │
  * └─────────────────────────────────────────────────────────────────────────────┘
  * ┌─ Phase 3 : Fin de manche ───────────────────────────────────────────────────┐
- * │  Ordre OBLIGATOIRE :                                                         │
- * │  1. deductHandPenalties()  → retire la valeur des cartes restantes           │
- * │  2. checkJury()            → perte ≥ 20 → Jury (géré par JuryController)    │
- * │  3. checkCesure()          → crédits < 0 → Césure                           │
- * │  4. checkStudyAbroad()     → main vide → 4 cartes la prochaine manche        │
- * │  5. checkDetecBonus()      → manche 4, LONG, ≥ 120 crédits → +30            │
+ * │                            Mandatory order:                                 │
+ * │    1. deductHandPenalties()  → removes the value from the remaining cards   │
+ * │    2. checkJury()   → loss ≥ 20 → Jury (managed by JuryController)          │
+ * │    3. checkCesure()   → credits > 0 → Gap                                   │
+ * │    4. checkStudyAbroad()   → empty hand → 4 cards in the next round         │
+ * │    5. checkDetecBonus()   → round 4, LONG, ≥ 120 credits → +30              │
  * └─────────────────────────────────────────────────────────────────────────────┘
  */
 public class Round {
@@ -45,10 +45,10 @@ public class Round {
     public static final int STUDY_ABROAD_HAND_SIZE = 4;
 
     /**
-     * @param roundNumber numéro de la manche (commence à 1)
-     * @param allPlayers  tous les joueurs de la partie
-     * @param gameMode    mode de jeu (pour le bonus DETEC)
-     * @param ledger      registre comptable partagé avec Game
+     * @param roundNumber round number (starts at 1)
+     * @param allPlayers all the players in the game
+     * @param gameMode game mode (for the DETEC bonus)
+     * @param ledger accounting record shared with Game
      */
     public Round(int roundNumber, List<Player> allPlayers, GameMode gameMode, CreditLedger ledger) {
         this.roundNumber = roundNumber;
@@ -59,15 +59,15 @@ public class Round {
     }
 
     /**
-     * Initialise la manche :
-     * - Distribue +35 crédits à TOUS les joueurs (y compris les suspendus)
-     * - Identifie les joueurs actifs (non suspendus)
-     * - Pour chaque joueur actif : remet en PLAYING, vide la main, distribue les cartes
-     * - Applique le semestre à l'étranger (4 cartes) si actif
-     * - Remet le flag studyAbroad à false après distribution
-     * - Lève la suspension des joueurs en césure
+     * Initialize the round:
+     * - Distributes +35 credits to ALL players (including suspended ones)
+     * - Identifies active (not suspended) players
+     * - For each active player: put the hand back to PLAYING, empty it, deal the cards
+     * - Applies the semester abroad (4 cards) if active
+     * - Resets the Abroad study flag to false after distribution
+     * - Lifts the suspension of players on a hiatus
      *
-     * @param drawPile pioche depuis laquelle distribuer les cartes
+     * @param drawPile picks from which to deal the cards
      */
     public void startRound(Deck drawPile) {
         activePlayers.clear();
@@ -108,12 +108,12 @@ public class Round {
 
 
     /**
-     * Vérifie si la manche est terminée.
-     * Conditions de fin :
-     * - Tous les joueurs actifs ont passé (State.QUITTING)
-     * - Au moins un joueur actif a vidé sa main
+     * Check if the round is finished.
+     * Completion Conditions:
+     * - All active players have passed (State.QUITTING)
+     * - At least one active player has emptied their hand
      *
-     * @return true si la manche doit se terminer
+     * @return true if the round should end
      */
     public boolean isOver() {
         if (activePlayers.isEmpty()) return true;
@@ -126,11 +126,11 @@ public class Round {
     }
 
     /**
-     * Applique la pénalité de fin de manche à tous les joueurs actifs.
-     * Déduit la valeur des cartes restantes en main.
-     * ⚠ Doit être appelé EN PREMIER dans la séquence de fin de manche.
+     * Applies the endgame penalty to all active players.
+     * Deduct the value of the remaining cards in hand.
+     * Must be called FIRST in the last inning sequence.
      *
-     * @return map joueur → crédits perdus (pour que JuryController sache qui convoquer)
+     * @return map player → lost credits (so that JuryController knows who to summon)
      */
     public List<JuryCandidate> deductHandPenalties() {
         List<JuryCandidate> juryCandidates = new ArrayList<>();
@@ -156,9 +156,9 @@ public class Round {
     }
 
     /**
-     * Vérifie et applique le flag "semestre à l'étranger" pour les joueurs
-     * ayant vidé leur main lors de cette manche.
-     * ⚠ Doit être appelé APRÈS deductHandPenalties() et la résolution du jury.
+     * Checks and applies the "semester abroad" flag for players
+     * having emptied their hand during this round.
+     * Must be called AFTER deductHandPenalties() and jury resolution.
      */
     public void checkStudyAbroad() {
         for (Player p : activePlayers) {
@@ -170,9 +170,9 @@ public class Round {
     }
 
     /**
-     * Vérifie et applique le bonus DETEC.
-     * Conditions : mode LONG + fin de la manche 4 + crédits ≥ 120.
-     * ⚠ Doit être appelé à la fin de la manche 4 uniquement.
+     * Checks and applies the DETEC bonus.
+     * Conditions: LONG mode + end of round 4 + credits ≥ 120.
+     * Must be called at the end of round 4 only.
      */
     public void checkDetecBonus() {
         if (!gameMode.hasDetecBonus()) return;
@@ -187,21 +187,21 @@ public class Round {
     }
 
     /**
-     * Vérifie si un joueur doit partir en semestre de césure.
-     * Condition : crédits < 0 (après éventuel jury).
+     * Checks if a player has to leave during the gap semester.
+     * Condition: credits > 0 (after possible jury).
      *
-     * @param player le joueur à vérifier
-     * @return true si ce joueur doit partir en césure
+     * @param player the player to check
+     * @return true if this player has to go on hiatus
      */
     public boolean needsCesure(Player player) {
         return player.getCredits() < 0;
     }
 
     /**
-     * Applique la suspension (semestre de césure) à un joueur.
-     * La suspension sera levée au début de la manche suivante.
+     * Applies the suspension (gap semester) to a player.
+     * The suspension will be lifted at the beginning of the next round.
      *
-     * @param player le joueur à suspendre
+     * @param player the player to be suspended
      */
     public void applyCesure(Player player) {
         player.setSuspended(true);
@@ -209,10 +209,10 @@ public class Round {
     }
 
     /**
-     * Cas particulier 1v1 : si TOUS les joueurs actifs sont en césure,
-     * ils sautent la manche ensemble.
+     * Special case 1v1: if ALL active players are on a hiatus,
+     * They’re up to bat together.
      *
-     * @return true si tous les joueurs actifs sont suspendus
+     * @return true if all active players are suspended
      */
     public boolean allPlayersSuspended() {
         return allPlayers.stream().allMatch(Player::isSuspended);
@@ -244,9 +244,9 @@ public class Round {
     }
 
     /**
-     * Représente un joueur convoqué au jury avec le montant de sa perte.
-     * Retourné par deductHandPenalties() pour que Game/Controller
-     * puisse déclencher les jurys dans le bon ordre.
+     * Represents a player summoned to the jury with the amount of his loss.
+     * Returned by deductHandPenalties() so that Game/Controller
+     * can trigger the juries in the correct order.
      */
     public record JuryCandidate(Player player, int creditsLost) {
     }
