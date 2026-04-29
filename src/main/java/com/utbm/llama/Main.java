@@ -6,6 +6,7 @@ import main.java.com.utbm.llama.view.MainFrame;
 import javax.swing.*;
 
 import java.util.Locale;
+
 /**
  * Entry point of the LAMA UTBM application.
  * Launch the main window and initialize the GameController

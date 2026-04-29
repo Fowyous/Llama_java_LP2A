@@ -48,9 +48,9 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     private JLabel lbl, hintLbl;
 
     /**
-     *Constructs the SettingsView, initializes components,
+     * Constructs the SettingsView, initializes components,
      * and sets up the layout and initial resource bundle.
-    */
+     */
     public SettingsView(MainFrame mainFrame) {
         mainFrame.addLocaleChangeListener(this);
 
@@ -73,9 +73,10 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Creates and returns the header panel containing the title, subtitle,
-    * and a decorative separator.
-    */
+     * Build the header panel containing title and subtitle.
+     *
+     * @return the header panel
+     */
     private JPanel buildHeader() {
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(BG);
@@ -102,8 +103,10 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Builds the main form container using a GridBagLayout to center the settings fields.
-    */
+     * Build the main form wrapper containing all field groups.
+     *
+     * @return the form wrapper panel
+     */
     private JPanel buildForm() {
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(BG);
@@ -134,8 +137,8 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Generic helper method to create a labeled field group with a title, a hint, and an input component.
-    */
+     * Generic helper method to create a labeled field group with a title, a hint, and an input component.
+     */
     private JPanel buildFieldGroup(String label, String hint, JComponent input) {
         JPanel group = new JPanel();
         group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
@@ -165,8 +168,10 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Specifically constructs the UI group for selecting the number of players.
-    */
+     * Build the number-of-players field group.
+     *
+     * @return the players field group panel
+     */
     private JPanel buildFieldGroupNbPlayers() {
         JPanel group = new JPanel();
         group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
@@ -194,9 +199,12 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
         return group;
     }
 
+
     /**
-    * Specifically constructs the UI group for selecting the AI difficulty level.
-    */
+     * Build the difficulty field group.
+     *
+     * @return the difficulty field group panel
+     */
     private JPanel buildFieldGroupDifficulty() {
         JPanel group = new JPanel();
         group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
@@ -224,8 +232,10 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Specifically constructs the UI group for the language selection dropdown.
-    */
+     * Build the language selection field group.
+     *
+     * @return the language field group panel
+     */
     private JPanel buildFieldGroupLanguage() {
         JPanel group = new JPanel();
         group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
@@ -254,8 +264,10 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Specifically constructs the UI group for selecting the game mode.
-    */
+     * Build the game mode field group.
+     *
+     * @return the mode field group panel
+     */
     private JPanel buildFieldGroupMode() {
         JPanel group = new JPanel();
         group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
@@ -284,8 +296,10 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Creates the bottom panel containing the navigation and action buttons (Back and Save).
-    */
+     * Build the actions panel containing Back and Save buttons.
+     *
+     * @return the actions panel
+     */
     private JPanel buildActions() {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 24));
         actions.setBackground(BG);
@@ -294,9 +308,14 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
         return actions;
     }
 
+
     /**
-    *Initializes a JComboBox with a specific set of items and applies the custom styling.
-    */
+     * Build a typed combo box from provided items.
+     *
+     * @param items the items to populate the combo box with
+     * @param <T>   the item type
+     * @return the constructed JComboBox
+     */
     private <T> JComboBox<T> buildCombo(T[] items) {
         JComboBox<T> combo = new JComboBox<>(items);
         styleCombo(combo);
@@ -304,8 +323,10 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Applies a dark-themed visual style to combo boxes and other input components.
-    */
+     * Apply consistent styling to a combo-like component.
+     *
+     * @param comp the component to style
+     */
     private void styleCombo(JComponent comp) {
         comp.setBackground(Color.decode("#1A1A1A"));
         comp.setForeground(TEXT_MAIN);
@@ -316,8 +337,8 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Creates a stylized JButton, alternating between primary (accent color) and secondary styles.
-    */
+     * Creates a stylized JButton, alternating between primary (accent color) and secondary styles.
+     */
     private JButton buildButton(String text, boolean isPrimary) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("Monospaced", Font.BOLD, 13));
@@ -337,71 +358,75 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Registers an ActionListener for the Save button.
-    */
+     * Registers an ActionListener for the Save button.
+     */
     public void addSaveListener(ActionListener l) {
         btnSave.addActionListener(l);
     }
 
     /**
-    * Registers an ActionListener for the Back button.
-    */
+     * Registers an ActionListener for the Back button.
+     */
     public void addBackListener(ActionListener l) {
         btnBack.addActionListener(l);
     }
 
     /**
-    * Registers an ActionListener for the language selection combo box.
-    */
+     * Registers an ActionListener for the language selection combo box.
+     */
     public void addLanguageChangeListener(ActionListener l) {
         comboLanguage.addActionListener(l);
     }
 
     /**
-    * Returns the currently selected number of players from the UI.
-    */
+     * Get the currently selected number of players.
+     *
+     * @return the selected number of players
+     */
     public int getNbPlayers() {
         return (Integer) comboNbPlayers.getSelectedItem();
     }
 
     /**
-    * Returns the currently selected Difficulty enum value.
-    */
+     * Returns the currently selected Difficulty enum value.
+     */
     public Difficulty getDifficulty() {
         return (Difficulty) comboDifficulty.getSelectedItem();
     }
 
     /**
-    * Returns the currently selected GameMode enum value.
-    */
+     * Returns the currently selected GameMode enum value.
+     */
     public GameMode getGameMode() {
         return (GameMode) comboGameMode.getSelectedItem();
     }
 
     /**
-    * Updates the player count selection in the UI.
-    */
+     * Updates the player count selection in the UI.
+     */
     public void setNbPlayers(int n) {
         comboNbPlayers.setSelectedItem(n);
     }
 
     /**
-    * Updates the difficulty selection in the UI.
-    */
+     * Updates the difficulty selection in the UI.
+     */
     public void setDifficulty(Difficulty d) {
         comboDifficulty.setSelectedItem(d);
     }
 
     /**
-    * Updates the game mode selection in the UI.
-    */
+     * Updates the game mode selection in the UI.
+     */
     public void setGameMode(GameMode m) {
         comboGameMode.setSelectedItem(m);
     }
 
     /**
-    * Maps the text selection in the language dropdown to a specific Locale object.
-    */
+     * Get the Locale corresponding to the selected language display value.
+     *
+     * @return the selected Locale (or currentLocale if unmatched)
+     */
     public Locale getSelectedLanguage() {
         String selected = (String) comboLanguage.getSelectedItem();
         return switch (selected) {
@@ -413,8 +438,10 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Sets the language dropdown selection based on a provided Locale.
-    */
+     * Update the language selection combo to match a locale.
+     *
+     * @param locale the locale to reflect in the combo selection
+     */
     private void setLanguageSelection(Locale locale) {
         String language = switch (locale.getLanguage()) {
             case "en" -> "English";
@@ -427,8 +454,8 @@ public class SettingsView extends JPanel implements LocaleChangeListener {
     }
 
     /**
-    * Updates all UI text components dynamically when the application language is changed.
-    */
+     * Updates all UI text components dynamically when the application language is changed.
+     */
     @Override
     public void onLocaleChange(Locale locale) {
         this.currentLocale = locale;
