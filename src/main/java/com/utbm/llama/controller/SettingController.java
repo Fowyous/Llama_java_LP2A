@@ -13,27 +13,32 @@ import java.util.List;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
 /**
- * Contrôleur de l'écran de paramètres.
- * Responsabilités :
- * - Lire les choix de l'utilisateur (nb joueurs, difficulté, mode)
- * - Construire la liste de joueurs (humain + bots)
- * - Créer un nouveau modèle Game et le transmettre au GameController
- * - Naviguer vers le menu ou lancer la partie selon l'action
+ * Controller of the settings screen.
+ * Responsibilities:
+ * - Read the user’s choices (number of players, difficulty, mode)
+ * - Build the list of players (human + bots)
+ * - Create a new Game template and send it to the GameController
+ * - Navigate to the menu or start the game depending on the action
  */
 public class SettingController {
 
     private final MainFrame mainFrame;
     private final SettingsView settingsView;
     private GameController gameController;
-    
+
     private Locale currentLocale;
     private ResourceBundle bundle;
-    
+
     private int savedNbPlayers = 3;
     private Difficulty savedDifficulty = Difficulty.MEDIUM;
     private GameMode savedGameMode = GameMode.SHORT;
 
+    /**
+     * Initialise le contrôleur des paramètres en récupérant la vue dédiée,
+     * la langue actuelle du système et en configurant les écouteurs d'événements.
+     */
     public SettingController(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         this.settingsView = mainFrame.getSettingsView();
@@ -42,31 +47,35 @@ public class SettingController {
         initListeners();
     }
 
+    /**
+     * Relie les interactions de la vue (sauvegarde, retour, changement de langue)
+     * aux méthodes logiques du contrôleur pour mettre à jour la configuration.
+     */
     private void initListeners() {
 
         settingsView.addSaveListener(e -> handleSaveSettings(settingsView.getNbPlayers(), settingsView.getDifficulty(), settingsView.getGameMode()));
 
         settingsView.addBackListener(e -> mainFrame.showMenu());
-        
+
         settingsView.addLanguageChangeListener(e -> handleLanguageChange());
     }
 
+    /**
+     * Récupère la nouvelle langue sélectionnée par l'utilisateur et
+     * demande à la fenêtre principale de mettre à jour l'ensemble de l'application.
+     */
     private void handleLanguageChange() {
-        // gets the new selected locale.
         Locale newLocale = settingsView.getSelectedLanguage();
-        
-        // updates it.
         this.currentLocale = newLocale;
-        
-        // updates the view
         mainFrame.updateApplicationLocale(newLocale);
     }
+
     /**
-     * Sauvegarde les paramètres, construit le modèle Game et démarre la partie.
+     * Save the settings, build the Game template and start the game.
      *
-     * @param nbPlayers  nombre total de joueurs (1 humain + N-1 bots)
-     * @param difficulty difficulté des bots
-     * @param gameMode   SHORT (6 manches) ou LONG (10 manches)
+     * @param nbPlayers  total number of players (1 human + N-1 bots)
+     * @param difficulty bots difficulty
+     * @param gameMode   SHORT (6 rounds) or LONG (10 rounds)
      */
     public void handleSaveSettings(int nbPlayers, Difficulty difficulty, GameMode gameMode) {
         this.savedNbPlayers = nbPlayers;
@@ -86,20 +95,20 @@ public class SettingController {
 
 
     /**
-     * Crée la liste de joueurs : 1 humain (index 0) + (nbPlayers - 1) bots.
+     * Create the player list: 1 human (index 0) + (nbPlayers - 1) bots.
      */
     private List<Player> buildPlayers(int nbPlayers, Difficulty difficulty) {
         List<Player> players = new ArrayList<>();
 
         players.add(new Player(bundle.getString("player_human")));
 
-        String[] botNameKeys = {            
-        		"bot_student_a",             
-        		"bot_student_b",             
-        		"bot_student_c",             
-        		"bot_student_d",             
-        		"bot_student_e" 
-        		};
+        String[] botNameKeys = {
+                "bot_student_a",
+                "bot_student_b",
+                "bot_student_c",
+                "bot_student_d",
+                "bot_student_e"
+        };
         for (int i = 1; i < nbPlayers; i++) {
             String botName = bundle.getString(botNameKeys[i - 1]);
             players.add(new Bot(botName, difficulty));
@@ -108,18 +117,30 @@ public class SettingController {
         return players;
     }
 
+    /**
+     * Retourne le nombre de joueurs actuellement enregistré dans les paramètres.
+     */
     public int getSavedNbPlayers() {
         return savedNbPlayers;
     }
 
+    /**
+     * Retourne le niveau de difficulté sélectionné pour les bots.
+     */
     public Difficulty getSavedDifficulty() {
         return savedDifficulty;
     }
 
+    /**
+     * Retourne le mode de jeu (court ou long) choisi par l'utilisateur.
+     */
     public GameMode getSavedGameMode() {
         return savedGameMode;
     }
 
+    /**
+     * Définit la référence vers le contrôleur de jeu principal pour permettre la transition vers le plateau lors du lancement.
+     */
     public void setGameController(GameController gc) {
         this.gameController = gc;
     }

@@ -9,16 +9,16 @@ import main.java.com.utbm.llama.view.MainFrame;
 import javax.swing.*;
 
 /**
- * Contrôleur du mini-jeu "Jury".
- * Contexte : déclenché quand un joueur perd ≥ 20 crédits dans une manche.
- * Le joueur choisit 1 carte parmi 7 cachées et gagne sa valeur en crédits.
- * Responsabilités :
- * - Initialiser la JuryView avec les données du joueur concerné
- * - Gérer la sélection et la révélation de la carte
- * - Appliquer le gain de crédits sur le modèle Player
- * - Vérifier si le joueur est toujours en négatif après le jury
- * (→ déclenche alors la CésureController)
- * - Notifier le BoardController une fois le jury terminé
+ * Controller of the "Jury" mini-game.
+ * Context: triggered when a player loses ≥ 20 credits in a round.
+ * The player chooses 1 card among 7 hidden and wins its value in credits.
+ * Responsibilities:
+ * - Initialize the JuryView with the player’s data
+ * - Manage card selection and reveal
+ * - Apply the credit gain to the Player model
+ * - Check if the player is still in negative after the jury
+ * (→ then triggers the CésureController)
+ * - Notify the BoardController once the jury has finished
  */
 public class JuryController {
 
@@ -37,16 +37,16 @@ public class JuryController {
     }
 
     /**
-     * Démarre le jury pour un joueur donné.
+     * Starts the jury for a given player.
      *
-     * @param player      le joueur convoqué devant le jury
-     * @param creditsLost crédits perdus cette manche (≥ 20)
-     * @param onFinished  callback appelé quand le jury est terminé
+     * @param player      the player summoned before the jury
+     * @param creditsLost lost credits this round (≥ 20)
+     * @param onFinished  callback called when the jury is finished
      */
     public void startJury(Player player, int creditsLost, Runnable onFinished) {
-        this.targetPlayer         = player;
+        this.targetPlayer = player;
         this.creditsLostThisRound = creditsLost;
-        this.onJuryFinished       = onFinished;
+        this.onJuryFinished = onFinished;
 
         this.juryModel = new Jury(player, creditsLost);
 
@@ -57,9 +57,9 @@ public class JuryController {
     }
 
     /**
-     * Traite le choix de carte du joueur.
+     * Processes the player’s card choice.
      *
-     * @param index index de la carte choisie (0-6)
+     * @param index index of the chosen map (0-6)
      */
     private void handleCardPicked(int index) {
         if (index < 0) return;
@@ -81,9 +81,9 @@ public class JuryController {
     }
 
     /**
-     * Vérifie si le joueur est toujours en négatif après le jury.
-     * - Si oui  → semestre de césure
-     * - Si non  → retour au plateau
+     * Check if the player is still in negative after the jury.
+     * - If so → gap semester
+     * - If not → return to the set
      */
     private void evaluatePostJury() {
         if (juryModel.requiresCesure()) {
@@ -93,6 +93,9 @@ public class JuryController {
         }
     }
 
+    /**
+     * Finalise la séquence du jury en revenant à la vue du plateau de jeu et en déclenchant le callback de fin pour passer au candidat suivant.
+     */
     private void notifyFinished() {
         SwingUtilities.invokeLater(() -> {
             if (boardController.getBoardView() != null) {
@@ -104,10 +107,16 @@ public class JuryController {
         });
     }
 
+    /**
+     * Établit la connexion avec le contrôleur du plateau pour permettre la navigation entre le mini-jeu et la partie principale.
+     */
     public void setBoardController(BoardController bc) {
         this.boardController = bc;
     }
 
+    /**
+     * Récupère l'instance de la vue associée au jury pour l'affichage dans la fenêtre principale.
+     */
     public JuryView getJuryView() {
         return juryView;
     }

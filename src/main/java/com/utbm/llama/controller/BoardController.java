@@ -11,26 +11,26 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Contrôleur du plateau de jeu.
- * C'est le contrôleur central : il orchestre le déroulement complet
- * d'une partie, manche par manche, tour par tour.
- * Responsabilités :
+ * Game board controller.
+ * This is the central controller: he orchestrates the entire process.
+ * of a game, round by round, turn by turn.
+ * Responsibilities:
  * ┌─ Actions du joueur local ───────────────────────────────────────────────┐
- * │  - Jouer une carte (PLAY_CARD)                                          │
- * │  - Piocher une carte (DRAW_CARD)                                        │
- * │  - Passer la manche (QUIT_ROUND)                                        │
+ * │                    - Play a card (PLAY_CARD)                            │
+ * │                    - Draw a card (DRAW_CARD)                            │
+ * │                    - Pass the round (QUIT_ROUND)                        │
  * └─────────────────────────────────────────────────────────────────────────┘
  * ┌─ Tour des bots ─────────────────────────────────────────────────────────┐
- * │  - Déclencher le coup du bot avec un délai visuel                       │
+ * │                - Trigger the bot move with a visual delay               │
  * └─────────────────────────────────────────────────────────────────────────┘
  * ┌─ Fin de manche / post-manche ───────────────────────────────────────────┐
- * │  - Déduire les crédits (valeur des cartes restantes)                    │
- * │  - Distribuer +35 crédits en début de manche suivante                   │
- * │  - Vérifier : perte ≥ 20 → Jury                                         │
- * │  - Vérifier : crédits < 0 après jury → Césure                           │
- * │  - Vérifier : main vide → Semestre à l'étranger (4 cartes)              │
- * │  - Vérifier : bonus DETEC (manche 4, mode LONG, ≥ 120 crédits)          │
- * │  - Vérifier : fin de partie (nb manches atteint)                        │
+ * │            - Deduct credits (value of remaining cards)                  │
+ * │            - Distribute +35 credits at the beginning of the next round  │
+ * │            - Check: loss ≥ 20 → Jury                                    │
+ * │            - Check: credits > 0 after jury → Gap                        │
+ * │            - Check: empty hand → Semester abroad (4 cards)              │
+ * │            - Check: DETEC bonus (round 4, long mode, ≥ 120 credits)     │
+ * │            - Check: end of game (number of innings reached)             │
  * └─────────────────────────────────────────────────────────────────────────┘
  */
 public class BoardController {
@@ -41,16 +41,20 @@ public class BoardController {
     private BoardView boardView;
     private JuryController juryController;
     private RuleEngine ruleEngine;
-    
+
     private boolean roundInProgress = false;
     private int currentRoundNumber = 1;
 
     private static final int BOT_DELAY_MS = 1200;
 
     private final Locale locale;
+
+    /**
+     * Initializes the central game controller, links the rule engine, and establishes the connection with the Jury controller for post-round events.
+     */
     public BoardController(MainFrame mainFrame, Game game, Player localPlayer, JuryController juryController, Locale locale) {
-    	this.locale = locale;
-    	
+        this.locale = locale;
+
         this.mainFrame = mainFrame;
         this.game = game;
         this.localPlayer = localPlayer;
@@ -62,8 +66,8 @@ public class BoardController {
     }
 
     /**
-     * Initialise et affiche le plateau, distribue les premières cartes,
-     * puis démarre le premier tour.
+     * Initializes and displays the board, deals the first cards,
+     * then starts the first round.
      */
     public void initBoard() {
         boardView = new BoardView(locale);
@@ -73,6 +77,9 @@ public class BoardController {
         startRound();
     }
 
+    /**
+     * Connects the draw and quit buttons in the board view to their respective logic handlers for the local player.
+     */
     private void bindBoardListeners() {
 
         boardView.addDrawListener(e -> {
@@ -84,6 +91,9 @@ public class BoardController {
         });
     }
 
+    /**
+     * Attaches a callback to the local player's hand view to process playing a card when it is their turn.
+     */
     private void bindCardPlayedListener() {
         PlayerViewRef lpv = safeGetLocalPlayerView();
         if (lpv == null) return;
@@ -94,21 +104,21 @@ public class BoardController {
     }
 
     /**
-     * Le joueur joue une carte de sa main sur la défausse.
-     * Règle : la carte jouée doit être ≥ à la carte du dessus de la défausse,
-     * ou être un LLAMA si le dessus est un SIX, ou le dessus est vide.
+     * The player plays a card from their hand on the discard pile.
+     * Rule: the played card must be ≥ on the top card of the discard pile,
+     * or be a LLAMA if the top is a SIX, or the top is empty.
      */
     public void handlePlayCard(CardType card) {
-    	Move move = Move.playCard(localPlayer, card);
-    	
-    	if (!ruleEngine.validateMove(move, game)) {
+        Move move = Move.playCard(localPlayer, card);
+
+        if (!ruleEngine.validateMove(move, game)) {
             System.out.println("[BOARD] Coup invalide : " + card.name());
             updateView();
             return;
-    	}
-    	game.applyMove(move);
-    	
-    	ruleEngine.applyRules(move, game);
+        }
+        game.applyMove(move);
+
+        ruleEngine.applyRules(move, game);
         System.out.println("[BOARD] " + localPlayer.getName() + " joue " + card.name());
 
         updateView();
@@ -143,26 +153,26 @@ public class BoardController {
     }
 
     /**
-     * Le joueur pioche une carte.
+     * The player draws a card.
      */
     public void handleDrawCard() {
         Move move = Move.drawCard(localPlayer);
-        
+
         if (!ruleEngine.validateMove(move, game)) {
             System.out.println("[BOARD] Coup invalide : impossible de piocher");
             updateView();
             return;
         }
-        
+
         game.applyMove(move);
         ruleEngine.applyRules(move, game);
-        
+
         System.out.println("[BOARD] " + localPlayer.getName() + " pioche");
 
         game.applyMove(move);
-        
-    	ruleEngine.applyRules(move, game);
-    	
+
+        ruleEngine.applyRules(move, game);
+
         updateView();
 
         game.nextTurn();
@@ -171,17 +181,17 @@ public class BoardController {
     }
 
     /**
-     * Le joueur passe la manche (ne joue plus jusqu'à la fin).
+     * The player passes the sleeve (no longer plays until the end).
      */
     public void handleQuitRound() {
-    	Move move = Move.quitRound(localPlayer);
-    	
+        Move move = Move.quitRound(localPlayer);
+
         if (!ruleEngine.validateMove(move, game)) {
             System.out.println("[BOARD] Coup invalide : impossible de passer la manche");
             updateView();
             return;
         }
-        
+
         game.applyMove(move);
         //localPlayer.changeState(State.QUITTING);
         //System.out.println("[BOARD] " + localPlayer.getName() + " passe la manche");
@@ -197,7 +207,7 @@ public class BoardController {
     }
 
     /**
-     * Si le joueur actuel est un bot, déclenche son tour après un délai visuel.
+     * If the current player is a bot, triggers his turn after a visual delay.
      */
     private void checkBotTurn() {
         Player current = game.getCurrentPlayer();
@@ -222,8 +232,9 @@ public class BoardController {
         botTimer.setRepeats(false);
         botTimer.start();
     }
+
     /**
-     * Exécute le coup décidé par le bot.
+     * Execute the move decided by the bot.
      */
     private void executeBotTurn(Bot bot) {
         if (!roundInProgress) return;
@@ -234,7 +245,7 @@ public class BoardController {
             System.out.println("[BOARD] Coup du bot invalide : " + bot.getName());
             return;
         }
-        
+
         game.applyMove(move);
 
         updateView();
@@ -247,15 +258,17 @@ public class BoardController {
         }
     }
 
-
+    /**
+     * Returns true if the human player is currently active, has not quit the round, and the round is still in progress.
+     */
     private boolean isLocalPlayerTurn() {
         return game.getCurrentPlayer().equals(localPlayer) && localPlayer.getState() == State.PLAYING && roundInProgress;
     }
 
     /**
-     * Vérifie si la manche est terminée.
-     * La manche se termine quand tous les joueurs actifs ont passé
-     * ou quand un joueur a vidé sa main.
+     * Check if the round is finished.
+     * The round ends when all active players have passed
+     * or when a player has emptied his hand.
      */
     private void checkRoundOver() {
         boolean allQuit = game.getPlayers().stream().filter(p -> !p.isSuspended()).allMatch(p -> p.getState() == State.QUITTING || p.getHand().isEmpty());
@@ -270,13 +283,13 @@ public class BoardController {
     }
 
     /**
-     * Séquence de fin de manche pour chaque joueur actif :
-     * 1. Déduit la valeur des cartes restantes en main
-     * 2. Vérifie perte ≥ 20 → Jury
-     * 3. Vérifie crédits < 0 → Césure
-     * 4. Vérifie main vide → Semestre à l'étranger
-     * 5. Vérifie bonus DETEC (manche 4, LONG, ≥ 120 crédits)
-     * 6. Prépare la manche suivante ou termine la partie
+     * Endgame sequence for each active player:
+     * 1. Deduct the value of the remaining cards in hand
+     * 2. Check loss ≥ 20 → Jury
+     * 3. Checks credits > 0 → Gap
+     * 4. Checks empty hand → Semester abroad
+     * 5. Checks DETEC bonus (round 4, LONG, ≥ 120 credits)
+     * 6. Prepare for the next round or finish the game
      */
     private void endRound() {
         roundInProgress = false;
@@ -292,7 +305,7 @@ public class BoardController {
         java.util.Map<Player, Integer> creditsLostMap = new java.util.HashMap<>();
         for (Player p : game.getPlayers()) {
             int before = creditsBefore.get(p);
-            int after  = p.getCredits();
+            int after = p.getCredits();
             creditsLostMap.put(p, Math.max(0, before - after));
         }
 
@@ -306,7 +319,7 @@ public class BoardController {
                     java.util.Map<Player, Integer> creditsGainedMap = new java.util.HashMap<>();
                     for (Player p : game.getPlayers()) {
                         int currentCredits = p.getCredits();
-                        int afterPenalty   = creditsBefore.get(p) - creditsLostMap.get(p);
+                        int afterPenalty = creditsBefore.get(p) - creditsLostMap.get(p);
                         creditsGainedMap.put(p, Math.max(0, currentCredits - afterPenalty));
                     }
 
@@ -316,8 +329,8 @@ public class BoardController {
     }
 
     /**
-     * Traite en cascade le post-manche pour chaque joueur.
-     * La cascade est nécessaire car jury et césure sont asynchrones (vue + interaction).
+     * Cascade the post-round for each player.
+     * The cascade is necessary because jury and caesura are asynchronous (view + interaction).
      */
     private void processPostRoundCascade(
             List<Round.JuryCandidate> candidates,
@@ -336,8 +349,8 @@ public class BoardController {
     }
 
     /**
-     * Déclenche l'écran de césure pour un joueur.
-     * Appelé depuis JuryController ou directement si crédits < 0.
+     * Triggers a player’s gap screen.
+     * Called from JuryController or directly if credits > 0.
      */
     public void triggerCesure(Player player, Runnable onDone) {
         player.setSuspended(true);
@@ -359,8 +372,8 @@ public class BoardController {
     }
 
     /**
-     * Prépare et lance la manche suivante.
-     * Vérifie d'abord si la partie est terminée.
+     * Prepare and throw the next round.
+     * First check if the game is over.
      */
     private void prepareNextRound() {
         if (game.isOver()) {
@@ -382,12 +395,12 @@ public class BoardController {
     }
 
     /**
-     * Initialise une manche :
-     * - +35 crédits pour tous (y compris les joueurs en césure)
-     * - Remet les joueurs en état PLAYING
-     * - Lève la suspension des joueurs en césure
-     * - Distribue les cartes (6 par défaut, 4 si semestre à l'étranger)
-     * - Mélange la pioche
+     * Initializes a round:
+     * - +35 credits for all (including players on a break)
+     * - Restores player status to PLAYING
+     * - Lifts the suspension of players on a hiatus
+     * - Deals the cards (6 by default, 4 if semester abroad)
+     * - Mix the pickaxe
      */
     private void startRound() {
         roundInProgress = true;
@@ -410,8 +423,8 @@ public class BoardController {
     }
 
     /**
-     * Applique le bonus DETEC : +30 crédits pour les joueurs
-     * ayant ≥ 120 crédits à la fin de la manche 4 (mode LONG).
+     * Applies the DETEC bonus: +30 credits for players
+     * having ≥ 120 credits at the end of round 4 (LONG mode).
      */
     private void applyDetecBonus() {
         for (Player p : game.getPlayers()) {
@@ -423,9 +436,9 @@ public class BoardController {
     }
 
     /**
-     * Détermine le vainqueur et affiche l'écran de fin.
-     * Gagnant = joueur avec le plus de crédits.
-     * Les seuils 180/300 sont honorifiques.
+     * Determines the winner and displays the end screen.
+     * Winner = player with the most credits.
+     * The thresholds 180/300 are honorary.
      */
     private void endGame() {
         Player winner = game.getPlayers().stream().max((a, b) -> Integer.compare(a.getCredits(), b.getCredits())).orElse(localPlayer);
@@ -453,7 +466,7 @@ public class BoardController {
     }
 
     /**
-     * Met à jour la vue du plateau depuis le modèle.
+     * Updates the board view from the template.
      */
     private void updateView() {
         if (boardView == null) return;
@@ -469,11 +482,17 @@ public class BoardController {
         }
     }
 
+    /**
+     * Returns true if the current game state satisfies the conditions for the DETEC round bonus.
+     */
     private boolean checkDetecApplied() {
         return game.getGameMode() == GameMode.LONG
                 && game.getCurrentRoundNumber() == GameMode.DETEC_ROUND;
     }
 
+    /**
+     * Displays the detailed results screen showing credit gains and losses for all players after a round is finalized.
+     */
     private void showRoundSummary(
             java.util.Map<Player, Integer> creditsLostMap,
             java.util.Map<Player, Integer> creditsGainedMap,
@@ -502,14 +521,14 @@ public class BoardController {
     }
 
     /**
-     * Active ou désactive les boutons d'action du joueur local.
+     * Enables or disables local player action buttons.
      */
     private void setLocalActionsEnabled(boolean enabled) {
         updateView();
     }
 
     /**
-     * Accès sûr à la PlayerView locale.
+     * Secure access to the local PlayerView.
      */
     private PlayerViewRef safeGetLocalPlayerView() {
         if (boardView == null || boardView.getLocalPlayerView() == null) return null;
@@ -520,14 +539,23 @@ public class BoardController {
 
     }
 
+    /**
+     * Updates the game model reference held by the controller.
+     */
     public void setGame(Game game) {
         this.game = game;
     }
 
+    /**
+     * Sets which player is considered the "local" human user for this controller.
+     */
     public void setLocalPlayer(Player p) {
         this.localPlayer = p;
     }
 
+    /**
+     * Retrieves the current BoardView instance managed by this controller.
+     */
     public BoardView getBoardView() {
         return boardView;
     }

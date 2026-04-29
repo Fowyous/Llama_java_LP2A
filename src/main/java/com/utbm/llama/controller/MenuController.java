@@ -4,6 +4,7 @@ import main.java.com.utbm.llama.view.MainFrame;
 import main.java.com.utbm.llama.view.MenuView;
 
 import java.util.Locale;
+
 /**
  * Contrôleur du menu principal.
  * Responsabilités :
@@ -15,17 +16,22 @@ public class MenuController {
     private final MainFrame mainFrame;
     private final MenuView menuView;
     private GameController gameController;
-    
+
     private final Locale locale;
 
-
+    /**
+     * Initialise le contrôleur du menu en récupérant la vue depuis la fenêtre principale et en attachant les écouteurs d'événements aux boutons.
+     */
     public MenuController(MainFrame mainFrame, Locale locale) {
-    	this.locale = locale;
+        this.locale = locale;
         this.mainFrame = mainFrame;
         this.menuView = mainFrame.getMenuView();
         initListeners();
     }
 
+    /**
+     * Relie les actions de l'interface utilisateur (Lancer, Paramètres, Quitter) aux méthodes logiques correspondantes du contrôleur.
+     */
     private void initListeners() {
 
         menuView.addStartListener(e -> handleStartGame());

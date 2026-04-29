@@ -7,22 +7,22 @@ import main.java.com.utbm.llama.view.MainFrame;
 import java.util.Locale;
 
 /**
- * Contrôleur racine de l'application LAMA UTBM.
- * Rôle : chef d'orchestre.
- * - Crée et relie tous les sous-contrôleurs
- * - Détient la référence au modèle Game et au joueur local
- * - Expose les points d'entrée utilisés par les sous-contrôleurs
- * pour naviguer ou changer d'état global
- * Cycle de vie :
+ * Root controller of the LAMA UTBM application.
+ * Role: conductor.
+ * - Creates and links all subcontrollers
+ * - Holds the reference to the Game model and the local player
+ * - Exposes entry points used by subcontrollers
+ * to navigate or change the global state
+ * Lifecycle:
  * main()
  * └── new GameController(mainFrame)
- * ├── new MenuController      → branche le menu
- * ├── new SettingController  → branche les paramètres
- * ├── new JuryController      → prêt à être déclenché
- * └── new BoardController     → créé au moment de startGame()
- * Pattern utilisé : Mediator
- * Les sous-contrôleurs ne se connaissent pas directement,
- * ils passent par GameController pour déclencher des actions croisées.
+ * ├── new MenuController   → switch to menu
+ * ├── new SettingController  → branch the settings
+ * ├── new JuryController → ready to be triggered
+ * └── new BoardController → created at the time of startGame()
+ * Pattern used: Mediator
+ * The subcontrollers do not know each other directly,
+ * they go through GameController to trigger cross-actions.
  */
 public class GameController {
 
@@ -34,18 +34,18 @@ public class GameController {
     private final SettingController settingController;
     private final JuryController juryController;
     private BoardController boardController;
-    
+
     private final Locale locale;
 
     /**
-     * Initialise l'application entière.
-     * À appeler une seule fois depuis main().
+     * Initializes the entire application.
+     * To be called only once from main().
      *
-     * @param mainFrame la fenêtre principale déjà construite
+     * @param mainFrame the main window already built
      */
     public GameController(MainFrame mainFrame, Locale locale) {
-    	this.locale = locale;
-    	
+        this.locale = locale;
+
         this.mainFrame = mainFrame;
 
         this.menuController = new MenuController(mainFrame, locale);
@@ -61,10 +61,10 @@ public class GameController {
     }
 
     /**
-     * Démarre (ou redémarre) une partie.
-     * Appelé par MenuController ou SettingController.
-     * Prérequis : game et localPlayer doivent être non-null.
-     * Si game est null (pas encore configuré), redirige vers les settings.
+     * Starts (or restarts) a game.
+     * Called by MenuController or SettingController.
+     * Prerequisites: game and localPlayer must be non-null.
+     * If game is null (not configured yet), redirects to settings.
      */
     public void startGame() {
         if (game == null || localPlayer == null) {
@@ -81,17 +81,23 @@ public class GameController {
         boardController.initBoard();
     }
 
+    /**
+     * Directs the main window to switch its view to the main menu screen.
+     */
     public void showMenu() {
         mainFrame.showMenu();
     }
 
+    /**
+     * Directs the main window to switch its view to the game settings and configuration screen.
+     */
     public void showSettings() {
         mainFrame.showSettings();
     }
 
     /**
-     * Remplace le modèle de jeu.
-     * Appelé par SettingController après que l'utilisateur a sauvegardé.
+     * Replaces the game template.
+     * Called by SettingController after the user has backed up.
      */
     public void setGame(Game game) {
         this.game = game;
@@ -99,37 +105,58 @@ public class GameController {
     }
 
     /**
-     * Définit le joueur contrôlé par l'humain.
+     * Defines the human-controlled player.
      */
     public void setLocalPlayer(Player localPlayer) {
         this.localPlayer = localPlayer;
         System.out.println("[GAME] Joueur local : " + localPlayer.getName());
     }
 
+    /**
+     * Returns the current game model instance.
+     */
     public Game getGame() {
         return game;
     }
 
+    /**
+     * Retrieves the player object assigned to the local user.
+     */
     public Player getLocalPlayer() {
         return localPlayer;
     }
 
+    /**
+     * Retrieves the controller responsible for main menu interactions.
+     */
     public MenuController getMenuController() {
         return menuController;
     }
 
+    /**
+     * Retrieves the controller responsible for game configuration and settings.
+     */
     public SettingController getSettingController() {
         return settingController;
     }
 
+    /**
+     * Retrieves the controller responsible for the Jury mini-game logic.
+     */
     public JuryController getJuryController() {
         return juryController;
     }
 
+    /**
+     * Retrieves the active game board controller (null if a game has not started).
+     */
     public BoardController getBoardController() {
         return boardController;
     }
 
+    /**
+     * Returns the primary application window reference.
+     */
     public MainFrame getMainFrame() {
         return mainFrame;
     }
