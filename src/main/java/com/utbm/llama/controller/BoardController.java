@@ -61,9 +61,10 @@ public class BoardController {
         }
     }
 
+
     /**
-     * Initialise et affiche le plateau, distribue les premières cartes,
-     * puis démarre le premier tour.
+     * Initializes and displays the board, deals the initial cards,
+     * then starts the first turn.
      */
     public void initBoard() {
         boardView = new BoardView(locale);
@@ -84,6 +85,7 @@ public class BoardController {
         });
     }
 
+    /*//a effacer je l'ai laisser pour la verif
     private void bindCardPlayedListener() {
         PlayerViewRef lpv = safeGetLocalPlayerView();
         if (lpv == null) return;
@@ -92,11 +94,16 @@ public class BoardController {
             if (isLocalPlayerTurn()) handlePlayCard(card);
         });
     }
-
+*/
     /**
-     * Le joueur joue une carte de sa main sur la défausse.
-     * Règle : la carte jouée doit être ≥ à la carte du dessus de la défausse,
-     * ou être un LLAMA si le dessus est un SIX, ou le dessus est vide.
+     * Plays a card from the local player's hand to the discard pile.
+     *
+     * Rules enforced:
+     * - The played card must be greater than or equal to the top card of the discard pile,
+     *   OR the played card may be a LLAMA when the top card is a SIX,
+     *   OR the discard pile may be empty.
+     *
+     * @param card the card the local player attempts to play
      */
     public void handlePlayCard(CardType card) {
     	Move move = Move.playCard(localPlayer, card);
@@ -144,7 +151,7 @@ public class BoardController {
     }
 
     /**
-     * Le joueur pioche une carte.
+     * the players draws a card.
      */
     public void handleDrawCard() {
         Move move = Move.drawCard(localPlayer);
@@ -174,7 +181,7 @@ public class BoardController {
     }
 
     /**
-     * Le joueur passe la manche (ne joue plus jusqu'à la fin).
+     * The player passes the current round.
      */
     public void handleQuitRound() {
     	Move move = Move.quitRound(localPlayer);
@@ -201,7 +208,7 @@ public class BoardController {
     }
 
     /**
-     * Si le joueur actuel est un bot, déclenche son tour après un délai visuel.
+     * If the current player is a bot, trigger their turn after a visual delay
      */
     private void checkBotTurn() {
         Player current = game.getCurrentPlayer();
@@ -227,7 +234,16 @@ public class BoardController {
         botTimer.start();
     }
     /**
-     * Exécute le coup décidé par le bot.
+     * Executes the move chosen by a bot for its turn.
+     *
+     * This method:
+     * - Skips execution if the round is no longer in progress.
+     * - Asks the bot to decide a Move based on the current game state.
+     * - Validates the move via the rule engine and aborts if invalid.
+     * - Applies the move to the game, updates the UI, checks for end-of-round,
+     *   and advances to the next turn (processing subsequent bot turns if needed).
+     *
+     * @param bot the Bot instance whose move should be executed
      */
     private void executeBotTurn(Bot bot) {
         if (!roundInProgress) return;
@@ -253,14 +269,24 @@ public class BoardController {
     }
 
 
+    /**
+     * Checks whether it is currently the local player's turn and they can play.
+     *
+     * The method returns true only if:
+     * - the game's current player is the local player,
+     * - the local player's state is PLAYING,
+     * - and the round is still in progress.
+     *
+     * @return true if it is the local player's active turn; false otherwise
+     */
     private boolean isLocalPlayerTurn() {
         return game.getCurrentPlayer().equals(localPlayer) && localPlayer.getState() == State.PLAYING && roundInProgress;
     }
 
     /**
-     * Vérifie si la manche est terminée.
-     * La manche se termine quand tous les joueurs actifs ont passé
-     * ou quand un joueur a vidé sa main.
+     * Checks if the round is finished.
+     * The round ends if all active players passed their rounds
+     * OR when a player has an empty hand.
      */
     private void checkRoundOver() {
         boolean allQuit = game.getPlayers().stream().filter(p -> !p.isSuspended()).allMatch(p -> p.getState() == State.QUITTING || p.getHand().isEmpty());
@@ -275,13 +301,13 @@ public class BoardController {
     }
 
     /**
-     * Séquence de fin de manche pour chaque joueur actif :
-     * 1. Déduit la valeur des cartes restantes en main
-     * 2. Vérifie perte ≥ 20 → Jury
-     * 3. Vérifie crédits < 0 → Césure
-     * 4. Vérifie main vide → Semestre à l'étranger
-     * 5. Vérifie bonus DETEC (manche 4, LONG, ≥ 120 crédits)
-     * 6. Prépare la manche suivante ou termine la partie
+     * End-of-round sequence for each active player:
+     * 1. Deduct the value of remaining cards in hand
+     * 2. Check loss ≥ 20 → Jury
+     * 3. Check credits < 0 → Gap year
+     * 4. Check empty hand → Semester abroad
+     * 5. Check DETEC bonus (round 4, LONG, ≥ 120 credits)
+     * 6. Prepare the next round or end the game
      */
     private void endRound() {
         roundInProgress = false;
@@ -479,6 +505,19 @@ public class BoardController {
                 && game.getCurrentRoundNumber() == GameMode.DETEC_ROUND;
     }
 
+    /**
+     * Displays the end-of-round summary UI on the Swing Event Dispatch Thread.
+     *
+     * This method:
+     * - Builds and configures a RoundSummaryView with the provided credit changes and whether
+     *   the DETEC rule was applied.
+     * - Registers a listener to proceed to the next round when the user requests it.
+     * - Shows the summary view via the main frame.
+     *
+     * @param creditsLostMap  map of players to credits they lost this round
+     * @param creditsGainedMap map of players to credits they gained this round
+     * @param detecApplied    true if the DETEC rule was applied during the round
+     */
     private void showRoundSummary(
             java.util.Map<Player, Integer> creditsLostMap,
             java.util.Map<Player, Integer> creditsGainedMap,
@@ -507,14 +546,17 @@ public class BoardController {
     }
 
     /**
-     * Active ou désactive les boutons d'action du joueur local.
+     * toremove
+     * Enables or disables the action buttons of a local player
+     * @param enabled how we want it enabled or disabled.
      */
+    /*
     private void setLocalActionsEnabled(boolean enabled) {
         updateView();
-    }
+    }*/
 
     /**
-     * Accès sûr à la PlayerView locale.
+     * accesses the Playerview 
      */
     private PlayerViewRef safeGetLocalPlayerView() {
         if (boardView == null || boardView.getLocalPlayerView() == null) return null;

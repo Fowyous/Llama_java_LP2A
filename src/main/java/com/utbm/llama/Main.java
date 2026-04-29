@@ -6,10 +6,12 @@ import main.java.com.utbm.llama.view.MainFrame;
 import javax.swing.*;
 
 import java.util.Locale;
+
 /**
- * Point d'entrée de l'application LAMA UTBM.
- * Lance la fenêtre principale et initialise le GameController
- * qui orchestre tous les sous-contrôleurs.
+ * 
+ *  Entry point of the LAMA UTBM application.
+ *  Launches the main window and initializes the GameController
+ *  which orchestrates all sub-controllers.
  */
 public class Main {
 

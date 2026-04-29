@@ -11,9 +11,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Écran de configuration d'une partie.
- * Permet de choisir le nombre de joueurs, leur difficulté (bots)
- * et le mode de jeu (6 ou 10 manches).
+ * Game configuration screen.
+ * Allows choosing the number of players, their difficulty (bots)
+ * and the game mode (6 or 10 rounds).
  */
 public class SettingsView extends JPanel implements LocaleChangeListener{
 
@@ -67,6 +67,11 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
         add(buildActions(), BorderLayout.SOUTH);
     }
 
+    /**
+     * Build the header panel containing title and subtitle.
+     *
+     * @return the header panel
+     */
     private JPanel buildHeader() {
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(BG);
@@ -92,6 +97,11 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
         return header;
     }
 
+    /**
+     * Build the main form wrapper containing all field groups.
+     *
+     * @return the form wrapper panel
+     */
     private JPanel buildForm() {
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(BG);
@@ -121,6 +131,7 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
         return wrapper;
     }
 
+    /*
     private JPanel buildFieldGroup(String label, String hint, JComponent input) {
         JPanel group = new JPanel();
         group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
@@ -147,7 +158,13 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
         group.add(input);
 
         return group;
-    }
+    }*/
+    
+    /**
+     * Build the number-of-players field group.
+     *
+     * @return the players field group panel
+     */
     private JPanel buildFieldGroupNbPlayers() {  
     	JPanel group = new JPanel();        
     	group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));        
@@ -175,6 +192,12 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
     	return group;
     	}
 
+
+    /**
+     * Build the difficulty field group.
+     *
+     * @return the difficulty field group panel
+     */
     private JPanel buildFieldGroupDifficulty() {    
     	JPanel group = new JPanel();      
     	group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));     
@@ -201,6 +224,11 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
     	return group; 
     	}
     
+    /**
+     * Build the language selection field group.
+     *
+     * @return the language field group panel
+     */
     private JPanel buildFieldGroupLanguage() {  
     	JPanel group = new JPanel();  
     	group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
@@ -227,6 +255,12 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
     
     	return group;    
     	}
+    
+    /**
+     * Build the game mode field group.
+     *
+     * @return the mode field group panel
+     */
     private JPanel buildFieldGroupMode() { 
     	JPanel group = new JPanel();  
     	group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));  
@@ -253,6 +287,11 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
     	
     	return group;   
     	}
+    /**
+     * Build the actions panel containing Back and Save buttons.
+     *
+     * @return the actions panel
+     */
     private JPanel buildActions() {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 24));
         actions.setBackground(BG);
@@ -260,13 +299,26 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
         actions.add(btnSave);
         return actions;
     }
+    
 
+    /**
+     * Build a typed combo box from provided items.
+     *
+     * @param items the items to populate the combo box with
+     * @param <T>   the item type
+     * @return the constructed JComboBox
+     */
     private <T> JComboBox<T> buildCombo(T[] items) {
         JComboBox<T> combo = new JComboBox<>(items);
         styleCombo(combo);
         return combo;
     }
 
+    /**
+     * Apply consistent styling to a combo-like component.
+     *
+     * @param comp the component to style
+     */
     private void styleCombo(JComponent comp) {
         comp.setBackground(Color.decode("#1A1A1A"));
         comp.setForeground(TEXT_MAIN);
@@ -306,6 +358,11 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
         comboLanguage.addActionListener(l);
     }
     
+    /**
+     * Get the currently selected number of players.
+     *
+     * @return the selected number of players
+     */
     public int getNbPlayers() {
         return (Integer) comboNbPlayers.getSelectedItem();
     }
@@ -329,6 +386,11 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
     public void setGameMode(GameMode m) {
         comboGameMode.setSelectedItem(m);
     }
+    /**
+     * Get the Locale corresponding to the selected language display value.
+     *
+     * @return the selected Locale (or currentLocale if unmatched)
+     */
     public Locale getSelectedLanguage() {
         String selected = (String) comboLanguage.getSelectedItem();
         return switch (selected) {
@@ -339,6 +401,11 @@ public class SettingsView extends JPanel implements LocaleChangeListener{
         };
     }
     
+    /**
+     * Update the language selection combo to match a locale.
+     *
+     * @param locale the locale to reflect in the combo selection
+     */
     private void setLanguageSelection(Locale locale) {
         String language = switch (locale.getLanguage()) {
             case "en" -> "English";
