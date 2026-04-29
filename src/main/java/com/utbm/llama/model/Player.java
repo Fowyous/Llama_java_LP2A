@@ -8,14 +8,14 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Représente un joueur humain dans le jeu LAMA UTBM.
+ * Represents a human player in the game LAMA UTBM.
  * <p>
- * Données gérées :
- * - Main de cartes
- * - Crédits (remplace les points du jeu original)
- * - État dans la manche (PLAYING / QUITTING)
- * - Flags spéciaux : semestre à l'étranger, semestre de césure
- * - Suivi des crédits perdus dans la manche (pour déclencher le jury)
+ * Managed Data:
+ * - Card hand
+ * - Credits (replaces points from the original game)
+ * - State in the sleeve (PLAYING / QUITTING)
+ * - Special flags: semester abroad, gap semester
+ * - Tracking lost credits in the round (to trigger the jury)
  */
 public class Player {
 
@@ -24,35 +24,35 @@ public class Player {
     private final List<CardType> hand = new ArrayList<>();
 
     /**
-     * Crédits actuels du joueur. Peuvent être négatifs.
+     * Player’s current credits. May be negative.
      */
     private int credits = 0;
 
     /**
-     * Crédits perdus au cours de la manche en cours.
-     * Remis à 0 au début de chaque manche.
-     * Utilisé pour déclencher le jury (seuil ≥ 20).
+     * Credits lost during the current round.
+     * Reset to 0 at the beginning of each round.
+     * Used to trigger the jury (threshold ≥ 20).
      */
     private int creditsLostThisRound = 0;
 
     /**
-     * Nombre de cartes distribuées en début de manche.
-     * Vaut 6 par défaut, 4 si le joueur bénéficie du semestre à l'étranger.
+     * Number of cards dealt at the beginning of the round.
+     * Is 6 by default, 4 if the player benefits from the semester abroad.
      */
     private int startingHandSize = 6;
 
     /**
-     * true → le joueur a vidé sa main lors de la manche précédente.
-     * Il commence la prochaine manche avec 4 cartes au lieu de 6.
-     * Ce flag est remis à false au début de la manche où il s'applique.
-     * Non cumulable.
+     * true → the player emptied his hand in the previous round.
+     * He starts the next round with 4 cards instead of 6.
+     * This flag is reset to false at the beginning of the round where it applies.
+     * Not cumulative.
      */
     private boolean studyAbroad = false;
 
     /**
-     * true → le joueur est en semestre de césure.
-     * Il saute la prochaine manche mais reçoit quand même les +35 crédits.
-     * Remis à false au début de la manche où il reprend.
+     * true → the player is in a gap semester.
+     * He skips the next round but still gets the +35 credits.
+     * Reset to false at the beginning of the round where it starts again.
      */
     private boolean suspended = false;
 
@@ -65,9 +65,9 @@ public class Player {
     }
 
     /**
-     * Ajoute une carte à la main du joueur.
+     * Adds a card to the player’s hand.
      *
-     * @param card la carte à ajouter
+     * @param card the card to add
      */
     public void addCard(CardType card) {
         if (card == null) throw new IllegalArgumentException("Carte null impossible");
@@ -75,10 +75,10 @@ public class Player {
     }
 
     /**
-     * Retire une carte de la main du joueur.
+     * Removes a card from the player’s hand.
      *
-     * @param card la carte à retirer
-     * @throws IllegalStateException si la carte n'est pas dans la main
+     * @param card the card to be withdrawn
+     * @throws IllegalStateException if the card is not in the hand
      */
     public void removeCard(CardType card) {
         if (!hand.remove(card))
@@ -86,25 +86,25 @@ public class Player {
     }
 
     /**
-     * Vide complètement la main du joueur.
-     * Utilisé entre deux manches.
+     * Completely empties the player’s hand.
+     * Used between two rounds.
      */
     public void clearHand() {
         hand.clear();
     }
 
     /**
-     * Retourne la main sous forme de liste non modifiable.
+     * Returns the hand as a non-editable list.
      */
     public List<CardType> getHand() {
         return Collections.unmodifiableList(hand);
     }
 
     /**
-     * Calcule la valeur totale des cartes encore en main.
-     * C'est ce montant qui sera déduit des crédits en fin de manche.
+     * Calculates the total value of cards still in hand.
+     * This is the amount that will be deducted from the credits at the end of the round.
      *
-     * @return somme des valeurs des cartes en main
+     * @return sum of the values of the cards in hand
      */
     public int computeHandValue() {
         return hand.stream()
@@ -113,9 +113,9 @@ public class Player {
     }
 
     /**
-     * Ajoute (ou soustrait si négatif) un nombre de crédits.
+     * Adds (or subtracts if negative) a number of credits.
      *
-     * @param amount montant à ajouter (peut être négatif)
+     * @param amount to add (can be negative)
      */
     public void addCredits(int amount) {
         if (amount < 0) {
@@ -125,43 +125,43 @@ public class Player {
     }
 
     /**
-     * @return les crédits actuels (peut être négatif)
+     * @return current credits (can be negative)
      */
     public int getCredits() {
         return credits;
     }
 
     /**
-     * Force la valeur des crédits (utiliser avec précaution).
+     * Forces the value of credits (use with caution).
      */
     public void setCredits(int credits) {
         this.credits = credits;
     }
 
     /**
-     * @return les crédits perdus au cours de la manche en cours (≥ 0)
+     * @return the credits lost during the current round (≥ 0)
      */
     public int getCreditsLostThisRound() {
         return creditsLostThisRound;
     }
 
     /**
-     * Remet le compteur de perte à 0 (appelé au début de chaque manche).
+     * Reset the loss counter to 0 (called at the beginning of each round).
      */
     public void resetCreditsLostThisRound() {
         creditsLostThisRound = 0;
     }
 
     /**
-     * @return true si le joueur bénéficie du semestre à l'étranger (4 cartes).
+     * @return true if the player benefits from the semester abroad (4 cards).
      */
     public boolean hasStudyAbroad() {
         return studyAbroad;
     }
 
     /**
-     * Active ou désactive le flag semestre à l'étranger.
-     * Quand true, startingHandSize est automatiquement mis à 4.
+     * Activates or deactivates the flag semester abroad.
+     * When true, startingHandSize is automatically set to 4.
      */
     public void setStudyAbroad(boolean studyAbroad) {
         this.studyAbroad = studyAbroad;
@@ -169,21 +169,21 @@ public class Player {
     }
 
     /**
-     * @return true si le joueur est en semestre de césure (saute une manche).
+     * @return true if the player is in a gap semester (skips a round).
      */
     public boolean isSuspended() {
         return suspended;
     }
 
     /**
-     * Active ou désactive la suspension (semestre de césure).
+     * Enables or disables suspension (gap semester).
      */
     public void setSuspended(boolean suspended) {
         this.suspended = suspended;
     }
 
     /**
-     * @return le nombre de cartes à distribuer en début de manche (4 ou 6).
+     * @return the number of cards to deal at the beginning of the round (4 or 6).
      */
     public int getStartingHandSize() {
         return startingHandSize;
@@ -203,8 +203,8 @@ public class Player {
     }
 
     /**
-     * Remet le joueur en état PLAYING et réinitialise le suivi des crédits.
-     * Appelé par Round.startRound() pour chaque joueur actif.
+     * Restores the player to PLAYING state and resets credit tracking.
+     * Called by Round.startRound() for each active player.
      */
     public void resetForNewRound() {
         state = State.PLAYING;
@@ -219,6 +219,10 @@ public class Player {
                 suspended ? " | CÉSURE" : "");
     }
 
+    /**
+     * Updates the amount of credits lost by the player during the current round,
+     * generally calculated from the cards remaining in hand.
+     */
     public void setCreditsLostThisRound(int creditsLostThisRound) {
         this.creditsLostThisRound = creditsLostThisRound;
     }

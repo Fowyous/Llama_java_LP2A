@@ -48,8 +48,8 @@ public class SettingController {
     }
 
     /**
-     * Relie les interactions de la vue (sauvegarde, retour, changement de langue)
-     * aux méthodes logiques du contrôleur pour mettre à jour la configuration.
+     * Connects view interactions (save, return, language change)
+     * to the controller’s logical methods for updating the configuration.
      */
     private void initListeners() {
 
@@ -61,8 +61,8 @@ public class SettingController {
     }
 
     /**
-     * Récupère la nouvelle langue sélectionnée par l'utilisateur et
-     * demande à la fenêtre principale de mettre à jour l'ensemble de l'application.
+     * Gets the new language selected by the user and
+     * asks the main window to update the entire application.
      */
     private void handleLanguageChange() {
         Locale newLocale = settingsView.getSelectedLanguage();
@@ -118,28 +118,28 @@ public class SettingController {
     }
 
     /**
-     * Retourne le nombre de joueurs actuellement enregistré dans les paramètres.
+     * Returns the number of players currently saved in settings.
      */
     public int getSavedNbPlayers() {
         return savedNbPlayers;
     }
 
     /**
-     * Retourne le niveau de difficulté sélectionné pour les bots.
+     * Returns the difficulty level selected for bots.
      */
     public Difficulty getSavedDifficulty() {
         return savedDifficulty;
     }
 
     /**
-     * Retourne le mode de jeu (court ou long) choisi par l'utilisateur.
+     * Returns the game mode (short or long) chosen by the user.
      */
     public GameMode getSavedGameMode() {
         return savedGameMode;
     }
 
     /**
-     * Définit la référence vers le contrôleur de jeu principal pour permettre la transition vers le plateau lors du lancement.
+     * Sets the reference to the main game controller to allow for transition to the board during launch.
      */
     public void setGameController(GameController gc) {
         this.gameController = gc;
