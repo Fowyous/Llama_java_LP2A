@@ -94,7 +94,7 @@ public class JuryController {
     }
 
     /**
-     * Finalise la séquence du jury en revenant à la vue du plateau de jeu et en déclenchant le callback de fin pour passer au candidat suivant.
+     * Finalize the jury sequence by returning to the game board view and triggering the end callback to move on to the next candidate.
      */
     private void notifyFinished() {
         SwingUtilities.invokeLater(() -> {
@@ -108,14 +108,14 @@ public class JuryController {
     }
 
     /**
-     * Établit la connexion avec le contrôleur du plateau pour permettre la navigation entre le mini-jeu et la partie principale.
+     * Establishes connection with the board controller to allow navigation between the minigame and the main game.
      */
     public void setBoardController(BoardController bc) {
         this.boardController = bc;
     }
 
     /**
-     * Récupère l'instance de la vue associée au jury pour l'affichage dans la fenêtre principale.
+     * Retrieves the instance of the jury related view for display in the main window.
      */
     public JuryView getJuryView() {
         return juryView;

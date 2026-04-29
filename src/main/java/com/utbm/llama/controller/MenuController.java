@@ -20,7 +20,7 @@ public class MenuController {
     private final Locale locale;
 
     /**
-     * Initialise le contrôleur du menu en récupérant la vue depuis la fenêtre principale et en attachant les écouteurs d'événements aux boutons.
+     * Initializes the menu controller by retrieving the view from the main window and attaching event listeners to the buttons.
      */
     public MenuController(MainFrame mainFrame, Locale locale) {
         this.locale = locale;
@@ -30,7 +30,7 @@ public class MenuController {
     }
 
     /**
-     * Relie les actions de l'interface utilisateur (Lancer, Paramètres, Quitter) aux méthodes logiques correspondantes du contrôleur.
+     * Links the user interface actions (Launch, Settings, Exit) to the corresponding logic methods on the controller.
      */
     private void initListeners() {
 
@@ -40,8 +40,8 @@ public class MenuController {
     }
 
     /**
-     * Lance une nouvelle partie avec les paramètres par défaut.
-     * Si les paramètres n'ont jamais été sauvegardés, ouvre d'abord les settings.
+     * Launches a new game with the default settings.
+     * If the settings were never saved, open the settings first.
      */
     public void handleStartGame() {
         if (gameController != null) {
@@ -50,14 +50,14 @@ public class MenuController {
     }
 
     /**
-     * Navigue vers l'écran de paramètres.
+     * Navigates to the settings screen.
      */
     public void handleOpenSettings() {
         mainFrame.showSettings();
     }
 
     /**
-     * Quitte l'application proprement.
+     * Exits the app cleanly.
      */
     public void handleExit() {
         System.exit(0);
@@ -65,7 +65,7 @@ public class MenuController {
 
 
     /**
-     * Appelé par GameController après sa propre construction.
+     * Called by GameController after its own construction.
      */
     public void setGameController(GameController gc) {
         this.gameController = gc;
