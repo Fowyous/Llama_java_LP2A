@@ -50,7 +50,7 @@ public class JuryController {
 
         this.juryModel = new Jury(player, creditsLost);
 
-        juryView = new JuryView();
+        juryView = new JuryView(mainFrame);
         juryView.setup(player.getName(), creditsLost, player.getCredits());
         juryView.addConfirmListener(e -> handleCardPicked(juryView.getSelectedIndex()));
         mainFrame.showJury(juryView);

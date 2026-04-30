@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 /**
@@ -23,7 +25,7 @@ import java.util.function.Consumer;
  * │                 [CONFIRM MY CHOICE]                  │
  * └──────────────────────────────────────────────────────┘
  */
-public class JuryView extends JPanel {
+public class JuryView extends JPanel implements LocaleChangeListener{
 
     private static final Color BG = Color.decode("#0D0D0D");
     private static final Color PANEL_BG = Color.decode("#111111");
@@ -32,6 +34,10 @@ public class JuryView extends JPanel {
     private static final Color TEXT = Color.decode("#F0EDE6");
     private static final Color SUB = Color.decode("#8A8680");
 
+    // Locale and bundle
+    private Locale currentLocale;
+    private ResourceBundle bundle;
+    
     private final List<CardView> hiddenCards = new ArrayList<>();
     private int selectedIndex = -1;
     private Consumer<Integer> onCardPicked;
@@ -43,11 +49,26 @@ public class JuryView extends JPanel {
     private final JButton btnConfirm;
     private final JLabel resultLabel;
 
+    private final JLabel instructionLabel;
+
+    // Data for re-rendering on locale change
+    private String lastPlayerName;
+    private int lastCreditsLost;
+    private int lastCurrentCredits;
+    private CardType lastRevealedCard;
+    private int lastRevealedIndex;
+    private boolean hasRevealed = false;
+    
     /**
      * Initializes the mini-game interface, setting up the dramatic dark theme,
      * building the layout structure, and preparing the initial set of hidden cards.
+     * @param mainFrame to add the locale change listener.
      */
-    public JuryView() {
+    public JuryView(MainFrame mainFrame) {
+        this.currentLocale = mainFrame.getCurrentLocale();
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+        mainFrame.addLocaleChangeListener(this);
+
         setBackground(BG);
         setLayout(new BorderLayout());
 
@@ -58,7 +79,7 @@ public class JuryView extends JPanel {
         cardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 8));
         cardsPanel.setBackground(BG);
 
-        btnConfirm = new JButton("VALIDER MON CHOIX");
+        btnConfirm = new JButton(bundle.getString("jury.button_confirm"));
         btnConfirm.setFont(new Font("Monospaced", Font.BOLD, 14));
         btnConfirm.setBackground(ACCENT);
         btnConfirm.setForeground(Color.decode("#0D0D0D"));
@@ -66,6 +87,8 @@ public class JuryView extends JPanel {
         btnConfirm.setPreferredSize(new Dimension(260, 50));
         btnConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnConfirm.setEnabled(false);
+
+        instructionLabel = buildLabel("", 14, Font.ITALIC, SUB);
 
         resultLabel = buildLabel("", 18, Font.BOLD, ACCENT);
         resultLabel.setVisible(false);
@@ -90,12 +113,12 @@ public class JuryView extends JPanel {
                 new EmptyBorder(32, 40, 24, 40)
         ));
 
-        JLabel title = new JLabel("⚖  PASSAGE DEVANT LE JURY");
+        JLabel title = new JLabel("⚖  " + bundle.getString("jury.title"));
         title.setFont(new Font("Serif", Font.BOLD, 32));
         title.setForeground(RED);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("Vous avez perdu trop de crédits cette manche.");
+        JLabel subtitle = new JLabel(bundle.getString("jury.subtitle"));
         subtitle.setFont(new Font("Serif", Font.ITALIC, 15));
         subtitle.setForeground(SUB);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -129,11 +152,8 @@ public class JuryView extends JPanel {
         gbc.gridy = 0;
         gbc.insets = new Insets(20, 0, 10, 0);
 
-        JLabel instruction = buildLabel(
-                "Choisissez UNE carte parmi les 7 — vous gagnerez sa valeur en crédits.",
-                14, Font.ITALIC, SUB
-        );
-        center.add(instruction, gbc);
+        instructionLabel.setText(bundle.getString("jury.instruction"));
+        center.add(instructionLabel, gbc);
 
         gbc.gridy = 1;
         gbc.insets = new Insets(10, 0, 20, 0);
@@ -199,6 +219,11 @@ public class JuryView extends JPanel {
      */
     public void revealCard(int index, CardType revealed) {
         if (index < 0 || index >= hiddenCards.size()) return;
+        
+        // Store reveal data for potential re-rendering
+        this.lastRevealedIndex = index;
+        this.lastRevealedCard = revealed;
+        this.hasRevealed = true;
 
         cardsPanel.remove(hiddenCards.get(index));
         CardView visible = new CardView(revealed);
@@ -206,7 +231,8 @@ public class JuryView extends JPanel {
         hiddenCards.set(index, visible);
 
         int gained = revealed.getValue();
-        resultLabel.setText("🎲 Vous gagnez " + gained + " crédit" + (gained > 1 ? "s" : "") + " !");
+        String creditWord = bundle.getString("jury.credit");
+        resultLabel.setText("🎲 " + bundle.getString("jury.you_won") + gained + creditWord + (gained > 1 ? "s" : "") + " !");
         resultLabel.setVisible(true);
 
         btnConfirm.setEnabled(false);
@@ -223,9 +249,15 @@ public class JuryView extends JPanel {
      * @param currentCredits current credits before the jury
      */
     public void setup(String playerName, int creditsLost, int currentCredits) {
-        playerNameLabel.setText(playerName + " est convoqué·e devant le jury");
-        creditsLostLabel.setText("Perte cette manche : −" + creditsLost + " crédits");
-        currentCreditsLabel.setText("Crédits actuels : " + currentCredits);
+        // Store data for re-rendering on locale change
+        this.lastPlayerName = playerName;
+        this.lastCreditsLost = creditsLost;
+        this.lastCurrentCredits = currentCredits;
+        this.hasRevealed = false;
+
+        playerNameLabel.setText(playerName + " " + bundle.getString("jury.player_summoned"));
+        creditsLostLabel.setText(bundle.getString("jury.loss_this_round") + " −" + creditsLost + bundle.getString("jury.credit"));
+        currentCreditsLabel.setText(bundle.getString("jury.current_credits") + currentCredits);
         resultLabel.setVisible(false);
         buildHiddenCards();
         btnConfirm.setEnabled(false);
@@ -265,5 +297,25 @@ public class JuryView extends JPanel {
         lbl.setFont(new Font("Serif", style, size));
         lbl.setForeground(color);
         return lbl;
+    }
+    
+
+    @Override 
+    public void onLocaleChange(Locale locale) {        
+    	this.currentLocale = locale;        
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+    	
+    	// Update all locale-dependent UI elements        
+    	btnConfirm.setText(bundle.getString("jury.button_confirm"));        
+    	instructionLabel.setText(bundle.getString("jury.instruction"));
+    	
+        // Re-render the entire jury view with new locale if data exists        
+    	if (lastPlayerName != null) {            
+    		setup(lastPlayerName, lastCreditsLost, lastCurrentCredits);
+    	}
+    	// Re-reveal the card if it was already revealed            
+    	if (hasRevealed && lastRevealedCard != null) {                
+    		revealCard(lastRevealedIndex, lastRevealedCard);            
+    	}        
     }
 }
