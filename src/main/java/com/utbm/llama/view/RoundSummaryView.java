@@ -10,6 +10,8 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Summary screen displayed between each round.
@@ -21,7 +23,7 @@ import java.util.List;
  * - Badges: Semester abroad / Gap year
  * A "Next Handle" button allows you to continue.
  */
-public class RoundSummaryView extends JPanel {
+public class RoundSummaryView extends JPanel implements LocaleChangeListener{
 
     private static final Color BG = Color.decode("#0D0D0D");
     private static final Color PANEL_BG = Color.decode("#111111");
@@ -33,6 +35,9 @@ public class RoundSummaryView extends JPanel {
     private static final Color BLUE = Color.decode("#5B9BD5");
     private static final Color BORDER = Color.decode("#2E2E2E");
 
+    // Locale and bundle
+    private Locale currentLocale;
+    private ResourceBundle bundle;
 
     private final JLabel roundLabel;
     private final JLabel modeLabel;
@@ -40,23 +45,37 @@ public class RoundSummaryView extends JPanel {
     private final JButton btnNext;
     private final JLabel bonusLabel;
 
+    // Data for re-rendering on locale change
+    private List<Player> lastPlayers;
+    private int lastRoundNumber;
+    private int lastMaxRounds;
+    private GameMode lastGameMode;
+    private java.util.Map<Player, Integer> lastCreditsLostMap;
+    private java.util.Map<Player, Integer> lastCreditsGainedMap;
+    private boolean lastDetecApplied;
+    
     /**
      *  Initializes the view with a dark theme, sets up the layout, and builds the header, player panel, and "Next Round" button.
+     *  @param mainFrame the mainFrame to add the locale listener
      */
-    public RoundSummaryView() {
+    public RoundSummaryView(MainFrame mainFrame) {
+        this.currentLocale = mainFrame.getCurrentLocale();
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+        mainFrame.addLocaleChangeListener(this);
+
         setBackground(BG);
         setLayout(new BorderLayout(0, 0));
 
-        roundLabel = buildLabel("FIN DE MANCHE", 28, Font.BOLD, TEXT);
+        roundLabel = buildLabel(bundle.getString("round_summary.title"), 28, Font.BOLD, TEXT);
         modeLabel = buildLabel("", 13, Font.ITALIC, SUB);
-        bonusLabel = buildLabel("🎓 BONUS DETEC +30 crédits !", 14, Font.BOLD, ACCENT);
+        bonusLabel = buildLabel("🎓 " + bundle.getString("round_summary.bonus_deutec"), 14, Font.BOLD, ACCENT);
         bonusLabel.setVisible(false);
 
         playersPanel = new JPanel();
         playersPanel.setBackground(BG);
         playersPanel.setLayout(new BoxLayout(playersPanel, BoxLayout.Y_AXIS));
 
-        btnNext = new JButton("MANCHE SUIVANTE  →");
+        btnNext = new JButton(bundle.getString("round_summary.next_button"));
         btnNext.setFont(new Font("Monospaced", Font.BOLD, 15));
         btnNext.setBackground(ACCENT);
         btnNext.setForeground(Color.decode("#0D0D0D"));
@@ -145,8 +164,17 @@ public class RoundSummaryView extends JPanel {
                       java.util.Map<Player, Integer> creditsLostMap,
                       java.util.Map<Player, Integer> creditsGainedMap,
                       boolean detecApplied) {
+        // Store data for potential re-rendering on locale change
+        this.lastPlayers = players;
+        this.lastRoundNumber = roundNumber;
+        this.lastMaxRounds = maxRounds;
+        this.lastGameMode = gameMode;
+        this.lastCreditsLostMap = creditsLostMap;
+        this.lastCreditsGainedMap = creditsGainedMap;
+        this.lastDetecApplied = detecApplied;
 
-        roundLabel.setText("FIN DE LA MANCHE " + roundNumber + " / " + maxRounds);
+
+        roundLabel.setText(bundle.getString("round_summary.round_header") + roundNumber + " / " + maxRounds);
         modeLabel.setText(gameMode.toString());
         bonusLabel.setVisible(detecApplied);
 
@@ -199,9 +227,9 @@ public class RoundSummaryView extends JPanel {
         leftCol.add(nameLabel);
 
         if (player.isSuspended()) {
-            leftCol.add(buildBadge("✈ Semestre de césure — prochaine manche sautée", RED));
+            leftCol.add(buildBadge("✈ " + bundle.getString("round_summary.badge_gap_semester"), RED));
         } else if (player.hasStudyAbroad()) {
-            leftCol.add(buildBadge("🌍 Semestre à l'étranger — 4 cartes à la prochaine manche", BLUE));
+            leftCol.add(buildBadge("🌍 " + bundle.getString("round_summary.badge_study_abroad"), BLUE));
         }
 
         JPanel rightCol = new JPanel(new GridLayout(3, 2, 8, 2));

@@ -5,26 +5,38 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Show pickup.
  * One click triggers the "draw a card" action via an ActionListener.
  */
-class DrawPileView extends JPanel {
+class DrawPileView extends JPanel implements LocaleChangeListener {
 
     private static final Color BG = new Color(0, 0, 0, 0);
     private static final Color ACCENT = Color.decode("#C8A84B");
     private static final Color TEXT = Color.decode("#F0EDE6");
     private static final Color SUB = Color.decode("#8A8680");
 
+    // Locale and bundle
+    private Locale currentLocale;
+    private ResourceBundle bundle;
+    
     private final JButton drawButton;
     private final JLabel countLabel;
+    private final JLabel piocheLabel;
+
     private int remaining = 0;
 
     /**
      * Initializes the draw pile component, creating a layered UI that features a custom-painted stack of cards and an invisible interactive button.
      */
-    public DrawPileView() {
+    public DrawPileView(MainFrame mainFrame) {
+    	this.currentLocale = mainFrame.getCurrentLocale();
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+        mainFrame.addLocaleChangeListener(this);
+        
         setOpaque(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(new EmptyBorder(8, 8, 8, 8));
@@ -83,12 +95,12 @@ class DrawPileView extends JPanel {
         layered.add(drawButton, JLayeredPane.PALETTE_LAYER);
         layered.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel piocheLabel = new JLabel("PIOCHE", SwingConstants.CENTER);
+        piocheLabel = new JLabel(bundle.getString("draw_pile.label"), SwingConstants.CENTER);
         piocheLabel.setFont(new Font("Monospaced", Font.BOLD, 10));
         piocheLabel.setForeground(ACCENT);
         piocheLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        countLabel = new JLabel("— cartes", SwingConstants.CENTER);
+        countLabel = new JLabel(bundle.getString("draw_pile.cards"), SwingConstants.CENTER);
         countLabel.setFont(new Font("Serif", Font.ITALIC, 12));
         countLabel.setForeground(SUB);
         countLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -104,7 +116,8 @@ class DrawPileView extends JPanel {
      */
     public void render(int remaining) {
         this.remaining = remaining;
-        countLabel.setText(remaining + " carte" + (remaining > 1 ? "s" : ""));
+        String cardsText = bundle.getString("draw_pile.card");
+        countLabel.setText(remaining + " " + cardsText + (remaining > 1 ? "s" : ""));
     }
 
     /**
@@ -123,4 +136,20 @@ class DrawPileView extends JPanel {
     public void addDrawListener(ActionListener l) {
         drawButton.addActionListener(l);
     }
+
+    @Override  
+    public void onLocaleChange(Locale locale) {  
+    	this.currentLocale = locale;    
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);    
+    	
+    	// Update all locale-dependent UI elements    
+    	piocheLabel.setText(bundle.getString("draw_pile.label"));  
+    	
+    	// Repaint to reflect changes  
+    	revalidate();
+    	repaint();
+    	
+    }
 }
+    
+    

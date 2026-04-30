@@ -72,8 +72,8 @@ public class BoardView extends JPanel implements LocaleChangeListener{
         setBackground(BG);
         setLayout(new BorderLayout(0, 0));
 
-        drawPileView = new DrawPileView();
-        discardPileView = new DiscardPileView();
+        drawPileView = new DrawPileView(mainFrame);
+        discardPileView = new DiscardPileView(mainFrame);
 
         roundLabel = buildHudLabel(bundle.getString("hud.default.round"), 20, Font.BOLD);
         modeLabel = buildHudLabel("", 12, Font.PLAIN);
