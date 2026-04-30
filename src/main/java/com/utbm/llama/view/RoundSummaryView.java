@@ -235,13 +235,14 @@ public class RoundSummaryView extends JPanel implements LocaleChangeListener{
         JPanel rightCol = new JPanel(new GridLayout(3, 2, 8, 2));
         rightCol.setOpaque(false);
 
-        addStatLine(rightCol, "Pénalité main :", "-" + lost + " crédits", RED);
-        addStatLine(rightCol, "Gains :", "+" + gained + " crédits", GREEN);
-        addStatLine(rightCol, "Net manche :",
-                (net >= 0 ? "+" : "") + net + " crédits",
+        String creditsText = bundle.getString("round_summary.credits");
+        addStatLine(rightCol, bundle.getString("round_summary.hand_penalty"), "-" + lost + creditsText, RED);
+        addStatLine(rightCol, bundle.getString("round_summary.gains"), "+" + gained + creditsText, GREEN);
+        addStatLine(rightCol, bundle.getString("round_summary.net_round"),
+                (net >= 0 ? "+" : "") + net + creditsText,
                 net >= 0 ? GREEN : RED);
 
-        JLabel totalLabel = new JLabel(player.getCredits() + " crédits");
+        JLabel totalLabel = new JLabel(player.getCredits() + creditsText);
         totalLabel.setFont(new Font("Serif", Font.BOLD, 22));
         totalLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         totalLabel.setForeground(player.getCredits() < 0 ? RED
@@ -298,4 +299,22 @@ public class RoundSummaryView extends JPanel implements LocaleChangeListener{
     public void addNextRoundListener(ActionListener l) {
         btnNext.addActionListener(l);
     }
+    
+    @Override   
+    public void onLocaleChange(Locale locale) {        
+    	this.currentLocale = locale;        
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+    	
+    	// Update all locale-dependent UI elements        
+    	roundLabel.setText(bundle.getString("round_summary.title"));        
+    	bonusLabel.setText("🎓 " + bundle.getString("round_summary.bonus_detuec"));        
+    	btnNext.setText(bundle.getString("round_summary.next_button"));
+    	
+    	// Re-render the entire summary with new locale if data exists     
+    	if (lastPlayers != null) {       
+    		setup(lastPlayers, lastRoundNumber, lastMaxRounds, lastGameMode,    
+    				lastCreditsLostMap, lastCreditsGainedMap, lastDetecApplied); 
+    	}   
+    }
 }
+

@@ -529,7 +529,7 @@ public class BoardController {
         SwingUtilities.invokeLater(() -> {
             int maxRounds = game.getGameMode().getMaxRounds();
 
-            RoundSummaryView summaryView = new RoundSummaryView();
+            RoundSummaryView summaryView = new RoundSummaryView(mainFrame);
             summaryView.setup(
                     game.getPlayers(),
                     game.getCurrentRoundNumber(),
