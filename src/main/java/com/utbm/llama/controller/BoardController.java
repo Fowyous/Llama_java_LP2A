@@ -134,27 +134,7 @@ public class BoardController {
             updateView();
             checkBotTurn();
         }
-  /*		// a effacer j'ai laisser ca pour alban
-        if (!validatePlayCard(card)) {// Il faut utiliser le rule engine
-            System.out.println("[BOARD] Coup invalide : " + card.name());
-            updateView();
-            return;
-        }
 
-        localPlayer.removeCard(card);//fait par game.applyMove(move)
-        game.getDiscardPile().add(card);//fait par game.applyMove(move)
-
-        System.out.println("[BOARD] " + localPlayer.getName() + " joue " + card.name());
-
-        updateView();
-        checkRoundOver();
-
-        if (roundInProgress) {
-            game.nextTurn();
-            updateView();
-            checkBotTurn();
-        }
-        */
     }
 
     /**
