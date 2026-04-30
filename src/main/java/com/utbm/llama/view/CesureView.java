@@ -5,6 +5,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * View of the "Gap Semester".
@@ -13,7 +15,7 @@ import java.awt.geom.RoundRectangle2D;
  * the 35 credits at the beginning of the next round.
  * In 1v1: both players complete the round simultaneously.
  */
-public class CesureView extends JPanel {
+public class CesureView extends JPanel implements LocaleChangeListener{
 
     private static final Color BG = Color.decode("#0D0D0D");
     private static final Color ACCENT = Color.decode("#C8A84B");
@@ -22,16 +24,34 @@ public class CesureView extends JPanel {
     private static final Color SUB = Color.decode("#8A8680");
     private static final Color RED = Color.decode("#D4526E");
 
+    // Locale and bundle
+    private Locale currentLocale;
+    private ResourceBundle bundle;
+
+
     private final JLabel playerNameLabel;
     private final JLabel creditsLabel;
     private final JLabel descriptionLabel;
     private final JLabel roundInfoLabel;
     private final JButton btnContinue;
 
+    // Data for re-rendering on locale change
+    private String lastPlayerName;
+    private int lastCurrentCredits;
+    private int lastNextRound;
+    private boolean lastIsBothSkipping;
+    private boolean hasSetup = false;
+
+
     /**
      * Initializes the Gap Semester view, setting up the layout, typography, and action buttons for the academic suspension screen.
+     * @param mainFrame to add the locale change listener.
      */
-    public CesureView() {
+    public CesureView(MainFrame mainFrame) {
+        this.currentLocale = mainFrame.getCurrentLocale();
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+        mainFrame.addLocaleChangeListener(this);
+
         setBackground(BG);
         setLayout(new GridBagLayout());
 
@@ -40,7 +60,7 @@ public class CesureView extends JPanel {
         descriptionLabel = buildLabel("", 14, Font.ITALIC, SUB);
         roundInfoLabel = buildLabel("", 13, Font.PLAIN, BLUE);
 
-        btnContinue = new JButton("CONTINUER →");
+        btnContinue = new JButton(bundle.getString("cesure.button_continue"));
         btnContinue.setFont(new Font("Monospaced", Font.BOLD, 14));
         btnContinue.setBackground(ACCENT);
         btnContinue.setForeground(Color.decode("#0D0D0D"));
@@ -115,7 +135,7 @@ public class CesureView extends JPanel {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(false);
 
-        JLabel title = buildLabel("SEMESTRE DE CÉSURE", 28, Font.BOLD, TEXT);
+        JLabel title = buildLabel(bundle.getString("cesure.title"), 28, Font.BOLD, TEXT);
         title.setBorder(new EmptyBorder(0, 0, 12, 0));
 
         JPanel row = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -151,14 +171,14 @@ public class CesureView extends JPanel {
         card.setBorder(new EmptyBorder(20, 32, 20, 32));
         card.setMaximumSize(new Dimension(560, 200));
 
-        String[] lines = {
-                "Vous ne jouez PAS la prochaine manche.",
-                "Vous recevrez quand même 35 crédits au début de la manche suivante.",
-                "En cas de 1v1, les deux joueurs passent la manche simultanément."
+        String[] keys = {
+                "cesure.info_line_1",
+                "cesure.info_line_2",
+                "cesure.info_line_3"
         };
-
-        for (String line : lines) {
-            JLabel lbl = buildLabel("• " + line, 13, Font.PLAIN, SUB);
+        
+        for (String key : keys) {
+            JLabel lbl = buildLabel("• " + bundle.getString(key), 13, Font.PLAIN, SUB);
             lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
             lbl.setBorder(new EmptyBorder(3, 0, 3, 0));
             card.add(lbl);
@@ -180,12 +200,19 @@ public class CesureView extends JPanel {
      * @param isBothSkipping true if both players jump (1v1)
      */
     public void setup(String playerName, int currentCredits, int nextRound, boolean isBothSkipping) {
-        playerNameLabel.setText(playerName + " part en césure");
-        creditsLabel.setText("Crédits actuels : " + currentCredits + " (négatif)");
-        roundInfoLabel.setText("Manche " + nextRound + " sautée — +35 crédits au retour");
+        // Store data for re-rendering on locale change
+        this.lastPlayerName = playerName;
+        this.lastCurrentCredits = currentCredits;
+        this.lastNextRound = nextRound;
+        this.lastIsBothSkipping = isBothSkipping;
+        this.hasSetup = true;
+
+        playerNameLabel.setText(playerName + " " + bundle.getString("cesure.player_in_gap"));
+        creditsLabel.setText(bundle.getString("cesure.current_credits") + currentCredits + " " + bundle.getString("cesure.negative"));
+        roundInfoLabel.setText(bundle.getString("cesure.round") + nextRound + " " + bundle.getString("cesure.skipped") + " +35 " + bundle.getString("cesure.credit") + (nextRound > 1 ? "s" : "") + " " + bundle.getString("cesure.on_return"));
 
         if (isBothSkipping) {
-            descriptionLabel.setText("Mode 1v1 : les deux joueurs sautent la manche " + nextRound + ".");
+            descriptionLabel.setText(bundle.getString("cesure.1v1_mode") + nextRound + ".");
             descriptionLabel.setForeground(ACCENT);
         } else {
             descriptionLabel.setText("");
@@ -208,4 +235,52 @@ public class CesureView extends JPanel {
         lbl.setForeground(color);
         return lbl;
     }
+    
+    @Override  
+    public void onLocaleChange(Locale locale) {    
+    	this.currentLocale = locale;    
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+    	
+    	// Update all locale-dependent UI elements      
+    	btnContinue.setText(bundle.getString("cesure.button_continue"));
+  
+    	// Re-render the entire cesure view with new locale if data exists       
+    	if (hasSetup && lastPlayerName != null) {      
+    		setup(lastPlayerName, lastCurrentCredits, lastNextRound, lastIsBothSkipping);
+    		}
+ 
+    	// Refresh the icon panel and info card to update locale-dependent text     
+    	removeAll();     
+    	GridBagConstraints gbc = new GridBagConstraints(); 
+    	gbc.gridx = 0;     
+    	gbc.fill = GridBagConstraints.NONE;  
+    	gbc.anchor = GridBagConstraints.CENTER;
+  
+    	gbc.gridy = 0; 
+    	gbc.insets = new Insets(0, 0, 24, 0);  
+    	add(buildIconPanel(), gbc);
+ 
+    	gbc.gridy = 1;  
+    	gbc.insets = new Insets(0, 0, 8, 0);  
+    	add(playerNameLabel, gbc);
+  
+    	gbc.gridy = 2;    
+    	gbc.insets = new Insets(0, 0, 16, 0); 
+    	add(creditsLabel, gbc);
+  
+    	gbc.gridy = 3;   
+    	gbc.insets = new Insets(0, 0, 8, 0);  
+    	add(buildInfoCard(), gbc);
+ 
+    	gbc.gridy = 4;     
+    	gbc.insets = new Insets(12, 0, 0, 0);     
+    	add(roundInfoLabel, gbc);
+  
+    	gbc.gridy = 5;    
+    	gbc.insets = new Insets(32, 0, 0, 0);    
+    	add(btnContinue, gbc);
+   
+    	revalidate();       
+    	repaint();
+    	}
 }

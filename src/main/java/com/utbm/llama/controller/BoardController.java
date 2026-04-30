@@ -376,7 +376,7 @@ public class BoardController {
 
         boolean allSuspended = game.getPlayers().stream().allMatch(Player::isSuspended);
 
-        CesureView cesureView = new CesureView();
+        CesureView cesureView = new CesureView(mainFrame);
         cesureView.setup(player.getName(), player.getCredits(), currentRoundNumber + 1, allSuspended);
 
         cesureView.addContinueListener(e -> {
