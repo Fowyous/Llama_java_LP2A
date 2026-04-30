@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
  * │             Local player panel                  │  SOUTH
  * └─────────────────────────────────────────────────┘
  */
-public class BoardView extends JPanel {
+public class BoardView extends JPanel implements LocaleChangeListener{
 
     private static final Color BG = Color.decode("#0D0D0D");
     private static final Color PANEL_BG = Color.decode("#111111");
@@ -44,7 +44,9 @@ public class BoardView extends JPanel {
     private final JLabel modeLabel;
     private final JLabel thresholdLabel;
     private final JLabel detecBonusLabel;
+    private final JLabel opponentsTitleLabel;
 
+    
     private final JButton btnDraw;
     private final JButton btnQuit;
 
@@ -52,14 +54,20 @@ public class BoardView extends JPanel {
     private final JPanel centerPanel;
     private final JPanel localPlayerPanel;
 
-    private final ResourceBundle bundle;
-
+    private ResourceBundle bundle;
+    private Locale currentLocale;
+    private Game currentGame;
+    private Player currentLocalPlayer;
+    private MainFrame mainFrame;
     /**
      * Initializes the game board with the specified locale, setting up the HUD,
      * draw/discard piles, and the various layout panels for opponents and the local player.
      */
-    public BoardView(Locale locale) {
-        this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+    public BoardView(MainFrame mainFrame) {
+    	this.mainFrame = mainFrame;
+        mainFrame.addLocaleChangeListener(this);
+    	this.currentLocale = mainFrame.getCurrentLocale();
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
 
         setBackground(BG);
         setLayout(new BorderLayout(0, 0));
@@ -68,20 +76,25 @@ public class BoardView extends JPanel {
         discardPileView = new DiscardPileView();
 
         roundLabel = buildHudLabel(bundle.getString("hud.default.round"), 20, Font.BOLD);
-        modeLabel = buildHudLabel("MODE COURT — 180 crédits", 12, Font.PLAIN);
+        modeLabel = buildHudLabel("", 12, Font.PLAIN);
         thresholdLabel = buildHudLabel("", 12, Font.ITALIC);
-        detecBonusLabel = buildHudLabel("🎓 BONUS DETEC +30 crédits !", 13, Font.BOLD);
+        detecBonusLabel = buildHudLabel(bundle.getString("hud.detecBonus"),3, Font.BOLD);
         detecBonusLabel.setForeground(ACCENT);
         detecBonusLabel.setVisible(false);
 
-        btnDraw = buildActionButton("PIOCHER", Color.decode("#1E3A5F"), TEXT_MAIN);
-        btnQuit = buildActionButton("PASSER LA MANCHE", RED, Color.WHITE);
+        btnDraw = buildActionButton(bundle.getString("action.draw"), Color.decode("#1E3A5F"), TEXT_MAIN);
+        btnQuit = buildActionButton(bundle.getString("action.quit"), RED, Color.WHITE);
 
         opponentsPanel = new JPanel();
         opponentsPanel.setBackground(PANEL_BG);
         opponentsPanel.setLayout(new BoxLayout(opponentsPanel, BoxLayout.Y_AXIS));
         opponentsPanel.setBorder(new EmptyBorder(12, 12, 12, 12));
         opponentsPanel.setPreferredSize(new Dimension(300, 0));
+        
+        opponentsTitleLabel = new JLabel(bundle.getString("opponents.title"));
+        opponentsTitleLabel.setFont(new Font("Monospaced", Font.BOLD, 10));
+        opponentsTitleLabel.setForeground(Color.decode("#8A8680"));
+        opponentsTitleLabel.setBorder(new javax.swing.border.EmptyBorder(0, 0, 10, 0));
 
         centerPanel = buildCenterPanel();
 
@@ -173,6 +186,8 @@ public class BoardView extends JPanel {
      * @param localPlayer the local player (visible hand)
      */
     public void updateBoard(Game game, Player localPlayer) {
+        this.currentGame = game;
+        this.currentLocalPlayer = localPlayer;
         updateHud(game);
         updatePiles(game);
         updatePlayers(game, localPlayer);
@@ -187,9 +202,9 @@ public class BoardView extends JPanel {
         if (game.getCurrentRound() == null) return;
         int maxRounds = game.getGameMode() == GameMode.SHORT ? 6 : 10;
         int threshold = game.getGraduationThreshold();
-        roundLabel.setText("MANCHE " + game.getCurrentRound().getRoundNumber() + " / " + maxRounds);
-        modeLabel.setText("MODE " + (game.getGameMode() == GameMode.SHORT ? "COURT" : "LONG")
-                + " — " + threshold + " crédits pour valider");
+        roundLabel.setText(bundle.getString("hud.round") + game.getCurrentRound().getRoundNumber() + " / " + maxRounds);
+        modeLabel.setText("MODE " + (game.getGameMode() == GameMode.SHORT ? bundle.getString("hud.mode.short"): bundle.getString("hud.mode.long"))
+                + " — " + threshold + bundle.getString("hud.mode.credits"));
 
         boolean showDetec = game.getGameMode() == GameMode.LONG
                 && game.getCurrentRound().getRoundNumber() == 4;
@@ -215,23 +230,26 @@ public class BoardView extends JPanel {
 
         localPlayerView = new PlayerView(
                 localPlayer.getName(),
-                localPlayer instanceof Bot
+                localPlayer instanceof Bot,
+                mainFrame
         );
 
         boolean isLocalActive = game.getCurrentPlayer().equals(localPlayer);
         localPlayerView.update(localPlayer, true, isLocalActive);
         localPlayerPanel.add(localPlayerView, BorderLayout.CENTER);
 
-        opponentsPanel.removeAll();
+        opponentsPanel.removeAll();/*
         JLabel oppTitle = new JLabel("ADVERSAIRES");
         oppTitle.setFont(new Font("Monospaced", Font.BOLD, 10));
         oppTitle.setForeground(Color.decode("#8A8680"));
         oppTitle.setBorder(new javax.swing.border.EmptyBorder(0, 0, 10, 0));
-        opponentsPanel.add(oppTitle);
+        opponentsPanel.add(oppTitle);*/
+        opponentsPanel.add(opponentsTitleLabel);
+
 
         for (Player p : game.getPlayers()) {
             if (p.equals(localPlayer)) continue;
-            PlayerView pv = new PlayerView(p.getName(), p instanceof Bot);
+            PlayerView pv = new PlayerView(p.getName(), p instanceof Bot, mainFrame);
             pv.update(p, false, game.getCurrentPlayer().equals(p));
             opponentsPanel.add(pv);
             opponentsPanel.add(Box.createVerticalStrut(8));
@@ -324,5 +342,27 @@ public class BoardView extends JPanel {
     public List<PlayerView> getPlayerViews() {
         return playerViews;
     }
+
+	@Override
+	public void onLocaleChange(Locale locale) {
+		this.currentLocale = locale;
+		this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+        // Update all labels with new localized strings
+		roundLabel.setText(bundle.getString("hud.round"));        
+		btnDraw.setText(bundle.getString("button.draw"));        
+		btnQuit.setText(bundle.getString("button.quit.round"));        
+		detecBonusLabel.setText(bundle.getString("hud.bonus.detec"));        
+		opponentsTitleLabel.setText(bundle.getString("label.opponents"));
+        // Refresh HUD with current game state in new language        
+		if (currentGame != null) {            
+			updateHud(currentGame);
+		}
+		
+
+        // Repaint the entire board to reflect changes    
+		revalidate();       
+		repaint();
+		
+	}
 
 }

@@ -8,6 +8,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Panel representing a player (human or bot) on the board.
@@ -18,7 +20,7 @@ import java.awt.*;
  * - special conditions: "Semester abroad," "Jury," "Gap"
  * - an indicator "active turn"
  */
-public class PlayerView extends JPanel {
+public class PlayerView extends JPanel implements LocaleChangeListener{
 
     private static final Color BG_IDLE = Color.decode("#141414");
     private static final Color BG_ACTIVE = Color.decode("#1C1C1C");
@@ -39,13 +41,23 @@ public class PlayerView extends JPanel {
     private final JLabel statusBadge;
     private final HandView handView;
     private final JLabel activeIndicator;
-
+    
+    private ResourceBundle bundle;
+    private Locale currentLocale;
+    private Player currentPlayer;
     /**
-     *  Initializes the player panel with name and type, setting up the layout for the header (name, credits, status) and the hand container.
+     * Initializes the player panel with name and type, setting up the layout for the header (name, credits, status) and the hand container.
+     * 
+     * @param playerName the name of the player
+     * @param isBot true if the player is an AI-controlled bot
+     * @param mainFrame the mainframe
      */
-    public PlayerView(String playerName, boolean isBot) {
+    public PlayerView(String playerName, boolean isBot, MainFrame mainFrame) {
         this.playerName = playerName;
         this.isBot = isBot;
+        this.currentLocale = mainFrame.getCurrentLocale();
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+        mainFrame.addLocaleChangeListener(this);
 
         setBackground(BG_IDLE);
         setBorder(new CompoundBorder(new LineBorder(BORDER_IDL, 1), new EmptyBorder(12, 14, 12, 14)));
@@ -96,6 +108,7 @@ public class PlayerView extends JPanel {
      * @param isActive true if it’s that player’s turn
      */
     public void update(Player player, boolean isLocal, boolean isActive) {
+        this.currentPlayer = player;
         updateCredits(player.getCredits());
         updateActive(isActive);
         updateStatus(player);
@@ -111,7 +124,7 @@ public class PlayerView extends JPanel {
      * Updates the display of credits with color according to value.
      */
     public void updateCredits(int credits) {
-        creditsLabel.setText(credits + " crédits");
+        creditsLabel.setText(credits + bundle.getString("label.credits"));
         if (credits >= 180) {
             creditsLabel.setForeground(GREEN);
         } else if (credits < 0) {
@@ -137,44 +150,47 @@ public class PlayerView extends JPanel {
      */
     public void updateStatus(Player player) {
         if (player.isSuspended()) {
-            showBadge("CÉSURE EN COURS", RED);
+            showBadge(bundle.getString("status.suspended"), RED);
         } else if (player.hasStudyAbroad()) {
-            showBadge("SEMESTRE À L'ÉTRANGER — 4 cartes", BLUE);
+            showBadge(bundle.getString("status.study.abroad"), BLUE);
         } else if (player.getState() == State.QUITTING) {
-            showBadge("A PASSÉ LA MANCHE", TEXT_SUB);
+            showBadge(bundle.getString("status.quitting"), TEXT_SUB);
         } else {
             statusBadge.setVisible(false);
         }
     }
 
     /**
-     *  Configures and displays a formatted status badge with specific colors and borders to highlight a player's temporary condition.
+     * Configures and displays a formatted status badge with specific colors and borders to highlight a player's temporary condition.
      */
     private void showBadge(String text, Color color) {
         statusBadge.setText(text);
         statusBadge.setForeground(color);
         statusBadge.setBackground(new Color(color.getRed(), color.getGreen(), color.getBlue(), 30));
         statusBadge.setOpaque(true);
-        statusBadge.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(color.getRed(), color.getGreen(), color.getBlue(), 80), 1), new EmptyBorder(2, 6, 2, 6)));
+        statusBadge.setBorder(BorderFactory.createCompoundBorder(
+        		BorderFactory.createLineBorder(new Color(color.getRed(), color.getGreen(), color.getBlue(), 80), 1), 
+        		new EmptyBorder(2, 6, 2, 6)
+        		));
         statusBadge.setVisible(true);
     }
 
     /**
-     *  Returns the HandView component associated with this player to allow interaction with the cards.
+     *  @return  the HandView component associated with this player to allow interaction with the cards.
      */
     public HandView getHandView() {
         return handView;
     }
 
     /**
-     *  Retrieves the name of the player associated with this view.
+     *  @return the name of the player associated with this view.
      */
     public String getPlayerName() {
         return playerName;
     }
 
     /**
-     * Returns true if the player represented by this view is an AI-controlled bot.
+     * @return  true if the player represented by this view is an AI-controlled bot.
      */
     public boolean isBot() {
         return isBot;
@@ -182,8 +198,27 @@ public class PlayerView extends JPanel {
 
     /**
      *  Generates the display string for the player's name, appending a robot icon if the player is a bot.
+     *  @return the generated string
      */
     private String buildNameText() {
         return playerName + (isBot ? "  🤖" : "");
     }
+    /**     
+     * Called when the application locale changes. Updates all UI text to reflect the new language.     
+     * */    
+    @Override    
+    public void onLocaleChange(Locale locale) {        
+    	this.currentLocale = locale;        
+    	this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+    	
+    	// Update credits label with new localized text        
+    	if (currentPlayer != null) {        
+    		updateCredits(currentPlayer.getCredits());            
+    		updateStatus(currentPlayer);        
+    	}
+    	
+    	// Repaint to reflect changes        
+    	revalidate();        
+    	repaint();    
+    	}
 }

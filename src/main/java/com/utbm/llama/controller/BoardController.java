@@ -71,7 +71,7 @@ public class BoardController {
      * then starts the first round.
      */
     public void initBoard() {
-        boardView = new BoardView(locale);
+        boardView = new BoardView(mainFrame);
         bindBoardListeners();
 
         mainFrame.showGame(boardView);

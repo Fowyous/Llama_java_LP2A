@@ -112,7 +112,7 @@ public class MenuView extends JPanel  implements LocaleChangeListener{
     }
 
     /**
-     * Placeholder — remplacé dans le constructeur.
+     * Placeholder — replaced by the constructor
      */
     private JPanel buildCenterPanel() {
         JPanel p = new JPanel();
