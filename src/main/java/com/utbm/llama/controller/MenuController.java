@@ -37,6 +37,7 @@ public class MenuController {
         menuView.addStartListener(e -> handleStartGame());
         menuView.addSettingsListener(e -> handleOpenSettings());
         menuView.addQuitListener(e -> handleExit());
+        menuView.addRulesListener(e -> handleOpenRules());
     }
 
     /**
@@ -69,5 +70,9 @@ public class MenuController {
      */
     public void setGameController(GameController gc) {
         this.gameController = gc;
+    }
+
+    public void handleOpenRules() {
+        mainFrame.showRules();
     }
 }

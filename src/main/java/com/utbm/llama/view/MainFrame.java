@@ -17,12 +17,14 @@ public class MainFrame extends JFrame {
     public static final String SCREEN_BOARD = "BOARD";
     public static final String SCREEN_JURY = "JURY";
     public static final String SCREEN_CESURE = "CESURE";
+    public static final String SCREEN_RULES = "RULES";
 
     private final MenuView menuView;
     private final SettingsView settingsView;
     private BoardView boardView;
     private JuryView juryView;
     private CesureView cesureView;
+    private RulesView rulesView;
 
     private final CardLayout cardLayout;
     private final JPanel contentPanel;
@@ -150,6 +152,16 @@ public class MainFrame extends JFrame {
 
     }
 
+    public void showRules() {
+        if (rulesView == null) {
+            rulesView = new RulesView();
+            contentPanel.add(rulesView, SCREEN_RULES);
+
+            rulesView.addBackListener(e -> showMenu());
+        }
+        cardLayout.show(contentPanel, SCREEN_RULES);
+    }
+
     /**
      * Registers a new component to receive notifications whenever the application's language is changed.
      */
@@ -212,4 +224,6 @@ public class MainFrame extends JFrame {
     public CesureView getCesureView() {
         return cesureView;
     }
+
+    public RulesView getRulesView() { return rulesView; }
 }
