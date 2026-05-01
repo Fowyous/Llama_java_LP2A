@@ -24,6 +24,7 @@ public class MenuView extends JPanel  implements LocaleChangeListener{
     private final JButton btnStart;
     private final JButton btnSettings;
     private final JButton btnQuit;
+    private final JButton btnRules;
 
     private final ResourceBundle bundle;
     private Locale currentLocale;
@@ -46,6 +47,7 @@ public class MenuView extends JPanel  implements LocaleChangeListener{
         btnStart = buildMenuButton("▶ "+bundle.getString("new_game"), true);
         btnSettings = buildMenuButton("⚙  "+bundle.getString("settings"), false);
         btnQuit = buildMenuButton("✕  "+bundle.getString("exit"), false);
+        btnRules = buildMenuButton("📖  RÈGLES DU JEU", false);
 
         removeAll();
         add(buildCenterPanelWithButtons(), BorderLayout.CENTER);
@@ -105,6 +107,9 @@ public class MenuView extends JPanel  implements LocaleChangeListener{
         panel.add(btnSettings, gbc);
 
         gbc.gridy = 6;
+        panel.add(btnRules, gbc);
+
+        gbc.gridy = 7;
         gbc.insets = new Insets(24, 0, 0, 0);
         panel.add(btnQuit, gbc);
 
@@ -200,6 +205,8 @@ public class MenuView extends JPanel  implements LocaleChangeListener{
         btnQuit.addActionListener(l);
     }
 
+    public void addRulesListener(ActionListener l) { btnRules.addActionListener(l); }
+
     public JButton getBtnStart() {
         return btnStart;
     }
@@ -211,4 +218,6 @@ public class MenuView extends JPanel  implements LocaleChangeListener{
     public JButton getBtnQuit() {
         return btnQuit;
     }
+
+    public JButton getBtnRules() { return btnRules; }
 }
