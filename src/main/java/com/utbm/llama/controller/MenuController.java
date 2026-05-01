@@ -73,6 +73,6 @@ public class MenuController {
     }
 
     public void handleOpenRules() {
-        mainFrame.showRules();
+        mainFrame.showRules(mainFrame);
     }
 }

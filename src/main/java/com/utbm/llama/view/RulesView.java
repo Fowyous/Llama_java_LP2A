@@ -5,8 +5,10 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-public class RulesView extends JPanel {
+public class RulesView extends JPanel implements LocaleChangeListener{
 
     private static final Color BG       = Color.decode("#0D0D0D");
     private static final Color PANEL_BG = Color.decode("#111111");
@@ -18,16 +20,29 @@ public class RulesView extends JPanel {
     private static final Color RED      = Color.decode("#D4526E");
     private static final Color BORDER   = Color.decode("#2E2E2E");
 
-    private final JButton btnBack;
+    private final MainFrame mainFrame;
+    private ResourceBundle bundle;
+    private Locale currentLocale;
 
-    public RulesView() {
+    private final JButton btnBack;
+    private JPanel centerScrollHolder;
+
+    public RulesView(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
+        mainFrame.addLocaleChangeListener(this);
+        this.currentLocale = mainFrame.getCurrentLocale();
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", currentLocale);
+
         setBackground(BG);
         setLayout(new BorderLayout());
 
-        btnBack = buildButton("← RETOUR AU MENU");
+        btnBack = buildButton(bundle.getString("rules.button.back"));
 
         add(buildHeader(),         BorderLayout.NORTH);
-        add(buildScrollContent(),  BorderLayout.CENTER);
+        centerScrollHolder = new JPanel(new BorderLayout());
+        centerScrollHolder.setOpaque(false);
+        centerScrollHolder.add(buildScrollContent(), BorderLayout.CENTER);
+        add(centerScrollHolder,    BorderLayout.CENTER);
         add(buildFooter(),         BorderLayout.SOUTH);
     }
 
@@ -40,12 +55,12 @@ public class RulesView extends JPanel {
                 new EmptyBorder(28, 40, 20, 40)
         ));
 
-        JLabel title = new JLabel("RÈGLES DU JEU", SwingConstants.CENTER);
+        JLabel title = new JLabel(bundle.getString("rules.header.title"), SwingConstants.CENTER);
         title.setFont(new Font("Serif", Font.BOLD, 32));
         title.setForeground(ACCENT);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("LAMA — Édition UTBM", SwingConstants.CENTER);
+        JLabel subtitle = new JLabel(bundle.getString("rules.header.subtitle"), SwingConstants.CENTER);
         subtitle.setFont(new Font("Serif", Font.ITALIC, 15));
         subtitle.setForeground(SUB);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -62,85 +77,66 @@ public class RulesView extends JPanel {
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setBorder(new EmptyBorder(24, 60, 24, 60));
 
-        content.add(buildSection("🎯  OBJECTIF",
-                "Terminer la partie avec le plus de crédits possible. " +
-                        "Les seuils honorifiques sont 180 crédits (mode court) et 300 crédits (mode long)."));
+        content.add(buildSection(bundle.getString("rules.section.objective.title"),
+                bundle.getString("rules.section.objective.text")));
 
         content.add(Box.createVerticalStrut(16));
 
-        content.add(buildSection("💳  LES CARTES",
-                "Le jeu comporte 7 types de cartes : 1, 2, 3, 4, 5, 6 et LAMA (valeur 10). " +
-                        "Il y a 8 exemplaires de chaque carte, soit 56 cartes en tout."));
+        content.add(buildSection(bundle.getString("rules.section.cards.title"),
+                bundle.getString("rules.section.cards.text")));
 
         content.add(Box.createVerticalStrut(16));
 
-        content.add(buildSection("🔄  DÉROULEMENT D'UN TOUR",
-                "À chaque tour, vous pouvez effectuer l'une des trois actions suivantes :"));
+        content.add(buildSection(bundle.getString("rules.section.turns.title"),
+                bundle.getString("rules.section.turns.text")));
 
-        content.add(buildBulletCard("JOUER UNE CARTE",
-                "Posez une carte de votre main sur la défausse. " +
-                        "Elle doit avoir la même valeur que la carte du dessus, " +
-                        "ou la valeur immédiatement supérieure (ex : 3 sur 2). " +
-                        "Cas spéciaux : LAMA se joue sur un 6, et 1 se joue sur un LAMA (cycle).",
+        content.add(buildBulletCard(bundle.getString("rules.bullet.play.title"),
+                bundle.getString("rules.bullet.play.text"),
                 ACCENT));
 
-        content.add(buildBulletCard("PIOCHER UNE CARTE",
-                "Prenez une carte depuis la pioche et ajoutez-la à votre main. " +
-                        "Votre tour se termine immédiatement.",
+
+        content.add(buildBulletCard(bundle.getString("rules.bullet.draw.title"),
+                bundle.getString("rules.bullet.draw.text"),
                 BLUE));
 
-        content.add(buildBulletCard("PASSER LA MANCHE",
-                "Vous quittez la manche en cours. Vous ne jouerez plus jusqu'à la prochaine manche. " +
-                        "Attention : les cartes restantes dans votre main vous seront déduites !",
+        content.add(buildBulletCard(bundle.getString("rules.bullet.pass.title"),
+                bundle.getString("rules.bullet.pass.text"),
                 RED));
 
         content.add(Box.createVerticalStrut(16));
 
-        content.add(buildSection("📊  FIN DE MANCHE",
-                "La manche se termine quand tous les joueurs ont passé ou qu'un joueur vide sa main. " +
-                        "La valeur totale des cartes encore en main est déduite des crédits de chaque joueur."));
+        content.add(buildSection(bundle.getString("rules.section.endround.title"),
+                bundle.getString("rules.section.endround.text")));
+        
+        content.add(Box.createVerticalStrut(16));
+
+        content.add(buildSection(bundle.getString("rules.section.startround.title"),
+                bundle.getString("rules.section.startround.text")));
 
         content.add(Box.createVerticalStrut(16));
 
-        content.add(buildSection("🔄  DÉBUT DE MANCHE",
-                "Au début de chaque manche, tous les joueurs reçoivent +35 crédits, " +
-                        "y compris les joueurs en semestre de césure."));
+        content.add(buildSection(bundle.getString("rules.section.jury.title"),
+                bundle.getString("rules.section.jury.text")));
 
         content.add(Box.createVerticalStrut(16));
 
-        content.add(buildSection("⚖  LE JURY",
-                "Si vous perdez 20 crédits ou plus en une seule manche, vous êtes convoqué devant le jury. " +
-                        "Vous choisissez une carte parmi 7 cartes face cachée (valeurs 1 à 6 et LAMA). " +
-                        "Vous gagnez la valeur de la carte choisie en crédits."));
+        content.add(buildSection(bundle.getString("rules.section.cesure.title"),
+                bundle.getString("rules.section.cesure.text")));
 
         content.add(Box.createVerticalStrut(16));
 
-        content.add(buildSection("✈  SEMESTRE DE CÉSURE",
-                "Si vos crédits sont négatifs après le jury, vous partez en semestre de césure. " +
-                        "Vous sautez la prochaine manche mais recevez quand même les 35 crédits du début de manche. " +
-                        "En mode 1v1, si les deux joueurs sont en césure, les deux sautent la manche simultanément."));
+        content.add(buildSection(bundle.getString("rules.section.eras.title"),
+                bundle.getString("rules.section.eras.text")));
 
         content.add(Box.createVerticalStrut(16));
 
-        content.add(buildSection("🌍  SEMESTRE À L'ÉTRANGER",
-                "Si vous terminez une manche sans aucune carte en main, " +
-                        "vous partez en semestre à l'étranger. " +
-                        "À la manche suivante, vous commencez avec seulement 4 cartes au lieu de 6. " +
-                        "Cet avantage n'est pas cumulable et ne dure qu'une seule manche."));
+        content.add(buildSection(bundle.getString("rules.section.modes.title"),
+                bundle.getString("rules.section.modes.text")));
 
         content.add(Box.createVerticalStrut(16));
 
-        content.add(buildSection("🎓  MODES DE JEU",
-                "Mode Court : 6 manches. Seuil honorifique : 180 crédits (équivalent d'une licence à l'UTBM).\n" +
-                        "Mode Long : 10 manches. Seuil honorifique : 300 crédits (master). " +
-                        "Bonus DETEC : si vous avez ≥ 120 crédits à la fin de la manche 4, vous recevez +30 crédits."));
-
-        content.add(Box.createVerticalStrut(16));
-
-        content.add(buildSection("🏆  VICTOIRE",
-                "À la fin de la dernière manche, le joueur avec le plus de crédits remporte la partie. " +
-                        "Les seuils de 180 et 300 crédits sont honorifiques : ils signalent que vous êtes " +
-                        "\"diplômé\" mais ne déterminent pas le gagnant."));
+        content.add(buildSection(bundle.getString("rules.section.victory.title"),
+                bundle.getString("rules.section.victory.text")));
 
         content.add(Box.createVerticalStrut(24));
 
@@ -189,13 +185,15 @@ public class RulesView extends JPanel {
         titleLabel.setForeground(ACCENT);
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        for (String line : description.split("\n")) {
+        String[] lines = description.split("\n");
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
             JLabel descLabel = new JLabel("<html><body style='width:680px'>" + line + "</body></html>");
             descLabel.setFont(new Font("Serif", Font.PLAIN, 14));
             descLabel.setForeground(TEXT);
             descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             descLabel.setBorder(new EmptyBorder(4, 0, 0, 0));
-            if (line.equals(description.split("\n")[0])) {
+            if (i == 0) {
                 panel.add(titleLabel);
                 panel.add(Box.createVerticalStrut(4));
             }
@@ -263,4 +261,23 @@ public class RulesView extends JPanel {
     }
 
     public void addBackListener(ActionListener l) { btnBack.addActionListener(l); }
+    @Override
+    public void onLocaleChange(Locale locale) {
+        this.currentLocale = locale;
+        this.bundle = ResourceBundle.getBundle("main.resources.strings", locale);
+
+        btnBack.setText(bundle.getString("rules.button.back"));
+
+        removeAll();
+        add(buildHeader(), BorderLayout.NORTH);
+        centerScrollHolder = new JPanel(new BorderLayout());
+        centerScrollHolder.setOpaque(false);
+        centerScrollHolder.add(buildScrollContent(), BorderLayout.CENTER);
+        add(centerScrollHolder, BorderLayout.CENTER);
+        add(buildFooter(), BorderLayout.SOUTH);
+
+        revalidate();
+        repaint();
+    }
+
 }

@@ -47,7 +47,7 @@ public class MenuView extends JPanel  implements LocaleChangeListener{
         btnStart = buildMenuButton("▶ "+bundle.getString("new_game"), true);
         btnSettings = buildMenuButton("⚙  "+bundle.getString("settings"), false);
         btnQuit = buildMenuButton("✕  "+bundle.getString("exit"), false);
-        btnRules = buildMenuButton("📖  RÈGLES DU JEU", false);
+        btnRules = buildMenuButton("📖  "+ bundle.getString("rules"), false);
 
         removeAll();
         add(buildCenterPanelWithButtons(), BorderLayout.CENTER);
@@ -183,7 +183,7 @@ public class MenuView extends JPanel  implements LocaleChangeListener{
         btnStart.setText("▶ " + newBundle.getString("new_game"));
         btnSettings.setText("⚙  " + newBundle.getString("settings"));
         btnQuit.setText("✕  " + newBundle.getString("exit"));
-        
+        btnRules.setText("📖  "+ newBundle.getString("rules"));
         if (taglineLabel != null) {
             taglineLabel.setText(newBundle.getString("tagline"));
         }

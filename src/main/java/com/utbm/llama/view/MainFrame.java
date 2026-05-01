@@ -152,9 +152,9 @@ public class MainFrame extends JFrame {
 
     }
 
-    public void showRules() {
+    public void showRules(MainFrame mainFrame) {
         if (rulesView == null) {
-            rulesView = new RulesView();
+            rulesView = new RulesView(mainFrame);
             contentPanel.add(rulesView, SCREEN_RULES);
 
             rulesView.addBackListener(e -> showMenu());
