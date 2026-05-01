@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="/home/Youssef/etudes/LP2A/LP2aprojecttest.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/Llama_java_LP2A/debug.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="Llama_java_LP2A/maingame.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/Llama_java_LP2A/debug.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" mainClassHandleIdentifier="=Llama_java_LP2A/src&lt;main.java.com.utbm.llama{Main.java[Main" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
