@@ -7,7 +7,7 @@ import main.java.com.utbm.llama.model.Move;
 import main.java.com.utbm.llama.model.Player;
 
 /**
- * Rule: DETEC BONUS
+ * Rule: DEUTEC BONUS
  * Context: END OF ROUND 4 rule, only in LONG mode.
  * Condition:
  * At the end of round 4 (LONG mode only),

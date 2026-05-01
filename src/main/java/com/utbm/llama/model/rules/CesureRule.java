@@ -5,27 +5,28 @@ import main.java.com.utbm.llama.model.Move;
 import main.java.com.utbm.llama.model.Player;
 
 /**
- * Règle : SEMESTRE DE CÉSURE
- * Contexte : règle de FIN DE MANCHE, après résolution du jury.
- * Condition :
- * Un joueur dont les crédits sont NÉGATIFS après le jury
- * est contraint au semestre de césure.
- * Effets du semestre de césure :
- * - Le joueur NE JOUE PAS la manche suivante
- * - Il reçoit quand même les +35 crédits du début de manche suivante
- * - Sa suspension est levée au début de la manche après
- * Cas particulier 1v1 :
- * Si les DEUX joueurs sont en césure, ils sautent TOUS LES DEUX la manche
- * et reçoivent quand même les 35 crédits chacun.
- * (Géré par Round.allPlayersSuspended() + BoardController)
- * Ordre dans la séquence de fin de manche :
+ * Rule: GAP SEMESTER
+ * Context: end-of-round rule, after jury resolution.
+ * Condition:
+ * A player whose credits are NEGATIVE after the jury
+ * is forced into a gap semester.
+ * Effects of the gap semester:
+ * - The player DOES NOT PLAY the next round
+ * - They still receive the +35 credits at the start of the next round
+ * - Their suspension is lifted at the start of the following round
+ * Special case 1v1:
+ * If BOTH players are in gap semester, they BOTH skip the round
+ * and still each receive the 35 credits.
+ * (Handled by Round.allPlayersSuspended() + BoardController)
+ * Order in the end-of-round sequence:
  * 1. deductHandPenalties()
- * 2. → JuryRule (si perte ≥ 20)
- * 3. → CesureRule ← s'applique si crédits < 0 après le jury
+ * 2. → JuryRule (if loss ≥ 20)
+ * 3. → GapSemesterRule ← applies if credits < 0 after the jury
  * 4. checkStudyAbroad()
  * 5. checkDetecBonus()
- * isApplicable() retourne false pendant le jeu (règle de fin de manche).
+ * isApplicable() returns false during play (end-of-round rule).
  */
+
 public class CesureRule implements Rule {
     /**
      * Determine if this rule should be triggered during standard gameplay turns.
